@@ -1,3 +1,6 @@
+
+# Start of template rc file.
+
 SHELLRC='~/.template_rc'
 
 if [ "$SHELL" = "/bin/bash" ]; then
