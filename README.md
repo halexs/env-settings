@@ -15,7 +15,7 @@ wget -P ~/ https://raw.githubusercontent.com/halexs/env-settings/master/.zshrc
 
 To dump alias into an existing `*rc` file. Do NOT run this command multiple times.
 ```bash
-curl -XGET https://raw.githubusercontent.com/halexs/env-settings/master/.bashrc >> ~/.bashrc && source ~/.bashrc
-curl -XGET https://raw.githubusercontent.com/halexs/env-settings/master/.bashrc >> ~/.bash_profile && source ~/.bash_profile
-curl -XGET https://raw.githubusercontent.com/halexs/env-settings/master/.bashrc >> ~/.zshrc && source ~/.zshrc
+curl -XGET https://raw.githubusercontent.com/halexs/env-settings/master/template_rc >> ~/.bashrc && source ~/.bashrc
+curl -XGET https://raw.githubusercontent.com/halexs/env-settings/master/template_rc >> ~/.bash_profile && source ~/.bash_profile
+curl -XGET https://raw.githubusercontent.com/halexs/env-settings/master/template_rc >> ~/.zshrc && source ~/.zshrc
 ```
