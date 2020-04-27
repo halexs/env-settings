@@ -1,7 +1,7 @@
-
+" Default command to make sure vim does not behave like vi
 set nocompatible
 
-"Search for cpp or use default
+"Search for cpp or use default, some languages need to be added (like typescript)
 syntax enable
 
 filetype plugin on
