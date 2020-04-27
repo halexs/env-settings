@@ -1,15 +1,18 @@
 
 # Start of template rc file.
 
+VIM=/usr/bin/vim
+EDITOR=$VIM/vim
+
 SHELLRC='~/.template_rc'
 
 if [ "$SHELL" = "/bin/bash" ]; then
-  SHELLRC='~/.bashrc'
+  SHELLRC=~/.bashrc
 elif [ "$SHELL" = "/bin/zsh" ]
-  SHELLRC='~/.zshrc'
+  SHELLRC=~/.zshrc
 # another if for bash_profile on macs
 else
-  SHELLRC='~/.bash_profile'
+  SHELLRC=~/.bash_profile
 fi
 
 add_dir () {
