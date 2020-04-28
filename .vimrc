@@ -1,10 +1,36 @@
 " Default command to make sure vim does not behave like vi
 set nocompatible
 
-"Search for cpp or use default, some languages need to be added (like typescript)
+"Search for cpp or use default
 syntax enable
 
 filetype plugin on
+
+" built in plugins for doing stuff
+set path+=**
+set wildmenu
+set wildignore+=**/node_modules/**
+
+" TAG JUMPING
+" command! MakeTags !ctags -R .
+command! MakeTags !/usr/local/bin/ctags -R .
+
+" FILE BROWSING
+"let g:netrw_banner=0        " disable banner
+let g:netrw_browse_split=4  " open in prior window
+let g:netrw_altv=1          " open splits to the right
+let g:netrw_liststyle=3      " tree view
+let g:netrw_list_hide=netrw_gitignore#Hide()
+let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
+
+" SNIPPETS
+" Read in and create a python main function
+nnoremap \python-main :read $HOME/.vim/templates/.python-main.template<CR>o<Tab>
+
+" THIS ALLOWS:
+" - :edit a folder to open file browser
+"   <CR>/v/t to open in an h-split/v-split/tab
+"   check |netrw-browse-maps| for more mappings
 
 set expandtab
 
@@ -57,10 +83,3 @@ set laststatus=2
 "set background=dark
 
 
-"  FINDING FILES:
-set path+=**
-set wildmenu
-
-" TAG JUMPING
-" command! MakeTags !ctags -R .
-command! MakeTags !/usr/local/bin/ctags -R .
