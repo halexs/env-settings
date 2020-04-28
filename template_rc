@@ -8,7 +8,7 @@ SHELLRC='~/.template_rc'
 
 if [ "$SHELL" = "/bin/bash" ]; then
   SHELLRC=~/.bashrc
-elif [ "$SHELL" = "/bin/zsh" ]
+elif [ "$SHELL" = "/bin/zsh" ]; then
   SHELLRC=~/.zshrc
 # another if for bash_profile on macs
 else
