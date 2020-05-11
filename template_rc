@@ -32,7 +32,7 @@ alias v-rc='vim $SHELLRC'
 
 # Source files to overcome terminal
 alias s-rc='source $SHELLRC'
-#alias spy3='source ~/Work/python_env/bin/activate'
+#alias s-py3='source ~/Work/python_env/bin/activate'
 
 #  cd alias are in format c-[first letter]
 #alias c-pl='cd /Users/ashsu/Work/playground'
@@ -42,7 +42,10 @@ alias s-rc='source $SHELLRC'
 # Other helpful commands
 alias dump_history='history >> ~/history.txt'
 alias dc='docker-compose'
+#alias tmux_init='tmux set -g prefix M-q'
 alias tmux_init='tmux set -g prefix C-a'
+alias dc-res='docker-compose down; docker-compose up -d'
+#alias fc='fc -e vim'
 
 # Helpful commands not portable to new installs.
 # alias quick_jup='docker run --rm --name jup -d -v ~/Work/playground/jupyter/data:/app/notebooks -p 20300:8888 [image name]'

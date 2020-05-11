@@ -1,6 +1,26 @@
 " Default command to make sure vim does not behave like vi
 set nocompatible
 
+inoremap jk <ESC>
+inoremap kj <ESC>
+"noremap xq <ESC>
+"nnoremap tq :rightbelow 20vs<CR>:e .<CR><C-w>r<CR>
+set mouse=a
+
+" tab key mapping. Does not work well in netrw, since `t` creates file in new
+" tab
+noremap <C-p> :tabp<cr>
+noremap <C-n> :tabn<cr>
+noremap tn :tabn<CR>
+noremap tp :tabp<CR>
+noremap th :tabn 1<CR>
+noremap t2 :tabn 2<CR>
+noremap t3 :tabn 3<CR>
+noremap t4 :tabn 4<CR>
+noremap t5 :tabn 5<CR>
+noremap t6 :tabn 6<CR>
+noremap tt :tablast<CR>
+
 "Search for cpp or use default
 syntax enable
 
@@ -25,7 +45,7 @@ let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
 
 " SNIPPETS
 " Read in and create a python main function
-nnoremap \python-main :read $HOME/.vim/templates/.python-main.template<CR>o<Tab>
+nnoremap \python-main :read $HOME/env-settings/templates/.python-main.template<CR>o<Tab>
 
 " THIS ALLOWS:
 " - :edit a folder to open file browser
