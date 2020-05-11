@@ -1,11 +1,24 @@
 " Default command to make sure vim does not behave like vi
 set nocompatible
 
+
+function! NetrwMapping()
+  noremap <buffer> <C-v> :call OpenToRight()<CR>
+  noremap <buffer> <C-h> :call OpenBelow()<CR>
+endfunction
+
+
+" SNIPPETS
+" Read in and create a python main function
+nnoremap \python-main :read $HOME/env-settings/templates/.python-main.template<CR>o<Tab>
+" Toggles netrw on the left side. Opens by default, toggle with
+" ctrl-e
+noremap <silent> <C-E> :call ToggleNetrw()<CR>
+
 inoremap jk <ESC>
 inoremap kj <ESC>
 "noremap xq <ESC>
 "nnoremap tq :rightbelow 20vs<CR>:e .<CR><C-w>r<CR>
-set mouse=a
 
 " tab key mapping. Does not work well in netrw, since `t` creates file in new
 " tab
@@ -42,10 +55,6 @@ let g:netrw_altv=1          " open splits to the right
 let g:netrw_liststyle=3      " tree view
 let g:netrw_list_hide=netrw_gitignore#Hide()
 let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
-
-" SNIPPETS
-" Read in and create a python main function
-nnoremap \python-main :read $HOME/env-settings/templates/.python-main.template<CR>o<Tab>
 
 " THIS ALLOWS:
 " - :edit a folder to open file browser
@@ -102,4 +111,50 @@ set laststatus=2
 
 "set background=dark
 
+" functions
+
+function! OpenToRight()
+  :normal v
+  let g:path=expand('%:p')
+  :q!
+  execute 'belowright vnew' g:path
+  :normal <C-l>
+endfunction
+
+function! OpenBelow()
+  :normal v
+  let g:path=expand('%:p')
+  :q!
+  execute 'belowright new' g:path
+  :normal <C-l>
+endfunction
+
+let g:NetrwIsOpen=0
+
+function! ToggleNetrw()
+  if g:NetrwIsOpen
+    let i = bufnr("$")
+    while (i >= 1)
+      if (getbufvar(i, "&filetype") == "netrw")
+        silent exe "bwipeout " . i
+      endif
+      let i-=1
+    endwhile
+    let g:NetrwIsOpen=0
+  else
+    let g:NetrwIsOpen=1
+    silent Lexplore
+    vertical resize 30
+  endif
+endfunction
+
+augroup ProjectDrawer
+  autocmd!
+  autocmd VimEnter * :call ToggleNetrw()
+augroup END
+
+augroup netrw_mapping
+    autocmd!
+    autocmd filetype netrw call NetrwMapping()
+augroup END
 
