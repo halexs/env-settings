@@ -1,6 +1,11 @@
 # env-settings
 This is generic environment settings for development.
 
+# How to Use
+run `git clone [repo]` in home directory, and run the `rc-import.sh` script.
+Generic imports will be done in repo, and will automatically be sourced.
+The following sections can still be done, but no longer necessary.
+
 .vimrc settings:
 ```bash
 wget -P ~/ https://raw.githubusercontent.com/halexs/env-settings/master/.vimrc
