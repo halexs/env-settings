@@ -3,7 +3,7 @@
 VIM=/usr/bin/vim
 EDITOR=$VIM/vim
 
-SHELLRC='~/.template_rc'
+SHELLRC='~/.bashrc'
 
 if [ "$SHELL" = "/bin/bash" ]; then
   SHELLRC=~/.bashrc
@@ -18,8 +18,9 @@ fi
 
 #  vim alias are v[description of file]
 alias v-ssh='vim ~/.ssh/config'
-alias v-vrc='vim -O ~/.vimrc ~/env-settings/.vimrc -c "call ToggleNetrw()"'
-alias v-rc='vim -O $SHELLRC ~/env-settings/template_rc -c "call ToggleNetrw()"'
+alias v-vrc='vim -O ~/env-settings/.vimrc ~/.vimrc -c "call ToggleNetrw()"'
+alias v-rc='vim -O ~/env-settings/template_rc $SHELLRC -c "call ToggleNetrw()"'
+alias vimf='vim -c "call ToggleNetrw()"'
 
 # Source files to overcome terminal
 alias s-rc='source $SHELLRC'
@@ -34,7 +35,7 @@ alias c-env='cd ~/env-settings'
 # Other helpful commands
 alias dump_history='history >> ~/history.txt'
 alias dc='docker-compose'
-alias tmux_init='tmux set -g prefix M-a'
+alias tmux_init='tmux set -g prefix M-a; tmux set -g mouse on'
 #alias tmux_init='tmux set -g prefix C-a'
 alias dc-res='docker-compose down; docker-compose up -d'
 #alias fc='fc -e vim'
