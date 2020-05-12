@@ -10,7 +10,7 @@ endfunction
 
 " SNIPPETS
 " Read in and create a python main function
-nnoremap \python-main :read $HOME/env-settings/templates/.python-main.template<CR>o<Tab>
+nnoremap \python-main :read $HOME/env-settings/templates/python-main.template<CR>o<Tab>
 " Toggles netrw on the left side. Opens by default, toggle with
 " ctrl-e
 noremap <silent> <C-E> :call ToggleNetrw()<CR>
@@ -36,6 +36,8 @@ noremap tt :tablast<CR>
 
 "Search for cpp or use default
 syntax enable
+
+set mouse=a
 
 filetype plugin on
 
