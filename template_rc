@@ -18,16 +18,16 @@ fi
 
 #  vim alias are v[description of file]
 alias v-ssh='vim ~/.ssh/config'
-alias v-vrc='vim -O ~/env-settings/.vimrc ~/.vimrc -c "call ToggleNetrw()"'
-alias v-rc='vim -O ~/env-settings/template_rc $SHELLRC -c "call ToggleNetrw()"'
-alias vimf='vim -c "call ToggleNetrw()"'
+alias v-vrc='vim -O $ENVSETTINGS/.vimrc ~/.vimrc'
+alias v-rc='vim -O $ENVSETTINGS/template_rc $SHELLRC'
+alias v-cd='vim -c "call ToggleNetrw()" .'
 
 # Source files to overcome terminal
 alias s-rc='source $SHELLRC'
 #alias s-py3='source ~/Work/python_env/bin/activate'
 
 # cd alias are in format c-[first letter]
-alias c-env='cd ~/env-settings'
+alias c-env='cd $ENVSETTINGS'
 #alias c-pl='cd /Users/ashsu/Work/playground'
 #alias c-jup='cd /Users/ashsu/Work/playground/jupyter'
 

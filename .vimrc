@@ -34,10 +34,16 @@ noremap t5 :tabn 5<CR>
 noremap t6 :tabn 6<CR>
 noremap tt :tablast<CR>
 
-"Search for cpp or use default
+" Highlight column 80
+set cc=80
+highlight ColorColumn guibg=lightgrey ctermbg=lightgrey
+
+" Search for cpp or use default
 syntax enable
 
 set mouse=a
+
+set pastetoggle=<F10>
 
 filetype plugin on
 
@@ -150,13 +156,22 @@ function! ToggleNetrw()
   endif
 endfunction
 
-augroup ProjectDrawer
-  autocmd!
-  autocmd VimEnter * :call ToggleNetrw()
-augroup END
+"fun! ProjectDrawer()
+"  if &ft ==# "netrw"
+"    call ToggleNetrw()
+"  endif
+"endfun
+
+"augroup ProjectDrawer
+"  autocmd!
+"  autocmd VimEnter * :call ToggleNetrw()
+"augroup END
 
 augroup netrw_mapping
-    autocmd!
-    autocmd filetype netrw call NetrwMapping()
+  autocmd!
+  autocmd filetype netrw call NetrwMapping()
+  "autocmd filetype netrw call ToggleNetrw()
+  "autocmd VimEnter * :call ProjectDrawer()
+  "autocmd VimEnter * :call ToggleNetrw()
 augroup END
 
