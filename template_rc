@@ -9,6 +9,7 @@ if [ "$SHELL" = "/bin/bash" ]; then
   SHELLRC=~/.bashrc
 elif [ "$SHELL" = "/bin/zsh" ]; then
   SHELLRC=~/.zshrc
+  path+=$ENVSETTINGS/scripts
 # another if for bash_profile on macs
 else
   SHELLRC=~/.bash_profile

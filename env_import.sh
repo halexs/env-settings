@@ -18,7 +18,6 @@ else
 fi
 
 ENVEXPORT="export ENVSETTINGS=$PWD"
-#echo $ENVEXPORT
 if ! grep -q "$ENVEXPORT" "$SHELLRC"; then
   echo $ENVEXPORT >> $SHELLRC
   echo 'export env-settings path'
@@ -33,6 +32,8 @@ if ! grep -q "$TEMPLATEVIMRC" ~/.vimrc; then
 else
   echo 'vimrc already sourced'
 fi
-#echo $ENVSETTINGS
-#echo $TEMPLATERC
-#echo $TEMPLATEVIMRC
+
+#ENVPATH="$ENVSETTINGS/scripts"
+#[[ ":$PATH:" != *":$ENVSETTINGS:"* ]] && PATH="${ENVPATH}:${PATH}" && echo "env scripts added to path"
+#export PATH
+
