@@ -1,20 +1,26 @@
-if [ "$SHELL" = "/bin/bash" ]; then
+#!/bin/bash
+
+if [[ "$SHELL" == *"/bash"* ]]; then
   SHELLRC=~/.bashrc
-elif [ "$SHELL" = "/bin/zsh" ]; then
+elif [[ "$SHELL" == *"/zsh"* ]]; then
   SHELLRC=~/.zshrc
 # another if for bash_profile on macs
 else
   SHELLRC=~/.bash_profile
 fi
 
+echo $SHELLRC
+#echo $SHELL
+
 export ENVSETTINGS=$PWD
 
 TEMPLATERC=". $ENVSETTINGS/template_rc"
 if ! grep -q "$TEMPLATERC" "$SHELLRC"; then
   echo $TEMPLATERC >> $SHELLRC
-  echo 'rc now importing templaterc'
+  echo "rc $SHELLRC now importing templaterc"
+  source $SHELLRC
 else
-  echo 'rc already sourced'
+  echo "rc $SHELLRC already sourced"
 fi
 
 ENVEXPORT="export ENVSETTINGS=$PWD"
