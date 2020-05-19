@@ -39,7 +39,9 @@ else
   echo 'vimrc already sourced'
 fi
 
-#ENVPATH="$ENVSETTINGS/scripts"
-#[[ ":$PATH:" != *":$ENVSETTINGS:"* ]] && PATH="${ENVPATH}:${PATH}" && echo "env scripts added to path"
+tmux source-file $ENVSETTINGS/tmux.conf
+
+ENVPATH="$ENVSETTINGS/scripts"
+[[ ":$PATH:" != *":$ENVSETTINGS:"* ]] && export PATH="${ENVPATH}:${PATH}" && echo "env scripts added to path"
 #export PATH
 
