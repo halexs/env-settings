@@ -1,6 +1,7 @@
 " Default command to make sure vim does not behave like vi
 set nocompatible
 
+" Plugin 'Chiel92/vim-autoformat'
 
 function! NetrwMapping()
   noremap <buffer> <C-v> :call OpenToRight()<CR>
@@ -73,6 +74,7 @@ set expandtab
 
 "Line Numbers
 set number
+set relativenumber
 
 "Tab Space
 set ts=4
