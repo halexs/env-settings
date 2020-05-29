@@ -49,7 +49,9 @@ else
 fi
 
 #tmux source-file $ENVSETTINGS/tmux.conf
+# can source tmux file from ~/.tmux.conf
 cp $ENVSETTINGS/tmux.conf ~/.tmux.conf
+cp $ENVSETTINGS/ctags ~/.ctags
 
 #export PATH
 
