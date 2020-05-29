@@ -19,7 +19,7 @@ fi
 
 #  vim alias are v[description of file]
 alias v-ssh='vim ~/.ssh/config'
-alias v-vrc='vim -O $ENVSETTINGS/.vimrc ~/.vimrc'
+alias v-vrc='vim -O $ENVSETTINGS/vimrc ~/.vimrc'
 alias v-rc='vim -O $ENVSETTINGS/template_rc $SHELLRC'
 alias v-cd='vim -c "call ToggleNetrw()" .'
 
@@ -59,7 +59,7 @@ add_dir () {
   source $SHELLRC
 }
 
-
-
-
 unset LESS
+
+
+

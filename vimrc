@@ -1,4 +1,23 @@
 " Default command to make sure vim does not behave like vi
+
+
+" SNIPPETS
+" Read in and create a python main function
+nnoremap \python-main :read $ENVSETTINGS/templates/python-main.template<CR>o<Tab>
+nnoremap \html-main :read $ENVSETTINGS/templates/html-main.template<CR>
+" Toggles netrw on the left side. Opens by default, toggle with
+" ctrl-e
+noremap <silent> <C-E> :call ToggleNetrw()<CR>
+
+" nnoremap <leader>ch vat:s/^\(.*\)$/<!-- \1 -->/
+
+" <html>
+"  help world
+" </html>
+
+" macros
+"let @c = 'vat:s/^\(.*\)$/<!-- \1 -->/:noh'
+
 set nocompatible
 " List of plugins... currently none
 " Plugin 'Chiel92/vim-autoformat'
@@ -50,21 +69,6 @@ function! NetrwMapping()
   noremap <buffer> <C-h> :call OpenBelow()<CR>
 endfunction
 
-" SNIPPETS
-" Read in and create a python main function
-nnoremap \python-main :read $HOME/env-settings/templates/python-main.template<CR>o<Tab>
-" Toggles netrw on the left side. Opens by default, toggle with
-" ctrl-e
-noremap <silent> <C-E> :call ToggleNetrw()<CR>
-
-" nnoremap <leader>ch vat:s/^\(.*\)$/<!-- \1 -->/
-
-" <html>
-"  help world
-" </html>
-
-" macros
-"let @c = 'vat:s/^\(.*\)$/<!-- \1 -->/:noh'
 
 "noremap xq <ESC>
 "nnoremap tq :rightbelow 20vs<CR>:e .<CR><C-w>r<CR>

@@ -12,7 +12,6 @@ fi
 echo $SHELLRC
 #echo $SHELL
 
-export ENVSETTINGS=$PWD
 
 TEMPLATERC=". $ENVSETTINGS/template_rc"
 if ! grep -q "$TEMPLATERC" "$SHELLRC"; then
@@ -31,7 +30,17 @@ else
   echo 'env-settings path already set'
 fi
 
-TEMPLATEVIMRC="source $ENVSETTINGS/.vimrc"
+PATHEXPORT='export PATH="${ENVSETTINGS}/scripts:${PATH}"'
+if ! grep -q "$PATHEXPORT" "$SHELLRC"; then
+  echo $PATHEXPORT >> $SHELLRC
+  echo 'export env-settings scripts path'
+else
+  echo 'env-settings scripts already in path'
+fi
+
+#[[ ":$PATH:" != *":$ENVSETTINGS:"* ]] && export PATH="${ENVPATH}:${PATH}" && echo "env scripts added to path"
+
+TEMPLATEVIMRC="source $ENVSETTINGS/vimrc"
 if ! grep -q "$TEMPLATEVIMRC" ~/.vimrc; then
   echo $TEMPLATEVIMRC >> ~/.vimrc
   echo 'vimrc now importing from git project'
@@ -39,9 +48,8 @@ else
   echo 'vimrc already sourced'
 fi
 
-tmux source-file $ENVSETTINGS/tmux.conf
+#tmux source-file $ENVSETTINGS/tmux.conf
+cp $ENVSETTINGS/tmux.conf ~/.tmux.conf
 
-ENVPATH="$ENVSETTINGS/scripts"
-[[ ":$PATH:" != *":$ENVSETTINGS:"* ]] && export PATH="${ENVPATH}:${PATH}" && echo "env scripts added to path"
 #export PATH
 
