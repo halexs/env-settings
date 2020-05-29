@@ -1,7 +1,42 @@
 " Default command to make sure vim does not behave like vi
 set nocompatible
-
+" List of plugins... currently none
 " Plugin 'Chiel92/vim-autoformat'
+
+
+"nnoremap <SPACE> <Nop>
+"let mapleader=" "
+map <SPACE> <leader>
+
+inoremap jk <ESC>
+inoremap kj <ESC>
+
+nmap <silent> <leader>wt :call MarkWindowSwap()<CR>
+nmap <silent> <leader>ws :call DoWindowSwap()<CR><C-w>h
+
+" Buffers
+noremap <leader>j :bn<cr>
+noremap <leader>k :bp<cr>
+noremap <leader>d :bd<cr> 
+
+" Tabs though this may not be necessary since gt and gT switches
+noremap <leader>l :tabn<CR>
+noremap <leader>h :tabp<CR>
+noremap <leader>t1 :tabn 1<CR>
+noremap <leader>t2 :tabn 2<CR>
+noremap <leader>t3 :tabn 3<CR>
+noremap <leader>t4 :tabn 4<CR>
+noremap <leader>t5 :tabn 5<CR>
+noremap <leader>t5 :tabn 6<CR>
+noremap <leader>t0 :tablast<CR>
+
+" Use ctrl-[elect the active split!
+nmap <silent> <c-k> :wincmd k<CR>
+nmap <silent> <c-j> :wincmd j<CR>
+nmap <silent> <c-h> :wincmd h<CR>
+nmap <silent> <c-l> :wincmd l<CR>
+
+
 
 function! NetrwMapping()
   noremap <buffer> <C-v> :call OpenToRight()<CR>
@@ -16,24 +51,22 @@ nnoremap \python-main :read $HOME/env-settings/templates/python-main.template<CR
 " ctrl-e
 noremap <silent> <C-E> :call ToggleNetrw()<CR>
 
-inoremap jk <ESC>
-inoremap kj <ESC>
 "noremap xq <ESC>
 "nnoremap tq :rightbelow 20vs<CR>:e .<CR><C-w>r<CR>
 
 " tab key mapping. Does not work well in netrw, since `t` creates file in new
 " tab
-noremap <C-p> :tabp<cr>
-noremap <C-n> :tabn<cr>
-noremap tn :tabn<CR>
-noremap tp :tabp<CR>
-noremap th :tabn 1<CR>
-noremap t2 :tabn 2<CR>
-noremap t3 :tabn 3<CR>
-noremap t4 :tabn 4<CR>
-noremap t5 :tabn 5<CR>
-noremap t6 :tabn 6<CR>
-noremap tt :tablast<CR>
+" noremap <C-p> :tabp<cr>
+" noremap <C-n> :tabn<cr>
+" noremap tn :tabn<CR>
+" noremap tp :tabp<CR>
+" noremap th :tabn 1<CR>
+" noremap t2 :tabn 2<CR>
+" noremap t3 :tabn 3<CR>
+" noremap t4 :tabn 4<CR>
+" noremap t5 :tabn 5<CR>
+" noremap t6 :tabn 6<CR>
+" noremap tt :tablast<CR>
 
 " Highlight column 80
 set cc=80
@@ -121,6 +154,8 @@ set laststatus=2
 
 "set background=dark
 
+set hidden
+
 " functions
 
 function! OpenToRight()
@@ -176,4 +211,25 @@ augroup netrw_mapping
   "autocmd VimEnter * :call ProjectDrawer()
   "autocmd VimEnter * :call ToggleNetrw()
 augroup END
+
+function! MarkWindowSwap()
+    let g:markedWinNum = winnr()
+endfunction
+
+function! DoWindowSwap()
+    "Mark destination
+    let curNum = winnr()
+    let curBuf = bufnr( "%" )
+    exe g:markedWinNum . "wincmd w"
+    "Switch to source and shuffle dest->source
+    let markedBuf = bufnr( "%" )
+    "Hide and open so that we aren't prompted and keep history
+    exe 'hide buf' curBuf
+    "Switch to dest and shuffle source->dest
+    exe curNum . "wincmd w"
+    "Hide and open so that we aren't prompted and keep history
+    exe 'hide buf' markedBuf 
+endfunction
+
+
 
