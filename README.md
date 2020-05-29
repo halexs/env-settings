@@ -2,9 +2,19 @@
 This is generic environment settings for development.
 
 # How to Use
-run `git clone [repo]` in home directory, and run the `rc-import.sh` script.
+run `git clone [repo]` in home directory, and run the 
+```bash
+./env_import.sh
+```
 Generic imports will be done in repo, and will automatically be sourced.
+
 The following sections can still be done, but no longer necessary.
+
+For ctags, need to run `./env_import.sh` script everytime. No idea how to source ctags.
+
+Current ctags work with typescript/angular.
+
+# OUTDATED
 
 .vimrc settings:
 ```bash
