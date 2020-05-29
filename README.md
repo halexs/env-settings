@@ -2,8 +2,10 @@
 This is generic environment settings for development.
 
 # How to Use
-run `git clone [repo]` in home directory, and run the 
+Run:
 ```bash
+git clone https://github.com/halexs/env-settings.git
+cd env-settings
 ./env_import.sh
 ```
 Generic imports will be done in repo, and will automatically be sourced.
