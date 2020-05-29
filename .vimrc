@@ -3,6 +3,13 @@ set nocompatible
 " List of plugins... currently none
 " Plugin 'Chiel92/vim-autoformat'
 
+"Tab Space
+"set ts=4
+set ts=2
+
+"Shift Space
+"set sw=4
+set sw=2
 
 "nnoremap <SPACE> <Nop>
 "let mapleader=" "
@@ -11,8 +18,8 @@ map <SPACE> <leader>
 inoremap jk <ESC>
 inoremap kj <ESC>
 
-nmap <silent> <leader>wt :call MarkWindowSwap()<CR>
-nmap <silent> <leader>ws :call DoWindowSwap()<CR><C-w>h
+nmap <silent> <leader>ws :call MarkWindowSwap()<CR>
+nmap <silent> <leader>wt :call DoWindowSwap()<CR><C-w>h
 
 " Buffers
 noremap <leader>j :bn<cr>
@@ -43,13 +50,21 @@ function! NetrwMapping()
   noremap <buffer> <C-h> :call OpenBelow()<CR>
 endfunction
 
-
 " SNIPPETS
 " Read in and create a python main function
 nnoremap \python-main :read $HOME/env-settings/templates/python-main.template<CR>o<Tab>
 " Toggles netrw on the left side. Opens by default, toggle with
 " ctrl-e
 noremap <silent> <C-E> :call ToggleNetrw()<CR>
+
+" nnoremap <leader>ch vat:s/^\(.*\)$/<!-- \1 -->/
+
+" <html>
+"  help world
+" </html>
+
+" macros
+"let @c = 'vat:s/^\(.*\)$/<!-- \1 -->/:noh'
 
 "noremap xq <ESC>
 "nnoremap tq :rightbelow 20vs<CR>:e .<CR><C-w>r<CR>
@@ -109,11 +124,6 @@ set expandtab
 set number
 set relativenumber
 
-"Tab Space
-set ts=4
-
-"Shift Space
-set sw=4
 
 "Wrapping
 set wrap
