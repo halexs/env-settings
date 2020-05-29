@@ -12,10 +12,9 @@ fi
 echo $SHELLRC
 #echo $SHELL
 
-
-TEMPLATERC=". $ENVSETTINGS/template_rc"
-if ! grep -q "$TEMPLATERC" "$SHELLRC"; then
-  echo $TEMPLATERC >> $SHELLRC
+SOURCE_TEMPLATERC=". $ENVSETTINGS/template_rc"
+if ! grep -q "$SOURCE_TEMPLATERC" "$SHELLRC"; then
+  echo $SOURCE_TEMPLATERC >> $SHELLRC
   echo "rc $SHELLRC now importing templaterc"
   source $SHELLRC
 else
@@ -40,9 +39,9 @@ fi
 
 #[[ ":$PATH:" != *":$ENVSETTINGS:"* ]] && export PATH="${ENVPATH}:${PATH}" && echo "env scripts added to path"
 
-TEMPLATEVIMRC="source $ENVSETTINGS/vimrc"
-if ! grep -q "$TEMPLATEVIMRC" ~/.vimrc; then
-  echo $TEMPLATEVIMRC >> ~/.vimrc
+SOURCE_VIMRC="source $ENVSETTINGS/vimrc"
+if ! grep -q "$SOURCE_VIMRC" ~/.vimrc; then
+  echo $SOURCE_VIMRC >> ~/.vimrc
   echo 'vimrc now importing from git project'
 else
   echo 'vimrc already sourced'
@@ -50,7 +49,15 @@ fi
 
 #tmux source-file $ENVSETTINGS/tmux.conf
 # can source tmux file from ~/.tmux.conf
-cp $ENVSETTINGS/tmux.conf ~/.tmux.conf
+SOURCE_TMUX="source-file $ENVSETTINGS/tmux.conf"
+#cp $ENVSETTINGS/tmux.conf ~/.tmux.conf
+if ! grep -q "$SOURCE_TMUX" ~/.tmux.conf; then
+  echo $SOURCE_TMUX >> ~/.tmux.conf
+  echo 'tmux now importing from git project'
+else
+  echo 'tmux already sourced'
+fi
+
 cp $ENVSETTINGS/ctags ~/.ctags
 
 #export PATH
