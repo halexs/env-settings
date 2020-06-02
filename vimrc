@@ -7,7 +7,6 @@ nnoremap \python-main :read $ENVSETTINGS/templates/python-main.template<CR>o<Tab
 nnoremap \html-main :read $ENVSETTINGS/templates/html-main.template<CR>
 " Toggles netrw on the left side. Opens by default, toggle with
 " ctrl-e
-noremap <silent> <C-E> :call ToggleNetrw()<CR>
 
 " nnoremap <leader>ch vat:s/^\(.*\)$/<!-- \1 -->/
 
@@ -40,14 +39,16 @@ inoremap kj <ESC>
 nmap <silent> <leader>ws :call MarkWindowSwap()<CR>
 nmap <silent> <leader>wt :call DoWindowSwap()<CR><C-w>h
 
+noremap <leader>e :call ToggleNetrw()<CR>
+
 " Buffers
-noremap <leader>j :bn<cr>
-noremap <leader>k :bp<cr>
+noremap <leader>i :bn<cr>
+noremap <leader>o :bp<cr>
 noremap <leader>d :bd<cr> 
 
 " Tabs though this may not be necessary since gt and gT switches
-noremap <leader>l :tabn<CR>
-noremap <leader>h :tabp<CR>
+noremap <leader>p :tabn<CR>
+noremap <leader>u :tabp<CR>
 noremap <leader>t1 :tabn 1<CR>
 noremap <leader>t2 :tabn 2<CR>
 noremap <leader>t3 :tabn 3<CR>
@@ -57,16 +58,29 @@ noremap <leader>t5 :tabn 6<CR>
 noremap <leader>t0 :tablast<CR>
 
 " Use ctrl-[elect the active split!
-nmap <silent> <c-k> :wincmd k<CR>
-nmap <silent> <c-j> :wincmd j<CR>
-nmap <silent> <c-h> :wincmd h<CR>
-nmap <silent> <c-l> :wincmd l<CR>
+"noremap <c-k> :wincmd k<CR>
+"noremap <c-j> :wincmd j<CR>
+"noremap <c-h> :wincmd h<CR>
+"noremap <c-l> :wincmd l<CR>
+noremap <leader>k :wincmd k<CR>
+noremap <leader>j :wincmd j<CR>
+noremap <leader>h :wincmd h<CR>
+noremap <leader>l :wincmd l<CR>
 
 
 
 function! NetrwMapping()
   noremap <buffer> <C-v> :call OpenToRight()<CR>
   noremap <buffer> <C-h> :call OpenBelow()<CR>
+"  noremap <leader>j :bn<cr>
+"  noremap <leader>k :bp<cr>
+"  noremap <leader>d :bd<cr> 
+"  noremap <leader>l :tabn<CR>
+"  noremap <leader>h :tabp<CR>
+"  noremap <c-k> :wincmd k<CR>
+"  noremap <c-j> :wincmd j<CR>
+"  noremap <c-h> :wincmd h<CR>
+"  noremap <c-l> :wincmd l<CR>
 endfunction
 
 
@@ -111,7 +125,7 @@ command! MakeTags !/usr/local/bin/ctags -R .
 
 " FILE BROWSING
 "let g:netrw_banner=0        " disable banner
-let g:netrw_browse_split=4  " open in prior window
+"let g:netrw_browse_split=4  " open in prior window
 let g:netrw_altv=1          " open splits to the right
 let g:netrw_liststyle=3      " tree view
 let g:netrw_list_hide=netrw_gitignore#Hide()
@@ -191,20 +205,22 @@ endfunction
 let g:NetrwIsOpen=0
 
 function! ToggleNetrw()
-  if g:NetrwIsOpen
-    let i = bufnr("$")
-    while (i >= 1)
-      if (getbufvar(i, "&filetype") == "netrw")
-        silent exe "bwipeout " . i
-      endif
-      let i-=1
-    endwhile
-    let g:NetrwIsOpen=0
-  else
-    let g:NetrwIsOpen=1
-    silent Lexplore
-    vertical resize 30
-  endif
+  silent Lexplore
+  vertical resize 30
+  "if g:NetrwIsOpen
+  "  let i = bufnr("$")
+  "  while (i >= 1)
+  "    if (getbufvar(i, "&filetype") == "netrw")
+  "      silent exe "bwipeout " . i
+  "    endif
+  "    let i-=1
+  "  endwhile
+  "  let g:NetrwIsOpen=0
+  "else
+  "  let g:NetrwIsOpen=1
+  "  silent Lexplore
+  "  vertical resize 30
+  "endif
 endfunction
 
 "fun! ProjectDrawer()
