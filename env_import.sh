@@ -12,6 +12,8 @@ fi
 echo $SHELLRC
 #echo $SHELL
 
+ENVSETTINGS=$PWD
+
 SOURCE_TEMPLATERC=". $ENVSETTINGS/template_rc"
 if ! grep -q "$SOURCE_TEMPLATERC" "$SHELLRC"; then
   echo $SOURCE_TEMPLATERC >> $SHELLRC
@@ -58,7 +60,8 @@ else
   echo 'tmux already sourced'
 fi
 
-cp $ENVSETTINGS/ctags ~/.ctags
+#cp $ENVSETTINGS/ctags ~/.ctags
 
 #export PATH
-
+#source $SHELLRC
+#echo $SHELLRC
