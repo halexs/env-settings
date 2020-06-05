@@ -5,6 +5,13 @@
 " Read in and create a python main function
 nnoremap \python-main :read $ENVSETTINGS/templates/python-main.template<CR>o<Tab>
 nnoremap \html-main :read $ENVSETTINGS/templates/html-main.template<CR>
+
+inoremap {<CR> {<CR>}<C-o><S-o>
+inoremap {<Tab> {}<Left>
+inoremap [<Tab> []<Left>
+inoremap (<Tab> ()<Left>
+inoremap '<Tab> ''<Left>
+inoremap "<Tab> ""<Left>
 " Toggles netrw on the left side. Opens by default, toggle with
 " ctrl-e
 
@@ -111,6 +118,7 @@ syntax enable
 set mouse=a
 
 set pastetoggle=<F10>
+" set pastetoggle=<M-p>
 
 filetype plugin on
 
@@ -128,7 +136,7 @@ command! MakeTags !/usr/local/bin/ctags -R .
 "let g:netrw_browse_split=4  " open in prior window
 let g:netrw_altv=1          " open splits to the right
 let g:netrw_liststyle=3      " tree view
-"let g:netrw_list_hide=netrw_gitignore#Hide()
+let g:netrw_list_hide=netrw_gitignore#Hide()
 let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
 
 " THIS ALLOWS:
@@ -181,6 +189,8 @@ set smartcase
 set laststatus=2
 
 "set background=dark
+
+set smartindent
 
 set hidden
 
