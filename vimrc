@@ -1,10 +1,23 @@
 " Default command to make sure vim does not behave like vi
 
+map <SPACE> <leader>
 
 " SNIPPETS
 " Read in and create a python main function
 nnoremap \python-main :read $ENVSETTINGS/templates/python-main.template<CR>o<Tab>
 nnoremap \html-main :read $ENVSETTINGS/templates/html-main.template<CR>
+
+" remap file save, file save+quit, and quit-all
+nnoremap <leader>s :w<CR>
+nnoremap <leader>x :x<CR>
+nnoremap <leader>q :qa<CR>
+" nnoremap <leader>qa :qa<CR>
+nnoremap <leader>r :source ~/.vimrc<CR>
+
+"nnoremap <C-e> 3<C-e>
+"nnoremap <C-E> 3<C-y>
+nnoremap <leader>] 10<C-e>
+nnoremap <leader>[ 10<C-y>
 
 inoremap {<CR> {<CR>}<C-o><S-o>
 inoremap {<Tab> {}<Left>
@@ -12,33 +25,8 @@ inoremap [<Tab> []<Left>
 inoremap (<Tab> ()<Left>
 inoremap '<Tab> ''<Left>
 inoremap "<Tab> ""<Left>
-" Toggles netrw on the left side. Opens by default, toggle with
-" ctrl-e
-
-" nnoremap <leader>ch vat:s/^\(.*\)$/<!-- \1 -->/
-
-" <html>
-"  help world
-" </html>
-
-" macros
-"let @c = 'vat:s/^\(.*\)$/<!-- \1 -->/:noh'
-
-set nocompatible
-" List of plugins... currently none
-" Plugin 'Chiel92/vim-autoformat'
-
-"Tab Space
-"set ts=4
-set ts=2
-
-"Shift Space
-"set sw=4
-set sw=2
-
 "nnoremap <SPACE> <Nop>
 "let mapleader=" "
-map <SPACE> <leader>
 
 inoremap jk <ESC>
 inoremap kj <ESC>
@@ -107,6 +95,29 @@ endfunction
 " noremap t5 :tabn 5<CR>
 " noremap t6 :tabn 6<CR>
 " noremap tt :tablast<CR>
+
+" Toggles netrw on the left side. Opens by default, toggle with
+" ctrl-e
+
+" nnoremap <leader>ch vat:s/^\(.*\)$/<!-- \1 -->/
+" <html>
+"  help world
+" </html>
+
+" macros
+"let @c = 'vat:s/^\(.*\)$/<!-- \1 -->/:noh'
+
+set nocompatible
+" List of plugins... currently none
+" Plugin 'Chiel92/vim-autoformat'
+
+"Tab Space
+"set ts=4
+set ts=2
+
+"Shift Space
+"set sw=4
+set sw=2
 
 " Highlight column 80
 set cc=80
