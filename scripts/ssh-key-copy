@@ -1,0 +1,41 @@
+#!/bin/sh
+
+key=$1 #can either be private or pub key
+user=$2
+host=$3
+
+echo $host
+echo $key
+
+fail=false
+
+if [ -z "$key" ]
+  then
+    echo "Need to specify key"
+    fail=true
+fi
+
+if [ -z "$user" ]
+  then
+    echo "Need to specify user"
+    fail=true
+fi
+
+if [ -z "$host" ]
+  then
+    echo "Need to specify host"
+    fail=true
+fi
+
+
+if [ "$fail" == true ] ; then
+  exit 1
+fi
+
+#check if key has .pub at the end. For now, make that in assumption.
+
+comm="cat ${key} | ssh ${user}@${host} \"mkdir -p ~/.ssh/ && cat >> ~/.ssh/authorized_keys\""
+echo $comm
+
+eval $comm
+
