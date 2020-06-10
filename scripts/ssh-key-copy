@@ -1,8 +1,10 @@
 #!/bin/sh
 
+# only private key for now
 key=$1 #can either be private or pub key
 user=$2
 host=$3
+sshname=$4
 
 echo $host
 echo $key
@@ -27,6 +29,10 @@ if [ -z "$host" ]
     fail=true
 fi
 
+if [ -z "$sshname" ]
+  then
+    sshname=$host
+fi
 
 if [ "$fail" == true ] ; then
   exit 1
@@ -34,8 +40,18 @@ fi
 
 #check if key has .pub at the end. For now, make that in assumption.
 
-comm="cat ${key} | ssh ${user}@${host} \"mkdir -p ~/.ssh/ && cat >> ~/.ssh/authorized_keys\""
+comm="cat ${key}.pub | ssh ${user}@${host} \"mkdir -p ~/.ssh/ && cat >> ~/.ssh/authorized_keys\""
 echo $comm
 
 eval $comm
+
+# Add to ~/.ssh/config file
+config_string="\nhost $sshname\n
+\t\thostname $host\n
+\t\tIdentityFile $key\n
+\t\tuser $user\n
+\t\tforwardx11 yes
+"
+echo $config_string
+echo $config_string >> ~/.ssh/config
 
