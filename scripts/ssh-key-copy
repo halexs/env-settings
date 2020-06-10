@@ -1,48 +1,44 @@
 #!/bin/sh
 
 # only private key for now
-key=$1 #can either be private or pub key
-user=$2
-host=$3
-sshname=$4
+fail=0
 
-echo $host
-echo $key
+check_input() {
+  var=$1
+  data=$2
+  if [ -z "$data" ]
+    then
+      echo "Need to specify $var"
+      read -p "$var: " data
+      if [ -z "$data" ]
+        then
+          fail=1
+      fi
+  fi
+  eval "$var=$data"
+}
 
-fail=false
+check_input "key" $1
+check_input "user" $2
+check_input "host" $3
 
-if [ -z "$key" ]
-  then
-    echo "Need to specify key"
-    fail=true
-fi
-
-if [ -z "$user" ]
-  then
-    echo "Need to specify user"
-    fail=true
-fi
-
-if [ -z "$host" ]
-  then
-    echo "Need to specify host"
-    fail=true
-fi
-
+echo "Specify host nick-name, use host if not supplied"
+read -p '(optional) sshname: ' sshname
 if [ -z "$sshname" ]
-  then
-    sshname=$host
+then
+  sshname=$host
 fi
 
-if [ "$fail" == true ] ; then
+if [ "$fail" == 1 ] ; then
+  echo "exiting script"
   exit 1
 fi
+
 
 #check if key has .pub at the end. For now, make that in assumption.
 
 comm="cat ${key}.pub | ssh ${user}@${host} \"mkdir -p ~/.ssh/ && cat >> ~/.ssh/authorized_keys\""
 echo $comm
-
 eval $comm
 
 # Add to ~/.ssh/config file
@@ -52,6 +48,6 @@ config_string="\nhost $sshname\n
 \t\tuser $user\n
 \t\tforwardx11 yes
 "
-echo $config_string
+#echo $config_string
 echo $config_string >> ~/.ssh/config
 
