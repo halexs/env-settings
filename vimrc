@@ -2,20 +2,33 @@
 
 map <SPACE> <leader>
 
+" mf files, ma, then `argdo open` to open in buffers. How to automate?
+
+
 " SNIPPETS
 " Read in and create a python main function
 nnoremap \python-main :read $ENVSETTINGS/templates/python-main.template<CR>o<Tab>
 nnoremap \html-main :read $ENVSETTINGS/templates/html-main.template<CR>
 
+" set pastetoggle=<leader>9
+" set pastetoggle=<F10>
+" noremap <leader>9 :set pastetoggle<CR>
+noremap <leader>9 :set paste!<CR>
+noremap <leader>8 :noh<cr>
+ 
 " remap file save, file save+quit, and quit-all
-nnoremap <leader>s :w<CR>
-nnoremap <leader>x :x<CR>
+nnoremap <C-S> :update<CR>
+nnoremap <C-x> :x<CR>
+" nnoremap <C-q> :qa<CR>
+
+" nnoremap <leader>s :w<CR>
+" nnoremap <leader>x :x<CR>
 nnoremap <leader>q :qa<CR>
 " nnoremap <leader>qa :qa<CR>
 nnoremap <leader>r :source ~/.vimrc<CR>
 
-"nnoremap <C-e> 3<C-e>
-"nnoremap <C-E> 3<C-y>
+nnoremap <C-e> 3<C-e>
+nnoremap <C-y> 3<C-y>
 nnoremap <leader>] 10<C-e>
 nnoremap <leader>[ 10<C-y>
 
@@ -28,8 +41,10 @@ inoremap "<Tab> ""<Left>
 "nnoremap <SPACE> <Nop>
 "let mapleader=" "
 
-inoremap jk <ESC>
-inoremap kj <ESC>
+"inoremap jk <ESC>
+"inoremap kj <ESC>
+inoremap ;' <ESC>
+inoremap '; <ESC>
 
 nmap <silent> <leader>ws :call MarkWindowSwap()<CR>
 nmap <silent> <leader>wt :call DoWindowSwap()<CR><C-w>h
@@ -37,20 +52,20 @@ nmap <silent> <leader>wt :call DoWindowSwap()<CR><C-w>h
 noremap <leader>e :call ToggleNetrw()<CR>
 
 " Buffers
-noremap <leader>i :bn<cr>
-noremap <leader>o :bp<cr>
-noremap <leader>d :bd<cr> 
+nnoremap <leader>i :bn<cr>
+nnoremap <leader>o :bp<cr>
+nnoremap <leader>d :bd<cr> 
 
 " Tabs though this may not be necessary since gt and gT switches
-noremap <leader>p :tabn<CR>
-noremap <leader>u :tabp<CR>
-noremap <leader>t1 :tabn 1<CR>
-noremap <leader>t2 :tabn 2<CR>
-noremap <leader>t3 :tabn 3<CR>
-noremap <leader>t4 :tabn 4<CR>
-noremap <leader>t5 :tabn 5<CR>
-noremap <leader>t5 :tabn 6<CR>
-noremap <leader>t0 :tablast<CR>
+nnoremap <leader>p :tabn<CR>
+nnoremap <leader>u :tabp<CR>
+nnoremap <leader>t1 :tabn 1<CR>
+nnoremap <leader>t2 :tabn 2<CR>
+nnoremap <leader>t3 :tabn 3<CR>
+nnoremap <leader>t4 :tabn 4<CR>
+nnoremap <leader>t5 :tabn 5<CR>
+nnoremap <leader>t5 :tabn 6<CR>
+nnoremap <leader>t0 :tablast<CR>
 
 " Use ctrl-[elect the active split!
 "noremap <c-k> :wincmd k<CR>
@@ -128,7 +143,7 @@ syntax enable
 
 set mouse=a
 
-set pastetoggle=<F10>
+" set pastetoggle=<F10>
 " set pastetoggle=<M-p>
 
 filetype plugin on

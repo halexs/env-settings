@@ -7,6 +7,15 @@ SHELLRC='~/.bashrc'
 
 if [ "$SHELL" = "/bin/bash" ]; then
   SHELLRC=~/.bashrc
+  stty -ixon
+  #vim()
+  #{
+  #    # osx users, use stty -g
+  #    local STTYOPTS="$(stty --save)"
+  #    stty stop '' -ixoff
+  #    command vim "$@"
+  #    stty "$STTYOPTS"
+  #}
 elif [ "$SHELL" = "/bin/zsh" ]; then
   SHELLRC=~/.zshrc
   path+=$ENVSETTINGS/scripts
@@ -15,6 +24,7 @@ elif [ "$SHELL" = "/bin/zsh" ]; then
   zle -N edit-command-line
   # bindkey '^xe' edit-command-line
   bindkey '^x^e' edit-command-line
+  alias vim="stty stop '' -ixoff ; vim"
 
 # another if for bash_profile on macs
 else
@@ -23,7 +33,10 @@ fi
 
 # Custom commands
 
-#  vim alias are v[description of file]
+#zsh
+# `Frozing' tty, so after any command terminal settings will be restored
+ttyctl -f
+
 alias v-ssh='vim ~/.ssh/config'
 alias v-vrc='vim -O $ENVSETTINGS/vimrc ~/.vimrc'
 alias v-rc='vim -O $ENVSETTINGS/template_rc $SHELLRC'
