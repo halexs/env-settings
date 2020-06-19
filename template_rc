@@ -37,6 +37,7 @@ fi
 # `Frozing' tty, so after any command terminal settings will be restored
 ttyctl -f
 
+alias v-notes='vim ~/notes'
 alias v-ssh='vim ~/.ssh/config'
 alias v-vrc='vim -O $ENVSETTINGS/vimrc ~/.vimrc'
 alias v-rc='vim -O $ENVSETTINGS/template_rc $SHELLRC'

@@ -37,7 +37,7 @@ fi
 
 #check if key has .pub at the end. For now, make that in assumption.
 
-comm="cat ${key}.pub | ssh ${user}@${host} \"mkdir -p ~/.ssh/ && cat >> ~/.ssh/authorized_keys\""
+comm="cat ${key}.pub | ssh ${user}@${host} \"mkdir -p ~/.ssh/ && chmod 700 ~/.ssh && cat >> ~/.ssh/authorized_keys ** chmod 600 ~/.ssh/authorized_keys\""
 echo $comm
 eval $comm
 

@@ -9,12 +9,19 @@ map <SPACE> <leader>
 " Read in and create a python main function
 nnoremap \python-main :read $ENVSETTINGS/templates/python-main.template<CR>o<Tab>
 nnoremap \html-main :read $ENVSETTINGS/templates/html-main.template<CR>
+" For local replace
+nnoremap gr gd[{V%::s/<C-R>///gc<left><left><left>
+
+" For global replace
+" nnoremap gR gD:%s/<C-R>///gc<left><left><left>
 
 " set pastetoggle=<leader>9
 " set pastetoggle=<F10>
 " noremap <leader>9 :set pastetoggle<CR>
+
+noremap <leader>7 :set smartindent!<CR>
+noremap <leader>8 :noh<CR>
 noremap <leader>9 :set paste!<CR>
-noremap <leader>8 :noh<cr>
  
 " remap file save, file save+quit, and quit-all
 nnoremap <C-S> :update<CR>
@@ -43,8 +50,9 @@ inoremap "<Tab> ""<Left>
 
 "inoremap jk <ESC>
 "inoremap kj <ESC>
-inoremap ;' <ESC>
-inoremap '; <ESC>
+" inoremap ;<space> <ESC>
+" inoremap <Space>; <ESC>
+inoremap '/ <ESC>
 
 nmap <silent> <leader>ws :call MarkWindowSwap()<CR>
 nmap <silent> <leader>wt :call DoWindowSwap()<CR><C-w>h
@@ -72,16 +80,18 @@ nnoremap <leader>t0 :tablast<CR>
 "noremap <c-j> :wincmd j<CR>
 "noremap <c-h> :wincmd h<CR>
 "noremap <c-l> :wincmd l<CR>
-noremap <leader>k :wincmd k<CR>
-noremap <leader>j :wincmd j<CR>
-noremap <leader>h :wincmd h<CR>
-noremap <leader>l :wincmd l<CR>
+noremap <silent> <leader>k :wincmd k<CR>
+noremap <silent> <leader>j :wincmd j<CR>
+noremap <silent> <leader>h :wincmd h<CR>
+noremap <silent> <leader>l :wincmd l<CR>
 
 
 
 function! NetrwMapping()
   noremap <buffer> <C-v> :call OpenToRight()<CR>
   noremap <buffer> <C-h> :call OpenBelow()<CR>
+"  set number
+"  set relativenumber
 "  noremap <leader>j :bn<cr>
 "  noremap <leader>k :bp<cr>
 "  noremap <leader>d :bd<cr> 
@@ -164,6 +174,7 @@ let g:netrw_altv=1          " open splits to the right
 let g:netrw_liststyle=3      " tree view
 let g:netrw_list_hide=netrw_gitignore#Hide()
 let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
+let g:netrw_bufsettings = 'noma nomod nu nobl nowrap ro'
 
 " THIS ALLOWS:
 " - :edit a folder to open file browser
@@ -208,6 +219,8 @@ set hlsearch
 "Set ignore Case when Searching
 set ignorecase
 
+set smartindent
+
 "Smart Casing when searching
 set smartcase
 
@@ -216,7 +229,6 @@ set laststatus=2
 
 "set background=dark
 
-set smartindent
 
 set hidden
 
