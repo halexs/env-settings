@@ -23,6 +23,9 @@ noremap <leader>7 :set smartindent!<CR>
 noremap <leader>8 :noh<CR>
 noremap <leader>9 :set paste!<CR>
  
+inoremap <C-e> <C-o>$
+inoremap <C-a> <C-o>0
+
 " remap file save, file save+quit, and quit-all
 nnoremap <C-S> :update<CR>
 nnoremap <C-x> :x<CR>

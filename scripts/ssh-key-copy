@@ -18,9 +18,18 @@ check_input() {
   eval "$var=$data"
 }
 
-check_input "key" $1
-check_input "user" $2
-check_input "host" $3
+while getopts "i:u:h:" opt; do
+  case $opt in
+    i) key=$OPTARG;;
+    u) user=$OPTARG;;
+    h) host=$OPTARG;;
+  esac
+done
+
+
+check_input "key" $key
+check_input "user" $user
+check_input "host" $host
 
 echo "Specify host nick-name, use host if not supplied"
 read -p '(optional) sshname: ' sshname
@@ -37,7 +46,7 @@ fi
 
 #check if key has .pub at the end. For now, make that in assumption.
 
-comm="cat ${key}.pub | ssh ${user}@${host} \"mkdir -p ~/.ssh/ && chmod 700 ~/.ssh && cat >> ~/.ssh/authorized_keys ** chmod 600 ~/.ssh/authorized_keys\""
+comm="cat ${key}.pub | ssh ${user}@${host} \"mkdir -p ~/.ssh/ && chmod 700 ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys\""
 echo $comm
 eval $comm
 
