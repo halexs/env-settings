@@ -48,6 +48,7 @@ inoremap [<Tab> []<Left>
 inoremap (<Tab> ()<Left>
 inoremap '<Tab> ''<Left>
 inoremap "<Tab> ""<Left>
+inoremap :<CR> :<CR><Tab>
 "nnoremap <SPACE> <Nop>
 "let mapleader=" "
 
@@ -56,6 +57,7 @@ inoremap "<Tab> ""<Left>
 " inoremap ;<space> <ESC>
 " inoremap <Space>; <ESC>
 inoremap '/ <ESC>
+inoremap <C-l> <ESC>
 
 nmap <silent> <leader>ws :call MarkWindowSwap()<CR>
 nmap <silent> <leader>wt :call DoWindowSwap()<CR><C-w>h
@@ -78,7 +80,7 @@ nnoremap <leader>t5 :tabn 5<CR>
 nnoremap <leader>t5 :tabn 6<CR>
 nnoremap <leader>t0 :tablast<CR>
 
-" Use ctrl-[elect the active split!
+" Use ctrl-[select] the active split!
 "noremap <c-k> :wincmd k<CR>
 "noremap <c-j> :wincmd j<CR>
 "noremap <c-h> :wincmd h<CR>
@@ -87,6 +89,10 @@ noremap <silent> <leader>k :wincmd k<CR>
 noremap <silent> <leader>j :wincmd j<CR>
 noremap <silent> <leader>h :wincmd h<CR>
 noremap <silent> <leader>l :wincmd l<CR>
+" inoremap <C-k> <C-o>:wincmd k<CR>
+" inoremap <C-j> <C-o>:wincmd j<CR>
+" inoremap <C-h> <C-o>:wincmd h<CR>
+" inoremap <C-l> <C-o>:wincmd l<CR>
 
 
 
