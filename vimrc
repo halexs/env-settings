@@ -19,14 +19,18 @@ nnoremap gr gd[{V%::s/<C-R>///gc<left><left><left>
 " set pastetoggle=<F10>
 " noremap <leader>9 :set pastetoggle<CR>
 
+noremap <leader>5 :call Lines()<CR>
+noremap <leader>6 :call Notes()<CR>
 noremap <leader>7 :set smartindent!<CR>
 noremap <leader>8 :noh<CR>
 noremap <leader>9 :set paste!<CR>
- 
+
+noremap <CR> o<Esc>k
 inoremap <C-e> <C-o>$
 inoremap <C-a> <C-o>0
 
 " remap file save, file save+quit, and quit-all
+inoremap <C-S> <ESC>:update<CR>a
 nnoremap <C-S> :update<CR>
 nnoremap <C-x> :x<CR>
 " nnoremap <C-q> :qa<CR>
@@ -48,7 +52,7 @@ inoremap [<Tab> []<Left>
 inoremap (<Tab> ()<Left>
 inoremap '<Tab> ''<Left>
 inoremap "<Tab> ""<Left>
-inoremap :<CR> :<CR><Tab>
+" inoremap :<CR> :<CR><Tab>
 "nnoremap <SPACE> <Nop>
 "let mapleader=" "
 
@@ -300,7 +304,17 @@ augroup netrw_mapping
 augroup END
 
 function! MarkWindowSwap()
-    let g:markedWinNum = winnr()
+  let g:markedWinNum = winnr()
+endfunction
+
+function! Lines()
+  set number!
+  set relativenumber!
+endfunction
+
+function! Notes()
+  setlocal formatoptions=ctnqro
+  setlocal comments+=n:*,n:#
 endfunction
 
 function! DoWindowSwap()

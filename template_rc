@@ -37,7 +37,8 @@ fi
 # `Frozing' tty, so after any command terminal settings will be restored
 ttyctl -f
 
-alias v-notes='vim ~/notes'
+# alias v-notes='vim ~/notes -c "call Notes()"'
+alias v-n='vim ~/notes -c "call Notes()"'
 alias v-ssh='vim ~/.ssh/config'
 alias v-vrc='vim -O $ENVSETTINGS/vimrc ~/.vimrc'
 alias v-rc='vim -O $ENVSETTINGS/template_rc $SHELLRC'
@@ -56,7 +57,7 @@ alias c-env='cd $ENVSETTINGS'
 # Other helpful commands
 alias dump_history='history >> ~/history.txt'
 alias dc='docker-compose'
-alias tmux_init='tmux source-file $ENVSETTINGS/tmux.conf'
+alias tmux-init='tmux source-file $ENVSETTINGS/tmux.conf'
 #alias tmux_init='tmux set -g prefix M-a; tmux set -g mouse on'
 #alias tmux_init='tmux set -g prefix C-a'
 alias dc-res='docker-compose down; docker-compose up -d'
