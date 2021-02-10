@@ -1,3 +1,4 @@
+# zsh I like: trapd00r
 # Start of template rc file.
 
 VIM=/usr/bin/vim
@@ -48,6 +49,7 @@ alias v-tmux='vim -O $ENVSETTINGS/tmux.conf ~/.tmux.conf'
 # Source files to overcome terminal
 alias s-rc='source $SHELLRC'
 #alias s-py3='source ~/Work/python_env/bin/activate'
+alias gitacomm='git add . ; git commit'
 
 # cd alias are in format c-[first letter]
 alias c-env='cd $ENVSETTINGS'
