@@ -44,13 +44,14 @@ set relativenumber
 " nnoremap <C-n> :NERDTree<CR>
 nnoremap <C-t> :NERDTreeToggle<CR>
 nnoremap <leader>n :NERDTreeFind<CR>
+let NERDTreeShowHidden=1
 
 " Start NERDTree and leave the cursor in it.
 " autocmd VimEnter * NERDTree
 " Start NERDTree and put the cursor back in the other window.
 " autocmd VimEnter * NERDTree | wincmd p
 " Exit Vim if NERDTree is the only window left.
-autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+" autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
 
 " remap file save, file save+quit, and quit-all
 inoremap <C-S> <ESC>:update<CR>a
