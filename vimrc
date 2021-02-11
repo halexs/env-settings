@@ -13,13 +13,15 @@ Plugin 'VundleVim/Vundle.vim'
 Plugin 'preservim/nerdtree' | 
 			\ Plugin 'Xuyuanp/nerdtree-git-plugin'
 Plugin 'airblade/vim-gitgutter'
+Plugin 'ackyshake/VimCompletesMe'
+Plugin 'junegunn/fzf'
+Plugin 'junegunn/fzf.vim'
 
 
-"
-" this is a new line
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
+
 filetype plugin indent on    " required
 
 " vim gitgutter plugin update time
@@ -38,7 +40,7 @@ set clipboard=unnamed
 set number
 set relativenumber
 
-nnoremap <leader>n :NERDTreeFocus<CR>
+"nnoremap <leader>n :NERDTreeFocus<CR>
 " nnoremap <C-n> :NERDTree<CR>
 nnoremap <C-t> :NERDTreeToggle<CR>
 nnoremap <leader>n :NERDTreeFind<CR>
@@ -48,15 +50,128 @@ nnoremap <leader>n :NERDTreeFind<CR>
 " Start NERDTree and put the cursor back in the other window.
 " autocmd VimEnter * NERDTree | wincmd p
 " Exit Vim if NERDTree is the only window left.
-
 autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
 
+" remap file save, file save+quit, and quit-all
+inoremap <C-S> <ESC>:update<CR>a
+nnoremap <C-S> :update<CR>
+nnoremap <C-x> :x<CR>
+" nnoremap <C-q> :qa<CR>
+nnoremap <leader>q :qa<CR>
+
+nnoremap <leader>r :source ~/.vimrc<CR>
+nnoremap <C-e> 3<C-e>
+nnoremap <C-y> 3<C-y>
+nnoremap <leader>] 10<C-e>
+nnoremap <leader>[ 10<C-y>
+
+inoremap <C-l> <ESC>
+
+" Buffers
+nnoremap <leader>u :bn<cr>
+nnoremap <leader>i :bp<cr>
+nnoremap <leader>d :bd<cr> 
+" nnoremap <leader>l :ls<cr>
+
+" Tabs though this may not be necessary since gt and gT switches
+nnoremap <leader>y :tabn<CR>
+nnoremap <leader>o :tabp<CR>
+nnoremap <leader>t1 :tabn 1<CR>
+nnoremap <leader>t2 :tabn 2<CR>
+nnoremap <leader>t3 :tabn 3<CR>
+nnoremap <leader>t4 :tabn 4<CR>
+nnoremap <leader>t5 :tabn 5<CR>
+nnoremap <leader>t5 :tabn 6<CR>
+nnoremap <leader>t0 :tablast<CR>
+
+" Use ctrl-[select] the active split!
+"noremap <c-k> :wincmd k<CR>
+"noremap <c-j> :wincmd j<CR>
+"noremap <c-h> :wincmd h<CR>
+"noremap <c-l> :wincmd l<CR>
+noremap <silent> <leader>k :wincmd k<CR>
+noremap <silent> <leader>j :wincmd j<CR>
+noremap <silent> <leader>h :wincmd h<CR>
+noremap <silent> <leader>l :wincmd l<CR>
+" inoremap <C-k> <C-o>:wincmd k<CR>
+" inoremap <C-j> <C-o>:wincmd j<CR>
+" inoremap <C-h> <C-o>:wincmd h<CR>
+" inoremap <C-l> <C-o>:wincmd l<CR>
+
+
+"Tab Space
+set ts=4
+" set ts=2
+
+set expandtab
+" Highlight column 80
+set cc=80
+highlight ColorColumn guibg=lightgrey ctermbg=lightgrey
+
+" " These commands customize built-in find to make vim search through the
+" whole project structure. Unfortunately even if files matched 'ignores'
+" node_modules, the searching takes a long time to complete still, leading me
+" to believe it's still searching through those files. 
+" " replaced with fzf.vim plugin instead.
+" set path+=**
+" set wildmenu
+" "set wildignore+=**/node_modules/**
+" set wildignore+=*/node_modules/*
+" set wildmode=longest,list,full
+
+" nnoremap <C-;> :GFiles<CR>
+nnoremap <C-a> :GFiles<CR>
+" map <C-a> :Files<CR>
+
+nnoremap <silent> <leader>f :ZoomToggle<CR>
 
 
 
 
 
+"vim functions
 
+
+
+" Zoom / Restore window.
+function! s:ZoomToggle() abort
+    if exists('t:zoomed') && t:zoomed
+        execute t:zoom_winrestcmd
+        let t:zoomed = 0
+    else
+        let t:zoom_winrestcmd = winrestcmd()
+        resize
+        vertical resize
+        let t:zoomed = 1
+    endif
+endfunction
+command! ZoomToggle call s:ZoomToggle()
+
+
+
+
+
+" inoremap <tab> <c-r>=Smart_TabComplete()<CR>
+" function! Smart_TabComplete()
+"   let line = getline('.')                         " current line
+" 
+"   let substr = strpart(line, -1, col('.')+1)      " from the start of the current
+"                                                   " line to one character right
+"                                                   " of the cursor
+"   let substr = matchstr(substr, "[^ \t]*$")       " word till cursor
+"   if (strlen(substr)==0)                          " nothing to match on empty string
+"     return "\<tab>"
+"   endif
+"   let has_period = match(substr, '\.') != -1      " position of period, if any
+"   let has_slash = match(substr, '\/') != -1       " position of slash, if any
+"   if (!has_period && !has_slash)
+"     return "\<C-X>\<C-P>"                         " existing text matching
+"   elseif ( has_slash )
+"     return "\<C-X>\<C-F>"                         " file matching
+"   else
+"     return "\<C-X>\<C-O>"                         " plugin matching
+"   endif
+" endfunction
 
 
 
@@ -110,22 +225,11 @@ autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTr
 " inoremap <C-e> <C-o>$
 " inoremap <C-a> <C-o>0
 " 
-" " remap file save, file save+quit, and quit-all
-" inoremap <C-S> <ESC>:update<CR>a
-" nnoremap <C-S> :update<CR>
-" nnoremap <C-x> :x<CR>
-" " nnoremap <C-q> :qa<CR>
 " 
 " " nnoremap <leader>s :w<CR>
 " " nnoremap <leader>x :x<CR>
 " nnoremap <leader>q :qa<CR>
 " " nnoremap <leader>qa :qa<CR>
-" nnoremap <leader>r :source ~/.vimrc<CR>
-" 
-" nnoremap <C-e> 3<C-e>
-" nnoremap <C-y> 3<C-y>
-" nnoremap <leader>] 10<C-e>
-" nnoremap <leader>[ 10<C-y>
 " 
 " inoremap {<CR> {<CR>}<C-o><S-o>
 " " inoremap {<Tab> {}<Left>
@@ -142,42 +246,10 @@ autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTr
 " " inoremap ;<space> <ESC>
 " " inoremap <Space>; <ESC>
 " " inoremap '/ <ESC>
-" inoremap <C-l> <ESC>
-" 
 " nmap <silent> <leader>ws :call MarkWindowSwap()<CR>
 " nmap <silent> <leader>wt :call DoWindowSwap()<CR><C-w>h
 " 
 " noremap <leader>e :call ToggleNetrw()<CR>
-" 
-" " Buffers
-" nnoremap <leader>i :bn<cr>
-" nnoremap <leader>o :bp<cr>
-" nnoremap <leader>d :bd<cr> 
-" 
-" " Tabs though this may not be necessary since gt and gT switches
-" nnoremap <leader>p :tabn<CR>
-" nnoremap <leader>u :tabp<CR>
-" nnoremap <leader>t1 :tabn 1<CR>
-" nnoremap <leader>t2 :tabn 2<CR>
-" nnoremap <leader>t3 :tabn 3<CR>
-" nnoremap <leader>t4 :tabn 4<CR>
-" nnoremap <leader>t5 :tabn 5<CR>
-" nnoremap <leader>t5 :tabn 6<CR>
-" nnoremap <leader>t0 :tablast<CR>
-" 
-" " Use ctrl-[select] the active split!
-" "noremap <c-k> :wincmd k<CR>
-" "noremap <c-j> :wincmd j<CR>
-" "noremap <c-h> :wincmd h<CR>
-" "noremap <c-l> :wincmd l<CR>
-" noremap <silent> <leader>k :wincmd k<CR>
-" noremap <silent> <leader>j :wincmd j<CR>
-" noremap <silent> <leader>h :wincmd h<CR>
-" noremap <silent> <leader>l :wincmd l<CR>
-" " inoremap <C-k> <C-o>:wincmd k<CR>
-" " inoremap <C-j> <C-o>:wincmd j<CR>
-" " inoremap <C-h> <C-o>:wincmd h<CR>
-" " inoremap <C-l> <C-o>:wincmd l<CR>
 " 
 " 
 " 
@@ -230,17 +302,10 @@ autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTr
 " " List of plugins... currently none
 " " Plugin 'Chiel92/vim-autoformat'
 " 
-" "Tab Space
-" "set ts=4
-" set ts=2
 " 
 " "Shift Space
 " "set sw=4
 " set sw=2
-" 
-" " Highlight column 80
-" set cc=80
-" highlight ColorColumn guibg=lightgrey ctermbg=lightgrey
 " 
 " 
 " " set pastetoggle=<F10>
@@ -248,10 +313,6 @@ autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTr
 " 
 " filetype plugin on
 " 
-" " built in plugins for doing stuff
-" set path+=**
-" set wildmenu
-" set wildignore+=**/node_modules/**
 " 
 " " TAG JUMPING
 " " command! MakeTags !ctags -R .
@@ -271,7 +332,6 @@ autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTr
 " "   <CR>/v/t to open in an h-split/v-split/tab
 " "   check |netrw-browse-maps| for more mappings
 " 
-" set expandtab
 " 
 " 
 " 
