@@ -8,12 +8,37 @@ call vundle#begin()
 " alternatively, pass a path where Vundle should install plugins
 "call vundle#begin('~/some/path/here')
 
+" To ignore plugin indent changes, instead use:
+"filetype plugin on
+"
+" Brief help
+" :PluginList       - lists configured plugins
+" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
+" :PluginSearch foo - searches for foo; append `!` to refresh local cache
+" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+"
+" see :h vundle for more details or wiki for FAQ
+" Put your non-Plugin stuff after this line
+
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
+
+" Nerdtree to replace netrw. Functionality is about the same, but a lot of
+" things are more transparent, like how to create/move/delete files. The
+" biggest change I like is shifting the 'working directory'. I was never able
+" to get that working on netrw. Bookmarks are also nice.
 Plugin 'preservim/nerdtree' | 
 			\ Plugin 'Xuyuanp/nerdtree-git-plugin'
+
+" Git integration to see if a line was added/changed/deleted.
 Plugin 'airblade/vim-gitgutter'
+
+" Maps autocomplete to Tab, along with more functionality.
 Plugin 'ackyshake/VimCompletesMe'
+
+" Replaces vim's default file find throughout a project. First plugin installs
+" (and compiles I think) the fzf tool, while the second integrates the tool
+" with vim.
 Plugin 'junegunn/fzf'
 Plugin 'junegunn/fzf.vim'
 
@@ -24,15 +49,14 @@ call vundle#end()            " required
 
 filetype plugin indent on    " required
 
-" vim gitgutter plugin update time
-set updatetime=100
 
-
+" My leader key is space.
 map <SPACE> <leader>
 " " Search for cpp or use default
 syntax enable
 " 
 set mouse=a
+
 " Allows mac to copy and paste through vim and clipboard
 set clipboard=unnamed
 
@@ -40,11 +64,14 @@ set clipboard=unnamed
 set number
 set relativenumber
 
-"nnoremap <leader>n :NERDTreeFocus<CR>
+" NERDTree plugin information
+" nnoremap <leader>n :NERDTreeFocus<CR>
 " nnoremap <C-n> :NERDTree<CR>
 nnoremap <C-t> :NERDTreeToggle<CR>
 nnoremap <leader>n :NERDTreeFind<CR>
 let NERDTreeShowHidden=1
+" Allows nerdtree to create/add/remove files.
+set modifiable
 
 " Start NERDTree and leave the cursor in it.
 " autocmd VimEnter * NERDTree
@@ -52,6 +79,22 @@ let NERDTreeShowHidden=1
 " autocmd VimEnter * NERDTree | wincmd p
 " Exit Vim if NERDTree is the only window left.
 " autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+
+" Vim git gutter information
+set updatetime=100
+" highlight SignColumn guibg=lightgrey
+" highlight SignColumn guibg=black
+" highlight clear SignColumn
+"let g:gitgutter_highlight_lines = 1
+" highlight DiffAdd guibg=green
+" highlight DiffAdd ctermbg=161
+" highlight link GitGutterDeleteLine DiffAdd
+" highlight GitGutterAdd guifg=#bbbb00 ctermfg=3
+" highlight GitGutterAddLine guifg=darkgrey
+" highlight link GitGutterAddLine DiffDelete
+" highlight link GitGutterAddLine DiffDelete
+" highlight SignColumn guibg=darkgrey
+" vim gitgutter plugin update time
 
 " remap file save, file save+quit, and quit-all
 inoremap <C-S> <ESC>:update<CR>a
@@ -69,21 +112,21 @@ nnoremap <leader>[ 10<C-y>
 inoremap <C-l> <ESC>
 
 " Buffers
-nnoremap <leader>u :bn<cr>
-nnoremap <leader>i :bp<cr>
+nnoremap <leader>i :bn<cr>
+nnoremap <leader>o :bp<cr>
 nnoremap <leader>d :bd<cr> 
 " nnoremap <leader>l :ls<cr>
 
 " Tabs though this may not be necessary since gt and gT switches
-nnoremap <leader>y :tabn<CR>
-nnoremap <leader>o :tabp<CR>
-nnoremap <leader>t1 :tabn 1<CR>
-nnoremap <leader>t2 :tabn 2<CR>
-nnoremap <leader>t3 :tabn 3<CR>
-nnoremap <leader>t4 :tabn 4<CR>
-nnoremap <leader>t5 :tabn 5<CR>
-nnoremap <leader>t5 :tabn 6<CR>
-nnoremap <leader>t0 :tablast<CR>
+nnoremap <leader>u :tabn<CR>
+nnoremap <leader>p :tabp<CR>
+" nnoremap <leader>t1 :tabn 1<CR>
+" nnoremap <leader>t2 :tabn 2<CR>
+" nnoremap <leader>t3 :tabn 3<CR>
+" nnoremap <leader>t4 :tabn 4<CR>
+" nnoremap <leader>t5 :tabn 5<CR>
+" nnoremap <leader>t5 :tabn 6<CR>
+" nnoremap <leader>t0 :tablast<CR>
 
 " Use ctrl-[select] the active split!
 "noremap <c-k> :wincmd k<CR>
@@ -105,7 +148,7 @@ set ts=4
 " set ts=2
 
 set expandtab
-" Highlight column 80
+" Highlight column 80 to unsure lines don't go too long.
 set cc=80
 highlight ColorColumn guibg=lightgrey ctermbg=lightgrey
 
@@ -120,10 +163,12 @@ highlight ColorColumn guibg=lightgrey ctermbg=lightgrey
 " set wildignore+=*/node_modules/*
 " set wildmode=longest,list,full
 
+" Maps fzf plugin to ctrl-a, searches through all NON-gitignore files.
 " nnoremap <C-;> :GFiles<CR>
 nnoremap <C-a> :GFiles<CR>
 " map <C-a> :Files<CR>
 
+" If splits exists, this will have the split take up the whole page.
 nnoremap <silent> <leader>f :ZoomToggle<CR>
 
 
@@ -148,6 +193,15 @@ function! s:ZoomToggle() abort
 endfunction
 command! ZoomToggle call s:ZoomToggle()
 
+" function! Lines()
+"   set number!
+"   set relativenumber!
+" endfunction
+" 
+" function! Notes()
+"   setlocal formatoptions=ctnqro
+"   setlocal comments+=n:*,n:#
+" endfunction
 
 
 
@@ -175,18 +229,6 @@ command! ZoomToggle call s:ZoomToggle()
 " endfunction
 
 
-
-" To ignore plugin indent changes, instead use:
-"filetype plugin on
-"
-" Brief help
-" :PluginList       - lists configured plugins
-" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
-" :PluginSearch foo - searches for foo; append `!` to refresh local cache
-" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
-"
-" see :h vundle for more details or wiki for FAQ
-" Put your non-Plugin stuff after this line
 
 " 
 " 
@@ -440,16 +482,6 @@ command! ZoomToggle call s:ZoomToggle()
 " 
 " function! MarkWindowSwap()
 "   let g:markedWinNum = winnr()
-" endfunction
-" 
-" function! Lines()
-"   set number!
-"   set relativenumber!
-" endfunction
-" 
-" function! Notes()
-"   setlocal formatoptions=ctnqro
-"   setlocal comments+=n:*,n:#
 " endfunction
 " 
 " function! DoWindowSwap()
