@@ -31,8 +31,10 @@ Plugin 'preservim/nerdtree' |
 			\ Plugin 'Xuyuanp/nerdtree-git-plugin'
 
 " Git integration to see if a line was added/changed/deleted.
+" Try using git fugitive to make merge conflicts easier for vim.
+" Try using both. There shouldn't be any conflicts.
 Plugin 'airblade/vim-gitgutter'
-
+Plugin 'tpope/vim-fugitive'
 " Maps autocomplete to Tab, along with more functionality.
 Plugin 'ackyshake/VimCompletesMe'
 
@@ -42,13 +44,14 @@ Plugin 'ackyshake/VimCompletesMe'
 Plugin 'junegunn/fzf'
 Plugin 'junegunn/fzf.vim'
 
+Plugin 'itchyny/lightline.vim'
 
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 
 filetype plugin indent on    " required
-
+set laststatus=2
 
 " My leader key is space.
 map <SPACE> <leader>
@@ -80,21 +83,30 @@ set modifiable
 " Exit Vim if NERDTree is the only window left.
 " autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
 
-" Vim git gutter information
+" Vim git gutter information, try using fugitive vim now.
+
+" vim gitgutter plugin update time
 set updatetime=100
+" highlight GitGutterAdd ctermfg=green guifg=green ctermbg=blue
+highlight clear SignColumn
+highlight GitGutterAdd ctermfg=darkgrey ctermbg=green 
+highlight GitGutterChange ctermfg=darkgrey ctermbg=yellow
+highlight GitGutterDelete ctermfg=darkgrey ctermbg=red
+" highlight GitGutterDelete ctermfg=black ctermbg=red
+highlight GitGutterChangeDelete ctermfg=darkgrey ctermbg=yellow
+
+" let g:gitgutter_highlight_lines = 1
 " highlight SignColumn guibg=lightgrey
-" highlight SignColumn guibg=black
-" highlight clear SignColumn
-"let g:gitgutter_highlight_lines = 1
+" highlight SignColumn guibg=blackdfasdfdsfadf
 " highlight DiffAdd guibg=green
-" highlight DiffAdd ctermbg=161
+" highlight DiffAdd ctermbg=green
+" highlight DiffChange ctermbg=47
 " highlight link GitGutterDeleteLine DiffAdd
 " highlight GitGutterAdd guifg=#bbbb00 ctermfg=3
 " highlight GitGutterAddLine guifg=darkgrey
 " highlight link GitGutterAddLine DiffDelete
 " highlight link GitGutterAddLine DiffDelete
 " highlight SignColumn guibg=darkgrey
-" vim gitgutter plugin update time
 
 " remap file save, file save+quit, and quit-all
 inoremap <C-S> <ESC>:update<CR>a
@@ -165,12 +177,67 @@ highlight ColorColumn guibg=lightgrey ctermbg=lightgrey
 
 " Maps fzf plugin to ctrl-a, searches through all NON-gitignore files.
 " nnoremap <C-;> :GFiles<CR>
+" To search through normal files, do :Files
 nnoremap <C-a> :GFiles<CR>
 " map <C-a> :Files<CR>
 
 " If splits exists, this will have the split take up the whole page.
 nnoremap <silent> <leader>f :ZoomToggle<CR>
 
+"Set ignore Case when Searching with /
+set ignorecase
+" 
+" Smart Casing when searching. This will ignore ignorecase if capital letters
+" are specified
+set smartcase
+
+" Visual line color. In black background and grey text, cannot see.
+" hi Visual  guifg=blue guibg=blue gui=none
+hi Visual ctermfg=darkgrey ctermbg=lightblue
+" highlight GitGutterDelete ctermfg=black ctermbg=red
+
+" Example of searching/grepping through files and opening in vim.
+" :grep bar **/*.py | copen
+
+" "Wrapping
+set wrap
+" 
+"Auto Indent. The following 2 go together.
+set ai
+set smartindent
+" 
+" "Always Show cmd
+" set showcmd
+" 
+" "Underline Current Cursor Line
+set cursorline
+" "set ruler
+" 
+" "Show Graphical Menu
+" set wildmenu
+" 
+" "Matching Brackets
+set showmatch
+" 
+"Tenth of a second to blink when matching brackets
+set mat=2
+" 
+"Search as characters are entered
+set incsearch
+" 
+"highlight search matches
+set hlsearch
+" This will clear the hlsearch
+nnoremap <c-l> :noh<return><esc>
+" 
+" 
+" "Always show status line
+set laststatus=2
+" 
+" "set background=dark
+" 
+" Allows to switch buffers even if not written too (which is vim default)
+set hidden
 
 
 
@@ -346,9 +413,9 @@ command! ZoomToggle call s:ZoomToggle()
 " " Plugin 'Chiel92/vim-autoformat'
 " 
 " 
-" "Shift Space
-" "set sw=4
-" set sw=2
+"Shift Space
+"set shiftwidth=4
+set shiftwidth=4
 " 
 " 
 " " set pastetoggle=<F10>
@@ -375,52 +442,6 @@ command! ZoomToggle call s:ZoomToggle()
 " "   <CR>/v/t to open in an h-split/v-split/tab
 " "   check |netrw-browse-maps| for more mappings
 " 
-" 
-" 
-" 
-" "Wrapping
-" set wrap
-" 
-" "Auto Indent
-" set ai
-" 
-" "Always Show cmd
-" set showcmd
-" 
-" "Underline Current Cursor Line
-" set cursorline
-" "set ruler
-" 
-" "Show Graphical Menu
-" set wildmenu
-" 
-" "Matching Brackets
-" set showmatch
-" 
-" "Tenth of a second to blink when matching brackets
-" set mat=2
-" 
-" "Search as characters are entered
-" set incsearch
-" 
-" "highlight search matches
-" set hlsearch
-" 
-" "Set ignore Case when Searching
-" set ignorecase
-" 
-" set smartindent
-" 
-" "Smart Casing when searching
-" set smartcase
-" 
-" "Always show status line
-" set laststatus=2
-" 
-" "set background=dark
-" 
-" 
-" set hidden
 " 
 " " functions
 " 
