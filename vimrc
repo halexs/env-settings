@@ -112,43 +112,36 @@ highlight GitGutterChangeDelete ctermfg=darkgrey ctermbg=yellow
 inoremap <C-S> <ESC>:update<CR>a
 nnoremap <C-S> :update<CR>
 nnoremap <C-x> :x<CR>
-" nnoremap <C-q> :qa<CR>
+nnoremap <C-q> :q<CR>
 nnoremap <leader>q :qa<CR>
 
 nnoremap <leader>r :source ~/.vimrc<CR>
 nnoremap <C-e> 3<C-e>
 nnoremap <C-y> 3<C-y>
-nnoremap <leader>] 10<C-e>
-nnoremap <leader>[ 10<C-y>
+"nnoremap <leader>] 10<C-e>
+"nnoremap <leader>[ 10<C-y>
+" nnoremap <C-j> 10<C-e>
+" nnoremap <C-k> 10<C-y>
+nnoremap <C-n> 10<C-e>
+nnoremap <C-m> 10<C-y>
 
 inoremap <C-l> <ESC>
 
 " Buffers
-nnoremap <leader>i :bn<cr>
-nnoremap <leader>o :bp<cr>
-nnoremap <leader>d :bd<cr> 
+nnoremap <C-i> :bn<cr>
+nnoremap <C-o> :bp<cr>
+nnoremap <C-d> :bd<cr> 
 " nnoremap <leader>l :ls<cr>
 
 " Tabs though this may not be necessary since gt and gT switches
-nnoremap <leader>u :tabn<CR>
-nnoremap <leader>p :tabp<CR>
-" nnoremap <leader>t1 :tabn 1<CR>
-" nnoremap <leader>t2 :tabn 2<CR>
-" nnoremap <leader>t3 :tabn 3<CR>
-" nnoremap <leader>t4 :tabn 4<CR>
-" nnoremap <leader>t5 :tabn 5<CR>
-" nnoremap <leader>t5 :tabn 6<CR>
-" nnoremap <leader>t0 :tablast<CR>
+nnoremap <C-u> :tabn<CR>
+nnoremap <C-p> :tabp<CR>
 
 " Use ctrl-[select] the active split!
-"noremap <c-k> :wincmd k<CR>
-"noremap <c-j> :wincmd j<CR>
-"noremap <c-h> :wincmd h<CR>
-"noremap <c-l> :wincmd l<CR>
-noremap <silent> <leader>k :wincmd k<CR>
-noremap <silent> <leader>j :wincmd j<CR>
-noremap <silent> <leader>h :wincmd h<CR>
-noremap <silent> <leader>l :wincmd l<CR>
+noremap <silent> <C-k> :wincmd k<CR>
+noremap <silent> <C-j> :wincmd j<CR>
+noremap <silent> <C-h> :wincmd h<CR>
+noremap <silent> <C-l> :wincmd l<CR>
 " inoremap <C-k> <C-o>:wincmd k<CR>
 " inoremap <C-j> <C-o>:wincmd j<CR>
 " inoremap <C-h> <C-o>:wincmd h<CR>
@@ -162,7 +155,8 @@ set ts=4
 set expandtab
 " Highlight column 80 to unsure lines don't go too long.
 set cc=80
-highlight ColorColumn guibg=lightgrey ctermbg=lightgrey
+highlight ColorColumn ctermbg=white
+" highlight ColorColumn guibg=lightgrey ctermbg=lightgrey
 
 " " These commands customize built-in find to make vim search through the
 " whole project structure. Unfortunately even if files matched 'ignores'
@@ -172,7 +166,7 @@ highlight ColorColumn guibg=lightgrey ctermbg=lightgrey
 " set path+=**
 " set wildmenu
 " "set wildignore+=**/node_modules/**
-" set wildignore+=*/node_modules/*
+set wildignore+=**/node_modules/**
 " set wildmode=longest,list,full
 
 " Maps fzf plugin to ctrl-a, searches through all NON-gitignore files.
@@ -228,7 +222,7 @@ set incsearch
 "highlight search matches
 set hlsearch
 " This will clear the hlsearch
-nnoremap <c-l> :noh<return><esc>
+nnoremap <silent> <C-c> :noh<return><esc>
 " 
 " 
 " "Always show status line
@@ -522,3 +516,37 @@ set shiftwidth=4
 " 
 " 
 " 
+" " Buffers
+" nnoremap <leader>i :bn<cr>
+" nnoremap <leader>o :bp<cr>
+" nnoremap <leader>d :bd<cr> 
+" " nnoremap <leader>l :ls<cr>
+" 
+" " Tabs though this may not be necessary since gt and gT switches
+" nnoremap <leader>u :tabn<CR>
+" nnoremap <leader>p :tabp<CR>
+" " nnoremap <leader>t1 :tabn 1<CR>
+" " nnoremap <leader>t2 :tabn 2<CR>
+" " nnoremap <leader>t3 :tabn 3<CR>
+" " nnoremap <leader>t4 :tabn 4<CR>
+" " nnoremap <leader>t5 :tabn 5<CR>
+" " nnoremap <leader>t5 :tabn 6<CR>
+" " nnoremap <leader>t0 :tablast<CR>
+" 
+" " Use ctrl-[select] the active split!
+" "noremap <c-k> :wincmd k<CR>
+" "noremap <c-j> :wincmd j<CR>
+" "noremap <c-h> :wincmd h<CR>
+" "noremap <c-l> :wincmd l<CR>
+" noremap <silent> <leader>k :wincmd k<CR>
+" noremap <silent> <leader>j :wincmd j<CR>
+" noremap <silent> <leader>h :wincmd h<CR>
+" noremap <silent> <leader>l :wincmd l<CR>
+" " inoremap <C-k> <C-o>:wincmd k<CR>
+" " inoremap <C-j> <C-o>:wincmd j<CR>
+" " inoremap <C-h> <C-o>:wincmd h<CR>
+" " inoremap <C-l> <C-o>:wincmd l<CR>
+
+
+
+

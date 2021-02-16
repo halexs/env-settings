@@ -39,7 +39,7 @@ fi
 ttyctl -f
 
 # alias v-notes='vim ~/notes -c "call Notes()"'
-alias v-n='vim ~/notes -c "call Notes()"'
+alias v-n='vim ~/notes' #  -c "call Notes()"'
 alias v-ssh='vim ~/.ssh/config'
 alias v-vrc='vim -O $ENVSETTINGS/vimrc ~/.vimrc'
 alias v-rc='vim -O $ENVSETTINGS/template_rc $SHELLRC'
