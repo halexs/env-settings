@@ -44,7 +44,11 @@ Plugin 'ackyshake/VimCompletesMe'
 Plugin 'junegunn/fzf'
 Plugin 'junegunn/fzf.vim'
 
+" Colors the bottom
 Plugin 'itchyny/lightline.vim'
+
+" Updates python syntax with features such as f-strings.
+Plugin 'vim-python/python-syntax'
 
 
 " All of your Plugins must be added before the following line
@@ -131,6 +135,7 @@ inoremap <C-l> <ESC>
 nnoremap <C-i> :bn<cr>
 nnoremap <C-o> :bp<cr>
 nnoremap <C-d> :bd<cr> 
+nnoremap <leader>b :ls<cr>
 " nnoremap <leader>l :ls<cr>
 
 " Tabs though this may not be necessary since gt and gT switches
@@ -222,7 +227,8 @@ set incsearch
 "highlight search matches
 set hlsearch
 " This will clear the hlsearch
-nnoremap <silent> <C-c> :noh<return><esc>
+" nnoremap <silent> <C-c> :noh<return><esc>
+nnoremap <silent> <leader>c :noh<return><esc>
 " 
 " 
 " "Always show status line
@@ -233,12 +239,60 @@ set laststatus=2
 " Allows to switch buffers even if not written too (which is vim default)
 set hidden
 
+" Remap Q to quit
+nnoremap Q :q<CR>
 
+" Navigate buffers using tab and shift-tab.
+nnoremap <Tab> :bn<CR>
+nnoremap <S-Tab> :bp<CR>
+
+" Turn on python plugin syntax highlighting
+let g:python_highlight_all = 1
+
+" Move lines up and down with shift arrowkey
+nnoremap <S-Up> :m-2<CR>
+nnoremap <S-Down> :m+<CR>
+inoremap <S-Up> <Esc>:m-2<CR>
+inoremap <S-Down> <Esc>:m+<CR>
+
+" move selected lines up one line
+xnoremap <S-Up>  :m-2<CR>gv=gv
+
+" move selected lines down one line
+xnoremap <S-Down> :m'>+<CR>gv=gv
+
+" keep undo history
+set undofile                " Save undos after file closes
+set undodir=$HOME/.vim/undo " where to save undo histories
+set undolevels=1000         " How many undos
+set undoreload=10000        " number of lines to save for undo
+
+
+" command! -nargs=* Xyz :call GrepSearch(<q-args>)
+
+nnoremap <leader>f :call GrepSearch("", "**/*")<left><left><left><left><left><left><left><left><left><left>
+" nnoremap <leader>f :call GrepSearch()<left>
+" nnoremap <leader>f :vim  **/* | copen<left><left><left><left><left><left><left><left><left><left><left><left><left>
 
 
 "vim functions
 
-
+" Self created function to make grep searching easier.
+function! GrepSearch(searchtext, extension) " This is like *args in python, max is 20 args
+    " a:0 contains an integer which is the number of arguments passed to the function
+    " echom a:0 
+    " a:1 contains the first argument passed, a:2 contains the second and so on
+    " echom a:1 
+    " a:000 contains a list of all arguments that were passed to the function
+    " echo a:000 
+    " full command:
+    " grep/vim [searchtext] **/*[optional filetype] | copen
+    echom a:searchtext
+    echom a:extension
+    execute "vim ".a:searchtext." ".a:extension." | copen"
+    " vim a:searchtext **/* | copen
+    " vim a:searchtext a:extension | copen
+endfunction
 
 " Zoom / Restore window.
 function! s:ZoomToggle() abort

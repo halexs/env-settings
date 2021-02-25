@@ -65,3 +65,4 @@ fi
 #export PATH
 #source $SHELLRC
 #echo $SHELLRC
+mkdir -p ~/.vim/undo
