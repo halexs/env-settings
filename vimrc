@@ -287,8 +287,9 @@ function! GrepSearch(searchtext, extension) " This is like *args in python, max 
     " echo a:000 
     " full command:
     " grep/vim [searchtext] **/*[optional filetype] | copen
-    echom a:searchtext
-    echom a:extension
+    " echom a:searchtext
+    " echom a:extension
+    echom "vim ".a:searchtext." ".a:extension." | copen"
     execute "vim ".a:searchtext." ".a:extension." | copen"
     " vim a:searchtext **/* | copen
     " vim a:searchtext a:extension | copen
