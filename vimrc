@@ -205,8 +205,8 @@ set wrap
 set ai
 set smartindent
 " 
-" "Always Show cmd
-" set showcmd
+" Always Show cmd
+set showcmd
 " 
 " "Underline Current Cursor Line
 set cursorline
@@ -274,6 +274,9 @@ nnoremap <leader>f :call GrepSearch("", "**/*")<left><left><left><left><left><le
 " nnoremap <leader>f :call GrepSearch()<left>
 " nnoremap <leader>f :vim  **/* | copen<left><left><left><left><left><left><left><left><left><left><left><left><left>
 
+" pretty print json file.
+" nnoremap \jsonpretty execute '%!python -m json.tool' | w 
+nnoremap \json-pretty :%!python -m json.tool
 
 "vim functions
 
