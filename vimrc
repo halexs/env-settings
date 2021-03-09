@@ -322,7 +322,7 @@ set undoreload=10000        " number of lines to save for undo
 
 " command! -nargs=* Xyz :call GrepSearch(<q-args>)
 
-nnoremap <leader>s :call GrepSearch("", "**/*")<left><left><left><left><left><left><left><left><left><left>
+nnoremap <leader>s :call GrepSearch("", "")<left><left><left><left><left><left>
 " nnoremap <leader>f :call GrepSearch()<left>
 " nnoremap <leader>f :vim  **/* | copen<left><left><left><left><left><left><left><left><left><left><left><left><left>
 
@@ -337,6 +337,8 @@ set scrolloff=10
 
 "vim functions
 
+" These do the job, but for some reason causes vim to slow down. Currently
+" using fugitive vim instead.
 function! GitBranch()
   return system("git rev-parse --abbrev-ref HEAD 2>/dev/null | tr -d '\n'")
 endfunction
@@ -346,14 +348,13 @@ function! StatuslineGit()
   return strlen(l:branchname) > 0?'  '.l:branchname.' ':''
 endfunction
 
-
 " Allows switching between 2 buffers. Called with Shift-Tab
 function! MoveBack()
      edit #
 endfunction
 
 " Self created function to make grep searching easier.
-function! GrepSearch(searchtext, extension) " This is like *args in python, max is 20 args
+function! GrepSearch(searchtext, extensionflag) " This is like *args in python, max is 20 args
     " a:0 contains an integer which is the number of arguments passed to the function
     " echom a:0 
     " a:1 contains the first argument passed, a:2 contains the second and so on
@@ -364,8 +365,25 @@ function! GrepSearch(searchtext, extension) " This is like *args in python, max 
     " grep/vim [searchtext] **/*[optional filetype] | copen
     " echom a:searchtext
     " echom a:extension
-    echom "vim ".a:searchtext." ".a:extension." | copen"
-    execute "vim ".a:searchtext." ".a:extension." | copen"
+    if len(a:extensionflag) == 0
+        let extension = "**/*"
+        let found_extension = expand('%:e')
+        if found_extension
+            extension +="." . found_extension
+        endif
+    elseif a:extensionflag == "all"
+        let extension = "**/*"
+    else
+        let extension = "**/*." . a:extensionflag
+    endif
+
+    " let file_name = expand('%:t:r')
+    " echo extension
+    let searchcommand = "vim " . a:searchtext . " " . extension . " | copen"
+    echom searchcommand
+    execute searchcommand
+    " echom "vim ".a:searchtext." ".a:extension." | copen"
+    " execute "vim ".a:searchtext." ".a:extension." | copen"
     " vim a:searchtext **/* | copen
     " vim a:searchtext a:extension | copen
 endfunction
