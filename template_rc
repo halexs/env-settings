@@ -41,10 +41,10 @@ ttyctl -f
 # alias v-notes='vim ~/notes -c "call Notes()"'
 alias v-n='vim ~/notes' #  -c "call Notes()"'
 alias v-ssh='vim ~/.ssh/config'
-alias v-vrc='vim -O $ENVSETTINGS/vimrc ~/.vimrc'
-alias v-rc='vim -O $ENVSETTINGS/template_rc $SHELLRC'
+alias v-vrc='vim $ENVSETTINGS/vimrc ~/.vimrc'
+alias v-rc='vim $ENVSETTINGS/template_rc $SHELLRC'
 alias v-cd='vim -c "call ToggleNetrw()" .'
-alias v-tmux='vim -O $ENVSETTINGS/tmux.conf ~/.tmux.conf'
+alias v-tmux='vim $ENVSETTINGS/tmux.conf ~/.tmux.conf'
 
 # Source files to overcome terminal
 alias s-rc='source $SHELLRC'

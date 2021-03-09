@@ -1,4 +1,5 @@
 " plugins
+" TODO: separate plugins into a plugins_rc file instead of this file.
 
 set nocompatible
 filetype off
@@ -55,7 +56,39 @@ Plugin 'vim-python/python-syntax'
 call vundle#end()            " required
 
 filetype plugin indent on    " required
+
+" Status line (bottom) configurations
 set laststatus=2
+" set statusline=
+" set statusline+=%{StatuslineGit()}
+
+" LightlineFilename, FugitiveHead requires vim-fugitive plugin.
+let g:lightline = {
+    \   'active': {
+    \       'left': [ [ 'mode', 'paste' ],
+    \                 [ 'readonly', 'modified', 'gitbranch', 'filename' ] ]
+    \   },
+    \   'component': {
+    \       'helloworld': 'Hello, world!',
+    \   },
+    \   'component_function' : {
+    \   	'filename': 'LightlineFilename',
+    \       'gitbranch': 'FugitiveHead'
+    \   },
+    \ }
+
+" let g:lightline = {
+"       \ 'colorscheme': 'wombat',
+"       \ 'active': {
+"       \   'left': [ [ 'mode', 'paste' ],
+"       \             [ 'readonly', 'filename', 'modified', 'helloworld' ] ]
+"       \ },
+"       \ 'component': {
+"       \   'helloworld': 'Hello, world!'
+"    \       'gitbranch': 'GitBranch'
+"    \   },
+"       \ },
+"       \ }
 
 " My leader key is space.
 map <SPACE> <leader>
@@ -132,15 +165,15 @@ nnoremap <C-m> 10<C-y>
 inoremap <C-l> <ESC>
 
 " Buffers
-nnoremap <C-i> :bn<cr>
-nnoremap <C-o> :bp<cr>
+" nnoremap <C-i> :bn<cr>
+" nnoremap <C-o> :bp<cr>
 nnoremap <C-d> :bd<cr> 
 nnoremap <leader>b :ls<cr>
 " nnoremap <leader>l :ls<cr>
 
 " Tabs though this may not be necessary since gt and gT switches
-nnoremap <C-u> :tabn<CR>
-nnoremap <C-p> :tabp<CR>
+" nnoremap <C-u> :tabn<CR>
+" nnoremap <C-p> :tabp<CR>
 
 " Use ctrl-[select] the active split!
 noremap <silent> <C-k> :wincmd k<CR>
@@ -244,7 +277,8 @@ nnoremap Q :q<CR>
 
 " Navigate buffers using tab and shift-tab.
 nnoremap <Tab> :bn<CR>
-nnoremap <S-Tab> :bp<CR>
+" nnoremap <S-Tab> :bp<CR>
+nnoremap <S-Tab> :call MoveBack()<CR>
 
 " Turn on python plugin syntax highlighting
 let g:python_highlight_all = 1
@@ -270,7 +304,7 @@ set undoreload=10000        " number of lines to save for undo
 
 " command! -nargs=* Xyz :call GrepSearch(<q-args>)
 
-nnoremap <leader>f :call GrepSearch("", "**/*")<left><left><left><left><left><left><left><left><left><left>
+nnoremap <leader>s :call GrepSearch("", "**/*")<left><left><left><left><left><left><left><left><left><left>
 " nnoremap <leader>f :call GrepSearch()<left>
 " nnoremap <leader>f :vim  **/* | copen<left><left><left><left><left><left><left><left><left><left><left><left><left>
 
@@ -278,7 +312,38 @@ nnoremap <leader>f :call GrepSearch("", "**/*")<left><left><left><left><left><le
 " nnoremap \jsonpretty execute '%!python -m json.tool' | w 
 nnoremap \json-pretty :%!python -m json.tool
 
+" scrolloff to keep the cursor in the center. Try it by default, or move to
+" function. Now change it to show at least 10 lines.
+" set scrolloff=999
+set scrolloff=10
+
 "vim functions
+
+" Require vim-fugitive plugin in order to  work. Displays the relative
+" filepath.
+function! LightlineFilename()
+  let root = fnamemodify(get(b:, 'git_dir'), ':h')
+  let path = expand('%:p')
+  if path[:len(root)-1] ==# root
+    return path[len(root)+1:]
+  endif
+  return expand('%')
+endfunction
+
+function! GitBranch()
+  return system("git rev-parse --abbrev-ref HEAD 2>/dev/null | tr -d '\n'")
+endfunction
+
+function! StatuslineGit()
+  let l:branchname = GitBranch()
+  return strlen(l:branchname) > 0?'  '.l:branchname.' ':''
+endfunction
+
+
+" Allows switching between 2 buffers. Called with Shift-Tab
+function! MoveBack()
+     edit #
+endfunction
 
 " Self created function to make grep searching easier.
 function! GrepSearch(searchtext, extension) " This is like *args in python, max is 20 args
