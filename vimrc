@@ -368,8 +368,9 @@ function! GrepSearch(searchtext, extensionflag) " This is like *args in python, 
     if len(a:extensionflag) == 0
         let extension = "**/*"
         let found_extension = expand('%:e')
-        if found_extension
-            extension +="." . found_extension
+        " echo found_extension
+        if len(found_extension) != 0
+            let extension = "**/*." . found_extension
         endif
     elseif a:extensionflag == "all"
         let extension = "**/*"
@@ -378,7 +379,7 @@ function! GrepSearch(searchtext, extensionflag) " This is like *args in python, 
     endif
 
     " let file_name = expand('%:t:r')
-    " echo extension
+    " echo expand('%:e')
     let searchcommand = "vim " . a:searchtext . " " . extension . " | copen"
     echom searchcommand
     execute searchcommand
