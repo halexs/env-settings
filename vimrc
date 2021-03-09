@@ -4,6 +4,8 @@
 set nocompatible
 filetype off
 " set the runtime path to include Vundle and initialize
+"
+" To run plugins, run :source %, then refresh the file.
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 " alternatively, pass a path where Vundle should install plugins
@@ -46,7 +48,7 @@ Plugin 'junegunn/fzf'
 Plugin 'junegunn/fzf.vim'
 
 " Colors the bottom
-Plugin 'itchyny/lightline.vim'
+" Plugin 'itchyny/lightline.vim'
 
 " Updates python syntax with features such as f-strings.
 Plugin 'vim-python/python-syntax'
@@ -59,23 +61,38 @@ filetype plugin indent on    " required
 
 " Status line (bottom) configurations
 set laststatus=2
-" set statusline=
 " set statusline+=%{StatuslineGit()}
 
+" Colors here: https://jonasjacek.github.io/colors/
+hi NormalColor ctermbg=155 ctermfg=27 
+hi InsertColor ctermbg=189 ctermfg=27 
+hi ReplaceColor ctermbg=165 ctermfg=0 
+hi VisualColor ctermbg=darkgrey ctermfg=0 
+" hi NormalColor ctermbg=155 ctermfg=27 guifg=Black guibg=Green
+" hi InsertColor ctermbg=189 ctermfg=27 guifg=Black guibg=Green
+" hi ReplaceColor ctermbg=165 ctermfg=0 guifg=Black guibg=Green
+" hi VisualColor ctermbg=grey ctermfg=0 guifg=Black guibg=Green
+
+set statusline=
+set statusline+=%#NormalColor#%{(mode()=='n')?'\ \ NORMAL\ ':''}
+set statusline+=%#InsertColor#%{(mode()=='i')?'\ \ INSERT\ ':''}
+set statusline+=%#ReplaceColor#%{(mode()=='R')?'\ \ REPLACE\ ':''}
+set statusline+=%#VisualColor#%{(mode()=='v')?'\ \ VISUAL\ ':''}
+
 " LightlineFilename, FugitiveHead requires vim-fugitive plugin.
-let g:lightline = {
-    \   'active': {
-    \       'left': [ [ 'mode', 'paste' ],
-    \                 [ 'readonly', 'modified', 'gitbranch', 'filename' ] ]
-    \   },
-    \   'component': {
-    \       'helloworld': 'Hello, world!',
-    \   },
-    \   'component_function' : {
-    \   	'filename': 'LightlineFilename',
-    \       'gitbranch': 'FugitiveHead'
-    \   },
-    \ }
+" let g:lightline = {
+"      \   'active': {
+"      \       'left': [ [ 'mode', 'paste' ],
+"      \                 [ 'readonly', 'modified', 'gitbranch', 'filename' ] ]
+"      \   },
+"      \   'component': {
+"      \       'helloworld': 'Hello, world!',
+"      \   },
+"      \   'component_function' : {
+"      \   	'filename': 'LightlineFilename',
+"      \       'gitbranch': 'FugitiveHead'
+"      \   },
+"      \ }
 
 " let g:lightline = {
 "       \ 'colorscheme': 'wombat',
