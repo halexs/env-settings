@@ -64,48 +64,42 @@ set laststatus=2
 " set statusline+=%{StatuslineGit()}
 
 " Colors here: https://jonasjacek.github.io/colors/
+" More usefule statusline: 
+" https://stackoverflow.com/questions/5375240/a-more-useful-statusline-in-vim
 hi NormalColor ctermbg=155 ctermfg=27 
 hi InsertColor ctermbg=189 ctermfg=27 
 hi ReplaceColor ctermbg=165 ctermfg=0 
-hi VisualColor ctermbg=darkgrey ctermfg=0 
+hi VisualColor ctermbg=darkgrey ctermfg=lightgrey
 " hi NormalColor ctermbg=155 ctermfg=27 guifg=Black guibg=Green
 " hi InsertColor ctermbg=189 ctermfg=27 guifg=Black guibg=Green
 " hi ReplaceColor ctermbg=165 ctermfg=0 guifg=Black guibg=Green
 " hi VisualColor ctermbg=grey ctermfg=0 guifg=Black guibg=Green
 
 set statusline=
+" Change color based on mode.
 set statusline+=%#NormalColor#%{(mode()=='n')?'\ \ NORMAL\ ':''}
 set statusline+=%#InsertColor#%{(mode()=='i')?'\ \ INSERT\ ':''}
 set statusline+=%#ReplaceColor#%{(mode()=='R')?'\ \ REPLACE\ ':''}
 set statusline+=%#VisualColor#%{(mode()=='v')?'\ \ VISUAL\ ':''}
+"buffernr
+" set statusline+=\[%n]
+"Modified? Readonly? Top/bot.
+set statusline+=\ %m%r%w
+set statusline+=%{StatuslineGit()}\ \|
+"File+path
+set statusline+=\ %<%f\ \|
 
-" LightlineFilename, FugitiveHead requires vim-fugitive plugin.
-" let g:lightline = {
-"      \   'active': {
-"      \       'left': [ [ 'mode', 'paste' ],
-"      \                 [ 'readonly', 'modified', 'gitbranch', 'filename' ] ]
-"      \   },
-"      \   'component': {
-"      \       'helloworld': 'Hello, world!',
-"      \   },
-"      \   'component_function' : {
-"      \   	'filename': 'LightlineFilename',
-"      \       'gitbranch': 'FugitiveHead'
-"      \   },
-"      \ }
+" Dividing line, above is left, below is right.
+set statusline+=\ %=
 
-" let g:lightline = {
-"       \ 'colorscheme': 'wombat',
-"       \ 'active': {
-"       \   'left': [ [ 'mode', 'paste' ],
-"       \             [ 'readonly', 'filename', 'modified', 'helloworld' ] ]
-"       \ },
-"       \ 'component': {
-"       \   'helloworld': 'Hello, world!'
-"    \       'gitbranch': 'GitBranch'
-"    \   },
-"       \ },
-"       \ }
+"FileType
+set statusline+=\ %y\ \|
+"Rownumber/total (%)
+set statusline+=\ row:%l/%L\ (%03p%%)\ \|
+"Colnr
+set statusline+=\ col:%03c
+
+set shortmess-=S
 
 " My leader key is space.
 map <SPACE> <leader>
@@ -186,6 +180,9 @@ inoremap <C-l> <ESC>
 " nnoremap <C-o> :bp<cr>
 nnoremap <C-d> :bd<cr> 
 nnoremap <leader>b :ls<cr>
+nnoremap <leader>o :buffers<CR>:b 
+"nnoremap <leader>o :buffers<CR>:b
+
 " nnoremap <leader>l :ls<cr>
 
 " Tabs though this may not be necessary since gt and gT switches
@@ -335,17 +332,6 @@ nnoremap \json-pretty :%!python -m json.tool
 set scrolloff=10
 
 "vim functions
-
-" Require vim-fugitive plugin in order to  work. Displays the relative
-" filepath.
-function! LightlineFilename()
-  let root = fnamemodify(get(b:, 'git_dir'), ':h')
-  let path = expand('%:p')
-  if path[:len(root)-1] ==# root
-    return path[len(root)+1:]
-  endif
-  return expand('%')
-endfunction
 
 function! GitBranch()
   return system("git rev-parse --abbrev-ref HEAD 2>/dev/null | tr -d '\n'")
