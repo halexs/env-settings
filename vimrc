@@ -81,11 +81,15 @@ set statusline+=%#NormalColor#%{(mode()=='n')?'\ \ NORMAL\ ':''}
 set statusline+=%#InsertColor#%{(mode()=='i')?'\ \ INSERT\ ':''}
 set statusline+=%#ReplaceColor#%{(mode()=='R')?'\ \ REPLACE\ ':''}
 set statusline+=%#VisualColor#%{(mode()=='v')?'\ \ VISUAL\ ':''}
-"buffernr
-" set statusline+=\[%n]
-"Modified? Readonly? Top/bot.
+" "buffernr
+" " set statusline+=\[%n]
+" "Modified? Readonly? Top/bot.
 set statusline+=\ %m%r%w
-set statusline+=%{StatuslineGit()}\ \|
+" display git branch without-plugin causing slow vim updates.
+" set statusline+=%{StatuslineGit()}\ \|
+" This requires fugitive vim plugin
+set statusline+=\ %{fugitive#head()}\ \|
+
 "File+path
 set statusline+=\ %<%f\ \|
 
