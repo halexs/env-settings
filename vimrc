@@ -64,16 +64,12 @@ set laststatus=2
 " set statusline+=%{StatuslineGit()}
 
 " Colors here: https://jonasjacek.github.io/colors/
-" More usefule statusline: 
+" More useful statusline: 
 " https://stackoverflow.com/questions/5375240/a-more-useful-statusline-in-vim
 hi NormalColor ctermbg=155 ctermfg=27 
 hi InsertColor ctermbg=189 ctermfg=27 
 hi ReplaceColor ctermbg=165 ctermfg=0 
 hi VisualColor ctermbg=darkgrey ctermfg=lightgrey
-" hi NormalColor ctermbg=155 ctermfg=27 guifg=Black guibg=Green
-" hi InsertColor ctermbg=189 ctermfg=27 guifg=Black guibg=Green
-" hi ReplaceColor ctermbg=165 ctermfg=0 guifg=Black guibg=Green
-" hi VisualColor ctermbg=grey ctermfg=0 guifg=Black guibg=Green
 
 set statusline=
 " Change color based on mode.
@@ -139,26 +135,11 @@ set modifiable
 
 " vim gitgutter plugin update time
 set updatetime=100
-" highlight GitGutterAdd ctermfg=green guifg=green ctermbg=blue
 highlight clear SignColumn
 highlight GitGutterAdd ctermfg=darkgrey ctermbg=green 
 highlight GitGutterChange ctermfg=darkgrey ctermbg=yellow
 highlight GitGutterDelete ctermfg=darkgrey ctermbg=red
-" highlight GitGutterDelete ctermfg=black ctermbg=red
 highlight GitGutterChangeDelete ctermfg=darkgrey ctermbg=yellow
-
-" let g:gitgutter_highlight_lines = 1
-" highlight SignColumn guibg=lightgrey
-" highlight SignColumn guibg=blackdfasdfdsfadf
-" highlight DiffAdd guibg=green
-" highlight DiffAdd ctermbg=green
-" highlight DiffChange ctermbg=47
-" highlight link GitGutterDeleteLine DiffAdd
-" highlight GitGutterAdd guifg=#bbbb00 ctermfg=3
-" highlight GitGutterAddLine guifg=darkgrey
-" highlight link GitGutterAddLine DiffDelete
-" highlight link GitGutterAddLine DiffDelete
-" highlight SignColumn guibg=darkgrey
 
 " remap file save, file save+quit, and quit-all
 inoremap <C-S> <ESC>:update<CR>a
@@ -234,11 +215,12 @@ nnoremap <C-a> :GFiles<CR>
 " If splits exists, this will have the split take up the whole page.
 nnoremap <silent> <leader>f :ZoomToggle<CR>
 
-"Set ignore Case when Searching with /
+"Set ignore Case when Searching with / and using vimgrep (GrepSearch)
 set ignorecase
 " 
 " Smart Casing when searching. This will ignore ignorecase if capital letters
 " are specified
+" Does not affect vimgrep. Need to turn off ignorecase (set noic)
 set smartcase
 
 " Visual line color. In black background and grey text, cannot see.
@@ -336,6 +318,8 @@ nnoremap \json-pretty :%!python -m json.tool
 " set scrolloff=999
 set scrolloff=10
 
+nnoremap <leader>0 :call VimSettings()<cr>
+
 "vim functions
 
 " These do the job, but for some reason causes vim to slow down. Currently
@@ -361,8 +345,6 @@ endfunction
 " If second is another specified filetype, then search using that.
 function! GrepSearch(parametersplit)
     let parameters = split(a:parametersplit, ",")
-    echo parameters
-    echo len(parameters)
     if len(parameters) == 1
         let found_extension = expand('%:e')
         " echo found_extension
@@ -373,55 +355,13 @@ function! GrepSearch(parametersplit)
         endif
     endif
     let extension = "**/*"
-    echo parameters[1]
     if parameters[1] != "all"
         let extension = extension . "." . parameters[1]
     endif
     let searchcommand = "vim " . parameters[0] . " " . extension . " | copen"
     echom searchcommand
     execute searchcommand
-
-    " This if statement may not be necessary
-    " if len(parameters) == 2
-    "     echo parameters[1]
-    " endif
 endfunction
-
-" Self created function to make grep searching easier.
-" function! GrepSearch(searchtext, extensionflag) " This is like *args in python, max is 20 args
-"     " a:0 contains an integer which is the number of arguments passed to the function
-"     " echom a:0 
-"     " a:1 contains the first argument passed, a:2 contains the second and so on
-"     " echom a:1 
-"     " a:000 contains a list of all arguments that were passed to the function
-"     " echo a:000 
-"     " full command:
-"     " grep/vim [searchtext] **/*[optional filetype] | copen
-"     " echom a:searchtext
-"     " echom a:extension
-"     if len(a:extensionflag) == 0
-"         let extension = "**/*"
-"         let found_extension = expand('%:e')
-"         " echo found_extension
-"         if len(found_extension) != 0
-"             let extension = "**/*." . found_extension
-"         endif
-"     elseif a:extensionflag == "all"
-"         let extension = "**/*"
-"     else
-"         let extension = "**/*." . a:extensionflag
-"     endif
-" 
-"     " let file_name = expand('%:t:r')
-"     " echo expand('%:e')
-"     let searchcommand = "vim " . a:searchtext . " " . extension . " | copen"
-"     echom searchcommand
-"     execute searchcommand
-"     " echom "vim ".a:searchtext." ".a:extension." | copen"
-"     " execute "vim ".a:searchtext." ".a:extension." | copen"
-"     " vim a:searchtext **/* | copen
-"     " vim a:searchtext a:extension | copen
-" endfunction
 
 " Zoom / Restore window.
 function! s:ZoomToggle() abort
@@ -437,15 +377,55 @@ function! s:ZoomToggle() abort
 endfunction
 command! ZoomToggle call s:ZoomToggle()
 
-" function! Lines()
-"   set number!
-"   set relativenumber!
+" function! Demo()
+"   let curline = getline('.')
+"   call inputsave()
+"   let name = input('Enter name: ')
+"   call inputrestore()
+"   call setline('.', curline . ' ' . name)
 " endfunction
-" 
-" function! Notes()
-"   setlocal formatoptions=ctnqro
-"   setlocal comments+=n:*,n:#
-" endfunction
+
+function! Test()
+    echo "working Test"
+endfunction
+
+function! VimSettings()
+    let settings = {
+        \   '0': 'do nothing',
+        \   '5': 'call Lines()',
+        \   '6': 'call Notes()',
+        \   '7': 'set smartindent!',
+        \   '8': 'noh',
+        \   '9': 'set paste!',
+    \}
+    " execute 'call Test()'
+    for [key,value] in items(settings)
+        echo key . ' ' . value
+    endfor
+
+    call inputsave()
+    let action = input('Enter option: ')
+    call inputrestore()
+    if action != 0
+        execute settings[action]
+    endif
+endfunction
+
+" noremap <leader>5 :call Lines()<CR>
+" noremap <leader>6 :call Notes()<CR>
+" noremap <leader>7 :set smartindent!<CR>
+" noremap <leader>8 :noh<CR>
+" noremap <leader>9 :set paste!<CR>
+
+function! Lines()
+  set number!
+  set relativenumber!
+endfunction
+
+function! Notes()
+  setlocal formatoptions=ctnqro
+  setlocal comments+=n:*,n:#
+endfunction
 
 
 
