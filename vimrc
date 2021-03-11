@@ -322,7 +322,8 @@ set undoreload=10000        " number of lines to save for undo
 
 " command! -nargs=* Xyz :call GrepSearch(<q-args>)
 
-nnoremap <leader>s :call GrepSearch("", "")<left><left><left><left><left><left>
+nnoremap <leader>s :call GrepSearch("")<left><left>
+" nnoremap <leader>s :call GrepSearch("", "")<left><left><left><left><left><left>
 " nnoremap <leader>f :call GrepSearch()<left>
 " nnoremap <leader>f :vim  **/* | copen<left><left><left><left><left><left><left><left><left><left><left><left><left>
 
@@ -352,42 +353,75 @@ endfunction
 function! MoveBack()
      edit #
 endfunction
-
-" Self created function to make grep searching easier.
-function! GrepSearch(searchtext, extensionflag) " This is like *args in python, max is 20 args
-    " a:0 contains an integer which is the number of arguments passed to the function
-    " echom a:0 
-    " a:1 contains the first argument passed, a:2 contains the second and so on
-    " echom a:1 
-    " a:000 contains a list of all arguments that were passed to the function
-    " echo a:000 
-    " full command:
-    " grep/vim [searchtext] **/*[optional filetype] | copen
-    " echom a:searchtext
-    " echom a:extension
-    if len(a:extensionflag) == 0
-        let extension = "**/*"
+    
+" rewrite to split on , to differentiate number of args
+" If second is blank, default to current filetype
+"   If default filetype is blank, default to all
+" If second is all, default to call
+" If second is another specified filetype, then search using that.
+function! GrepSearch(parametersplit)
+    let parameters = split(a:parametersplit, ",")
+    echo parameters
+    echo len(parameters)
+    if len(parameters) == 1
         let found_extension = expand('%:e')
         " echo found_extension
         if len(found_extension) != 0
-            let extension = "**/*." . found_extension
+            call add(parameters, found_extension)
+        else
+            call add(parameters, 'all')
         endif
-    elseif a:extensionflag == "all"
-        let extension = "**/*"
-    else
-        let extension = "**/*." . a:extensionflag
     endif
-
-    " let file_name = expand('%:t:r')
-    " echo expand('%:e')
-    let searchcommand = "vim " . a:searchtext . " " . extension . " | copen"
+    let extension = "**/*"
+    echo parameters[1]
+    if parameters[1] != "all"
+        let extension = extension . "." . parameters[1]
+    endif
+    let searchcommand = "vim " . parameters[0] . " " . extension . " | copen"
     echom searchcommand
     execute searchcommand
-    " echom "vim ".a:searchtext." ".a:extension." | copen"
-    " execute "vim ".a:searchtext." ".a:extension." | copen"
-    " vim a:searchtext **/* | copen
-    " vim a:searchtext a:extension | copen
+
+    " This if statement may not be necessary
+    " if len(parameters) == 2
+    "     echo parameters[1]
+    " endif
 endfunction
+
+" Self created function to make grep searching easier.
+" function! GrepSearch(searchtext, extensionflag) " This is like *args in python, max is 20 args
+"     " a:0 contains an integer which is the number of arguments passed to the function
+"     " echom a:0 
+"     " a:1 contains the first argument passed, a:2 contains the second and so on
+"     " echom a:1 
+"     " a:000 contains a list of all arguments that were passed to the function
+"     " echo a:000 
+"     " full command:
+"     " grep/vim [searchtext] **/*[optional filetype] | copen
+"     " echom a:searchtext
+"     " echom a:extension
+"     if len(a:extensionflag) == 0
+"         let extension = "**/*"
+"         let found_extension = expand('%:e')
+"         " echo found_extension
+"         if len(found_extension) != 0
+"             let extension = "**/*." . found_extension
+"         endif
+"     elseif a:extensionflag == "all"
+"         let extension = "**/*"
+"     else
+"         let extension = "**/*." . a:extensionflag
+"     endif
+" 
+"     " let file_name = expand('%:t:r')
+"     " echo expand('%:e')
+"     let searchcommand = "vim " . a:searchtext . " " . extension . " | copen"
+"     echom searchcommand
+"     execute searchcommand
+"     " echom "vim ".a:searchtext." ".a:extension." | copen"
+"     " execute "vim ".a:searchtext." ".a:extension." | copen"
+"     " vim a:searchtext **/* | copen
+"     " vim a:searchtext a:extension | copen
+" endfunction
 
 " Zoom / Restore window.
 function! s:ZoomToggle() abort
