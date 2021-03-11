@@ -102,9 +102,11 @@ set statusline+=\ row:%l/%L\ (%03p%%)\ \|
 set statusline+=\ col:%03c
 set shortmess-=S
 
+
 " Generic Plugin configurations
 
 " NERDTree plugin information
+
 " nnoremap <leader>n :NERDTreeFocus<CR>
 " nnoremap <C-n> :NERDTree<CR>
 nnoremap <C-t> :NERDTreeToggle<CR>
@@ -138,6 +140,16 @@ nnoremap <C-a> :GFiles<CR>
 
 " vim code help
 
+" " SNIPPETS
+" " Read in and create a python main function
+" nnoremap \python-main :read $ENVSETTINGS/templates/python-main.template<CR>o<Tab>
+" nnoremap \html-main :read $ENVSETTINGS/templates/html-main.template<CR>
+" " For local replace
+" nnoremap gr gd[{V%::s/<C-R>///gc<left><left><left>
+" 
+" " For global replace
+" " nnoremap gR gD:%s/<C-R>///gc<left><left><left>
+
 " pretty print json file.
 " nnoremap \jsonpretty execute '%!python -m json.tool' | w 
 nnoremap \json-pretty :%!python -m json.tool
@@ -152,6 +164,31 @@ nnoremap \json-pretty :%!python -m json.tool
 
 
 "vim general remapped keys (not related to plugins)
+
+" In the future, may want to remap this to be comma separated instead of being
+" two separate parameters.
+noremap <leader>/ :call AutoComment("","c")<cr>
+noremap <leader>. :call AutoComment("","u")<cr>
+" noremap <leader>/ :call AutoComment("","c")<left><left><left><left><left><left>
+" noremap <leader>. :call AutoComment("","u")<left><left><left><left><left><left>
+" noremap <c-/> :call AutoComment("","c")<cr>
+" noremap <c-.> :call AutoComment("","u")<cr>
+" vnoremap <leader>/ :call AutoComment("","c")<left><left><left><left><left><left>
+" vnoremap <leader>. :call AutoComment("","u")<left><left><left><left><left><left>
+
+
+nnoremap <CR> o<Esc>k
+inoremap <C-e> <C-o>$
+inoremap <C-a> <C-o>0
+" inoremap {<CR> {<CR>}<C-o><S-o>
+" inoremap {<Tab> {}<Left>
+" inoremap [<Tab> []<Left>
+" inoremap (<Tab> ()<Left>
+" inoremap '<Tab> ''<Left>
+" inoremap \"<Tab> \""<Left>
+" inoremap :<CR> :<CR><Tab>
+"nnoremap <SPACE> <Nop>
+
 
 " Visual line color. In black background and grey text, cannot see.
 " hi Visual  guifg=blue guibg=blue gui=none
@@ -182,7 +219,7 @@ xnoremap <S-Down> :m'>+<CR>gv=gv
 " Buffers
 " nnoremap <C-i> :bn<cr>
 " nnoremap <C-o> :bp<cr>
-nnoremap <C-d> :bd<cr> 
+nnoremap <leader><d> :bd<cr> 
 nnoremap <leader>b :ls<cr>
 nnoremap <leader>o :buffers<CR>:b 
 
@@ -234,6 +271,10 @@ nnoremap <leader>0 :call VimSettings()<cr>
 
 
 "vim settings
+
+
+" " Default command to make sure vim does not behave like vi
+" set tabstop=2
 
 
 " " Search for cpp or use default
@@ -332,6 +373,72 @@ set shiftwidth=4
 
 "vim functions
 
+
+function! VimSettings()
+    let settings = {
+                \   '0': 'do nothing',
+                \   '5': 'call Lines() " numbers!, relativenumbers!',
+                \   '6': 'call Notes() " formatoptions=ctnqro, comments+=n:*,n:#',
+                \   '7': 'set smartindent!',
+                \   '8': 'noh',
+                \   '9': 'set paste!',
+                \}
+    " execute 'call Test()'
+    for [key,value] in items(settings)
+        echo key . ' ' . value
+    endfor
+
+    call inputsave()
+    let action = input('Enter option: ')
+    call inputrestore()
+    if action != 0 && has_key(settings, action)
+        execute settings[action]
+    endif
+endfunction
+
+" If commentchar is specified, do that.
+"   If else check filetype, refer to dictionary to find char
+"   If not in list, default to #
+" https://github.com/KarimElghamry/vim-auto-comment
+" Autocommenting is hard and annoying. Just manually comment or uncomment
+function! AutoComment(comment_char, comment_boolean)
+    let comments = {
+                \   '"': ['vim'],
+                \   '#': ['py', 'sh'],
+                \   '//': ['js', 'ts', 'cpp', 'c', 'java'],
+                \}
+    let cur_filetype = &filetype
+    let comment_type = '#'
+
+    if len(a:comment_char) == 0
+        for [comment_char,comment_filetype] in items(comments)
+            if index(comment_filetype, cur_filetype) >= 0
+                let comment_type = comment_char
+            endif
+        endfor
+    else
+        let comment_type = comment_char
+    endif
+
+    let line=getline('.')
+
+    if a:comment_boolean == 'c'
+        let line = comment_type . ' ' . line
+    elseif a:comment_boolean == 'u'
+        if line[0] == comment_type
+            let line = line[2:]
+        endif
+    endif
+
+    " if line[0] == comment_type
+    "     let line = line[2:]
+    " elseif line[0] != comment_type
+    "     let line = comment_type . ' ' . line
+    " endif
+    call setline('.',line)
+
+endfunction
+
 " These do the job, but for some reason causes vim to slow down. Currently
 " using fugitive vim instead.
 function! GitBranch()
@@ -388,27 +495,6 @@ endfunction
 command! ZoomToggle call s:ZoomToggle()
 
 
-function! VimSettings()
-    let settings = {
-        \   '0': 'do nothing',
-        \   '5': 'call Lines()',
-        \   '6': 'call Notes()',
-        \   '7': 'set smartindent!',
-        \   '8': 'noh',
-        \   '9': 'set paste!',
-    \}
-    " execute 'call Test()'
-    for [key,value] in items(settings)
-        echo key . ' ' . value
-    endfor
-
-    call inputsave()
-    let action = input('Enter option: ')
-    call inputrestore()
-    if action != 0
-        execute settings[action]
-    endif
-endfunction
 
 function! Lines()
   set number!
@@ -446,58 +532,10 @@ endfunction
 " endfunction
 
 
-
-" 
-" 
-" 
-" 
-" 
-" 
-" 
-" " Default command to make sure vim does not behave like vi
-" set tabstop=2
-" 
 " 
 " " mf files, ma, then `argdo open` to open in buffers. How to automate?
 " 
-" 
-" " SNIPPETS
-" " Read in and create a python main function
-" nnoremap \python-main :read $ENVSETTINGS/templates/python-main.template<CR>o<Tab>
-" nnoremap \html-main :read $ENVSETTINGS/templates/html-main.template<CR>
-" " For local replace
-" nnoremap gr gd[{V%::s/<C-R>///gc<left><left><left>
-" 
-" " For global replace
-" " nnoremap gR gD:%s/<C-R>///gc<left><left><left>
-" 
-" noremap <CR> o<Esc>k
-" inoremap <C-e> <C-o>$
-" inoremap <C-a> <C-o>0
-" 
-" 
-" " nnoremap <leader>s :w<CR>
-" " nnoremap <leader>x :x<CR>
-" nnoremap <leader>q :qa<CR>
-" " nnoremap <leader>qa :qa<CR>
-" 
-" inoremap {<CR> {<CR>}<C-o><S-o>
-" " inoremap {<Tab> {}<Left>
-" " inoremap [<Tab> []<Left>
-" " inoremap (<Tab> ()<Left>
-" " inoremap '<Tab> ''<Left>
-" " inoremap \"<Tab> \""<Left>
-" " inoremap :<CR> :<CR><Tab>
-" "nnoremap <SPACE> <Nop>
-" 
-" "inoremap jk <ESC>
-" "inoremap kj <ESC>
-" " inoremap ;<space> <ESC>
-" " inoremap <Space>; <ESC>
-" " inoremap '/ <ESC>
-" 
 " noremap <leader>e :call ToggleNetrw()<CR>
-" 
 " 
 " 
 " function! NetrwMapping()
@@ -509,35 +547,8 @@ endfunction
 " "noremap xq <ESC>
 " "nnoremap tq :rightbelow 20vs<CR>:e .<CR><C-w>r<CR>
 " 
-" " tab key mapping. Does not work well in netrw, since `t` creates file in new
-" " tab
-" " noremap <C-p> :tabp<cr>
-" " noremap <C-n> :tabn<cr>
-" " noremap tn :tabn<CR>
-" " noremap tp :tabp<CR>
-" " noremap th :tabn 1<CR>
-" " noremap t2 :tabn 2<CR>
-" " noremap t3 :tabn 3<CR>
-" " noremap t4 :tabn 4<CR>
-" " noremap t5 :tabn 5<CR>
-" " noremap t6 :tabn 6<CR>
-" " noremap tt :tablast<CR>
-" 
 " " Toggles netrw on the left side. Opens by default, toggle with
 " " ctrl-e
-" 
-" set nocompatible
-" " List of plugins... currently none
-" " Plugin 'Chiel92/vim-autoformat'
-" 
-" 
-" 
-" 
-" " set pastetoggle=<F10>
-" " set pastetoggle=<M-p>
-" 
-" filetype plugin on
-" 
 " 
 " " TAG JUMPING
 " " command! MakeTags !ctags -R .
@@ -648,6 +659,10 @@ endfunction
 "   call setline('.', curline . ' ' . name)
 " endfunction
 
-" function! Test()
-"     echo "working Test"
-" endfunction
+function! Test()
+    echo "working Test"
+endfunction
+
+
+
+
