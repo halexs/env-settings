@@ -177,6 +177,9 @@ noremap <leader>. :call AutoComment("","u")<cr>
 " vnoremap <leader>. :call AutoComment("","u")<left><left><left><left><left><left>
 
 
+" If splits exists, this will have the split take up the whole page.
+nnoremap <silent> <leader>f :ZoomToggle<CR>
+
 nnoremap <CR> o<Esc>k
 inoremap <C-e> <C-o>$
 inoremap <C-a> <C-o>0
@@ -219,7 +222,7 @@ xnoremap <S-Down> :m'>+<CR>gv=gv
 " Buffers
 " nnoremap <C-i> :bn<cr>
 " nnoremap <C-o> :bp<cr>
-nnoremap <leader><d> :bd<cr> 
+nnoremap <leader>d :bd<cr> 
 nnoremap <leader>b :ls<cr>
 nnoremap <leader>o :buffers<CR>:b 
 
@@ -253,8 +256,6 @@ nnoremap <C-n> 10<C-e>
 nnoremap <C-m> 10<C-y>
 
 inoremap <C-l> <ESC>
-" If splits exists, this will have the split take up the whole page.
-nnoremap <silent> <leader>f :ZoomToggle<CR>
 " This will clear the hlsearch
 " nnoremap <silent> <C-c> :noh<return><esc>
 nnoremap <silent> <leader>c :noh<return><esc>
@@ -373,14 +374,13 @@ set shiftwidth=4
 
 "vim functions
 
-
 function! VimSettings()
     let settings = {
                 \   '0': 'do nothing',
                 \   '5': 'call Lines() " numbers!, relativenumbers!',
                 \   '6': 'call Notes() " formatoptions=ctnqro, comments+=n:*,n:#',
                 \   '7': 'set smartindent!',
-                \   '8': 'noh',
+                \   '8': 'ZoomToggle " Toggle fullscreen the current view',
                 \   '9': 'set paste!',
                 \}
     " execute 'call Test()'
@@ -389,6 +389,8 @@ function! VimSettings()
     endfor
 
     call inputsave()
+"     echo 'Enter option: '
+"     let action = getchar()
     let action = input('Enter option: ')
     call inputrestore()
     if action != 0 && has_key(settings, action)
