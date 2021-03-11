@@ -59,8 +59,11 @@ call vundle#end()            " required
 
 filetype plugin indent on    " required
 
+" My leader key is space.
+map <SPACE> <leader>
+
 " Status line (bottom) configurations
-set laststatus=2
+ set laststatus=2
 " set statusline+=%{StatuslineGit()}
 
 " Colors here: https://jonasjacek.github.io/colors/
@@ -85,7 +88,6 @@ set statusline+=\ %m%r%w
 " set statusline+=%{StatuslineGit()}\ \|
 " This requires fugitive vim plugin
 set statusline+=\ %{fugitive#head()}\ \|
-
 "File+path
 set statusline+=\ %<%f\ \|
 
@@ -98,22 +100,9 @@ set statusline+=\ %y\ \|
 set statusline+=\ row:%l/%L\ (%03p%%)\ \|
 "Colnr
 set statusline+=\ col:%03c
-
 set shortmess-=S
 
-" My leader key is space.
-map <SPACE> <leader>
-" " Search for cpp or use default
-syntax enable
-" 
-set mouse=a
-
-" Allows mac to copy and paste through vim and clipboard
-set clipboard=unnamed
-
-" "Line Numbers
-set number
-set relativenumber
+" Generic Plugin configurations
 
 " NERDTree plugin information
 " nnoremap <leader>n :NERDTreeFocus<CR>
@@ -131,8 +120,7 @@ set modifiable
 " Exit Vim if NERDTree is the only window left.
 " autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
 
-" Vim git gutter information, try using fugitive vim now.
-
+" Vim git gutter information, using both fugitive and git gutter
 " vim gitgutter plugin update time
 set updatetime=100
 highlight clear SignColumn
@@ -141,137 +129,34 @@ highlight GitGutterChange ctermfg=darkgrey ctermbg=yellow
 highlight GitGutterDelete ctermfg=darkgrey ctermbg=red
 highlight GitGutterChangeDelete ctermfg=darkgrey ctermbg=yellow
 
-" remap file save, file save+quit, and quit-all
-inoremap <C-S> <ESC>:update<CR>a
-nnoremap <C-S> :update<CR>
-nnoremap <C-x> :x<CR>
-nnoremap <C-q> :q<CR>
-nnoremap <leader>q :qa<CR>
-
-nnoremap <leader>r :source ~/.vimrc<CR>
-nnoremap <C-e> 3<C-e>
-nnoremap <C-y> 3<C-y>
-"nnoremap <leader>] 10<C-e>
-"nnoremap <leader>[ 10<C-y>
-" nnoremap <C-j> 10<C-e>
-" nnoremap <C-k> 10<C-y>
-nnoremap <C-n> 10<C-e>
-nnoremap <C-m> 10<C-y>
-
-inoremap <C-l> <ESC>
-
-" Buffers
-" nnoremap <C-i> :bn<cr>
-" nnoremap <C-o> :bp<cr>
-nnoremap <C-d> :bd<cr> 
-nnoremap <leader>b :ls<cr>
-nnoremap <leader>o :buffers<CR>:b 
-"nnoremap <leader>o :buffers<CR>:b
-
-" nnoremap <leader>l :ls<cr>
-
-" Tabs though this may not be necessary since gt and gT switches
-" nnoremap <C-u> :tabn<CR>
-" nnoremap <C-p> :tabp<CR>
-
-" Use ctrl-[select] the active split!
-noremap <silent> <C-k> :wincmd k<CR>
-noremap <silent> <C-j> :wincmd j<CR>
-noremap <silent> <C-h> :wincmd h<CR>
-noremap <silent> <C-l> :wincmd l<CR>
-" inoremap <C-k> <C-o>:wincmd k<CR>
-" inoremap <C-j> <C-o>:wincmd j<CR>
-" inoremap <C-h> <C-o>:wincmd h<CR>
-" inoremap <C-l> <C-o>:wincmd l<CR>
-
-
-"Tab Space
-set ts=4
-" set ts=2
-
-set expandtab
-" Highlight column 80 to unsure lines don't go too long.
-set cc=80
-highlight ColorColumn ctermbg=white
-" highlight ColorColumn guibg=lightgrey ctermbg=lightgrey
-
-" " These commands customize built-in find to make vim search through the
-" whole project structure. Unfortunately even if files matched 'ignores'
-" node_modules, the searching takes a long time to complete still, leading me
-" to believe it's still searching through those files. 
-" " replaced with fzf.vim plugin instead.
-" set path+=**
-" set wildmenu
-" "set wildignore+=**/node_modules/**
-set wildignore+=**/node_modules/**
-" set wildmode=longest,list,full
-
 " Maps fzf plugin to ctrl-a, searches through all NON-gitignore files.
 " nnoremap <C-;> :GFiles<CR>
 " To search through normal files, do :Files
 nnoremap <C-a> :GFiles<CR>
 " map <C-a> :Files<CR>
 
-" If splits exists, this will have the split take up the whole page.
-nnoremap <silent> <leader>f :ZoomToggle<CR>
 
-"Set ignore Case when Searching with / and using vimgrep (GrepSearch)
-set ignorecase
+" vim code help
+
+" pretty print json file.
+" nnoremap \jsonpretty execute '%!python -m json.tool' | w 
+nnoremap \json-pretty :%!python -m json.tool
+
+" " nnoremap <leader>ch vat:s/^\(.*\)$/<!-- \1 -->/
+" " <html>
+" "  help world
+" " </html>
 " 
-" Smart Casing when searching. This will ignore ignorecase if capital letters
-" are specified
-" Does not affect vimgrep. Need to turn off ignorecase (set noic)
-set smartcase
+" " macros
+" "let @c = 'vat:s/^\(.*\)$/<!-- \1 -->/:noh'
+
+
+"vim general remapped keys (not related to plugins)
 
 " Visual line color. In black background and grey text, cannot see.
 " hi Visual  guifg=blue guibg=blue gui=none
 hi Visual ctermfg=darkgrey ctermbg=lightblue
 " highlight GitGutterDelete ctermfg=black ctermbg=red
-
-" Example of searching/grepping through files and opening in vim.
-" :grep bar **/*.py | copen
-
-" "Wrapping
-set wrap
-" 
-"Auto Indent. The following 2 go together.
-set ai
-set smartindent
-" 
-" Always Show cmd
-set showcmd
-" 
-" "Underline Current Cursor Line
-set cursorline
-" "set ruler
-" 
-" "Show Graphical Menu
-" set wildmenu
-" 
-" "Matching Brackets
-set showmatch
-" 
-"Tenth of a second to blink when matching brackets
-set mat=2
-" 
-"Search as characters are entered
-set incsearch
-" 
-"highlight search matches
-set hlsearch
-" This will clear the hlsearch
-" nnoremap <silent> <C-c> :noh<return><esc>
-nnoremap <silent> <leader>c :noh<return><esc>
-" 
-" 
-" "Always show status line
-set laststatus=2
-" 
-" "set background=dark
-" 
-" Allows to switch buffers even if not written too (which is vim default)
-set hidden
-
 " Remap Q to quit
 nnoremap Q :q<CR>
 
@@ -294,6 +179,134 @@ xnoremap <S-Up>  :m-2<CR>gv=gv
 
 " move selected lines down one line
 xnoremap <S-Down> :m'>+<CR>gv=gv
+" Buffers
+" nnoremap <C-i> :bn<cr>
+" nnoremap <C-o> :bp<cr>
+nnoremap <C-d> :bd<cr> 
+nnoremap <leader>b :ls<cr>
+nnoremap <leader>o :buffers<CR>:b 
+
+" nnoremap <leader>l :ls<cr>
+
+
+" Use ctrl-[select] the active split!
+noremap <silent> <C-k> :wincmd k<CR>
+noremap <silent> <C-j> :wincmd j<CR>
+noremap <silent> <C-h> :wincmd h<CR>
+noremap <silent> <C-l> :wincmd l<CR>
+" inoremap <C-k> <C-o>:wincmd k<CR>
+" inoremap <C-j> <C-o>:wincmd j<CR>
+" inoremap <C-h> <C-o>:wincmd h<CR>
+" inoremap <C-l> <C-o>:wincmd l<CR>
+" remap file save, file save+quit, and quit-all
+inoremap <C-S> <ESC>:update<CR>a
+nnoremap <C-S> :update<CR>
+nnoremap <C-x> :x<CR>
+nnoremap <C-q> :q<CR>
+nnoremap <leader>q :qa<CR>
+
+nnoremap <leader>r :source ~/.vimrc<CR>
+nnoremap <C-e> 3<C-e>
+nnoremap <C-y> 3<C-y>
+"nnoremap <leader>] 10<C-e>
+"nnoremap <leader>[ 10<C-y>
+" nnoremap <C-j> 10<C-e>
+" nnoremap <C-k> 10<C-y>
+nnoremap <C-n> 10<C-e>
+nnoremap <C-m> 10<C-y>
+
+inoremap <C-l> <ESC>
+" If splits exists, this will have the split take up the whole page.
+nnoremap <silent> <leader>f :ZoomToggle<CR>
+" This will clear the hlsearch
+" nnoremap <silent> <C-c> :noh<return><esc>
+nnoremap <silent> <leader>c :noh<return><esc>
+
+" command! -nargs=* Xyz :call GrepSearch(<q-args>)
+
+nnoremap <leader>s :call GrepSearch("")<left><left>
+
+nnoremap <leader>0 :call VimSettings()<cr>
+" nmap <silent> <leader>ws :call MarkWindowSwap()<CR>
+" nmap <silent> <leader>wt :call DoWindowSwap()<CR><C-w>h
+" 
+
+
+
+"vim settings
+
+
+" " Search for cpp or use default
+syntax enable
+" 
+set mouse=a
+
+" Allows mac to copy and paste through vim and clipboard
+set clipboard=unnamed
+
+" "Line Numbers
+set number
+set relativenumber
+
+set expandtab
+" Highlight column 80 to unsure lines don't go too long.
+set cc=80
+highlight ColorColumn ctermbg=white
+" highlight ColorColumn guibg=lightgrey ctermbg=lightgrey
+
+" " These commands customize built-in find to make vim search through the
+" whole project structure. Unfortunately even if files matched 'ignores'
+" node_modules, the searching takes a long time to complete still, leading me
+" to believe it's still searching through those files. 
+" replaced with fzf.vim plugin instead.
+" Still useful for quick files.
+" set path+=**
+set wildmenu
+set wildignore+=**/node_modules/**
+set wildmode=longest,list,full
+
+"Set ignore Case when Searching with / and using vimgrep (GrepSearch)
+set ignorecase
+
+" Smart Casing when searching. This will ignore ignorecase if capital letters
+" are specified
+" Does not affect vimgrep. Need to turn off ignorecase (set noic)
+set smartcase
+
+" "Wrapping
+set wrap
+" 
+"Auto Indent. The following 2 go together.
+set ai
+set smartindent
+" 
+" Always Show cmd
+set showcmd
+" 
+" "Underline Current Cursor Line
+set cursorline
+" "set ruler
+" 
+" 
+" "Matching Brackets
+set showmatch
+" 
+"Tenth of a second to blink when matching brackets
+set mat=2
+" 
+"Search as characters are entered
+set incsearch
+" 
+"highlight search matches
+set hlsearch
+
+" "Always show status line
+set laststatus=2
+" 
+" "set background=dark
+" 
+" Allows to switch buffers even if not written too (which is vim default)
+set hidden
 
 " keep undo history
 set undofile                " Save undos after file closes
@@ -301,24 +314,21 @@ set undodir=$HOME/.vim/undo " where to save undo histories
 set undolevels=1000         " How many undos
 set undoreload=10000        " number of lines to save for undo
 
-
-" command! -nargs=* Xyz :call GrepSearch(<q-args>)
-
-nnoremap <leader>s :call GrepSearch("")<left><left>
-" nnoremap <leader>s :call GrepSearch("", "")<left><left><left><left><left><left>
-" nnoremap <leader>f :call GrepSearch()<left>
-" nnoremap <leader>f :vim  **/* | copen<left><left><left><left><left><left><left><left><left><left><left><left><left>
-
-" pretty print json file.
-" nnoremap \jsonpretty execute '%!python -m json.tool' | w 
-nnoremap \json-pretty :%!python -m json.tool
+"Tab Space
+set ts=4
+" set ts=2
 
 " scrolloff to keep the cursor in the center. Try it by default, or move to
 " function. Now change it to show at least 10 lines.
 " set scrolloff=999
 set scrolloff=10
 
-nnoremap <leader>0 :call VimSettings()<cr>
+"Shift Space
+"set shiftwidth=4
+set shiftwidth=4
+
+
+
 
 "vim functions
 
@@ -377,17 +387,6 @@ function! s:ZoomToggle() abort
 endfunction
 command! ZoomToggle call s:ZoomToggle()
 
-" function! Demo()
-"   let curline = getline('.')
-"   call inputsave()
-"   let name = input('Enter name: ')
-"   call inputrestore()
-"   call setline('.', curline . ' ' . name)
-" endfunction
-
-function! Test()
-    echo "working Test"
-endfunction
 
 function! VimSettings()
     let settings = {
@@ -410,12 +409,6 @@ function! VimSettings()
         execute settings[action]
     endif
 endfunction
-
-" noremap <leader>5 :call Lines()<CR>
-" noremap <leader>6 :call Notes()<CR>
-" noremap <leader>7 :set smartindent!<CR>
-" noremap <leader>8 :noh<CR>
-" noremap <leader>9 :set paste!<CR>
 
 function! Lines()
   set number!
@@ -478,16 +471,6 @@ endfunction
 " " For global replace
 " " nnoremap gR gD:%s/<C-R>///gc<left><left><left>
 " 
-" " set pastetoggle=<leader>9
-" " set pastetoggle=<F10>
-" " noremap <leader>9 :set pastetoggle<CR>
-" 
-" noremap <leader>5 :call Lines()<CR>
-" noremap <leader>6 :call Notes()<CR>
-" noremap <leader>7 :set smartindent!<CR>
-" noremap <leader>8 :noh<CR>
-" noremap <leader>9 :set paste!<CR>
-" 
 " noremap <CR> o<Esc>k
 " inoremap <C-e> <C-o>$
 " inoremap <C-a> <C-o>0
@@ -506,15 +489,12 @@ endfunction
 " " inoremap \"<Tab> \""<Left>
 " " inoremap :<CR> :<CR><Tab>
 " "nnoremap <SPACE> <Nop>
-" "let mapleader=" "
 " 
 " "inoremap jk <ESC>
 " "inoremap kj <ESC>
 " " inoremap ;<space> <ESC>
 " " inoremap <Space>; <ESC>
 " " inoremap '/ <ESC>
-" nmap <silent> <leader>ws :call MarkWindowSwap()<CR>
-" nmap <silent> <leader>wt :call DoWindowSwap()<CR><C-w>h
 " 
 " noremap <leader>e :call ToggleNetrw()<CR>
 " 
@@ -523,17 +503,6 @@ endfunction
 " function! NetrwMapping()
 "   noremap <buffer> <C-v> :call OpenToRight()<CR>
 "   noremap <buffer> <C-h> :call OpenBelow()<CR>
-" "  set number
-" "  set relativenumber
-" "  noremap <leader>j :bn<cr>
-" "  noremap <leader>k :bp<cr>
-" "  noremap <leader>d :bd<cr> 
-" "  noremap <leader>l :tabn<CR>
-" "  noremap <leader>h :tabp<CR>
-" "  noremap <c-k> :wincmd k<CR>
-" "  noremap <c-j> :wincmd j<CR>
-" "  noremap <c-h> :wincmd h<CR>
-" "  noremap <c-l> :wincmd l<CR>
 " endfunction
 " 
 " 
@@ -557,22 +526,11 @@ endfunction
 " " Toggles netrw on the left side. Opens by default, toggle with
 " " ctrl-e
 " 
-" " nnoremap <leader>ch vat:s/^\(.*\)$/<!-- \1 -->/
-" " <html>
-" "  help world
-" " </html>
-" 
-" " macros
-" "let @c = 'vat:s/^\(.*\)$/<!-- \1 -->/:noh'
-" 
 " set nocompatible
 " " List of plugins... currently none
 " " Plugin 'Chiel92/vim-autoformat'
 " 
 " 
-"Shift Space
-"set shiftwidth=4
-set shiftwidth=4
 " 
 " 
 " " set pastetoggle=<F10>
@@ -679,37 +637,17 @@ set shiftwidth=4
 " 
 " 
 " 
-" " Buffers
-" nnoremap <leader>i :bn<cr>
-" nnoremap <leader>o :bp<cr>
-" nnoremap <leader>d :bd<cr> 
-" " nnoremap <leader>l :ls<cr>
-" 
-" " Tabs though this may not be necessary since gt and gT switches
-" nnoremap <leader>u :tabn<CR>
-" nnoremap <leader>p :tabp<CR>
-" " nnoremap <leader>t1 :tabn 1<CR>
-" " nnoremap <leader>t2 :tabn 2<CR>
-" " nnoremap <leader>t3 :tabn 3<CR>
-" " nnoremap <leader>t4 :tabn 4<CR>
-" " nnoremap <leader>t5 :tabn 5<CR>
-" " nnoremap <leader>t5 :tabn 6<CR>
-" " nnoremap <leader>t0 :tablast<CR>
-" 
-" " Use ctrl-[select] the active split!
-" "noremap <c-k> :wincmd k<CR>
-" "noremap <c-j> :wincmd j<CR>
-" "noremap <c-h> :wincmd h<CR>
-" "noremap <c-l> :wincmd l<CR>
-" noremap <silent> <leader>k :wincmd k<CR>
-" noremap <silent> <leader>j :wincmd j<CR>
-" noremap <silent> <leader>h :wincmd h<CR>
-" noremap <silent> <leader>l :wincmd l<CR>
-" " inoremap <C-k> <C-o>:wincmd k<CR>
-" " inoremap <C-j> <C-o>:wincmd j<CR>
-" " inoremap <C-h> <C-o>:wincmd h<CR>
-" " inoremap <C-l> <C-o>:wincmd l<CR>
 
+" Helpful guides and how-tos for testing/quick reference purposes
 
+" function! Demo()
+"   let curline = getline('.')
+"   call inputsave()
+"   let name = input('Enter name: ')
+"   call inputrestore()
+"   call setline('.', curline . ' ' . name)
+" endfunction
 
-
+" function! Test()
+"     echo "working Test"
+" endfunction
