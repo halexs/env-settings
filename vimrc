@@ -466,39 +466,34 @@ function! AutoComment(comment_char, comment_boolean)
 endfunction
 
 
-function Test2(comment_char, comment_boolean)
-    if len(a:comment_char) == 0
-        let comment_character =  GetCommentChar()
-    else
-        let comment_character = comment_char
-    endif
-    " comment
-    " let command = "normal! mqI" . GetCommentChar() . " \<esc>`q"
-    " uncomment
-    " let command = "normal! mq^xx \<esc>`q"
-
-    " now make it smarter depending on the GetCommentChar() character
-
-    " get first character in a line.
-    let move_to_first = "normal! mq^"
-    execute move_to_first
-    let current_char = matchstr(getline('.'), '\%' . col('.') . 'c.')
-    " echo current_char
-    if current_char == ""
-        let change_line = "normal! `q"
-    elseif a:comment_boolean == 'u' || current_char == GetCommentChar()
-        echo "line is already commented"
-        let change_line = "normal! xx \<esc>`q"
-    elseif a:comment_boolean == 'c'
-        echo "line needs to be commented"
-        let change_line = "normal! i" . GetCommentChar() . " \<esc>`q"
-    endif
-    " echo change_line
-    execute change_line
-
-    " echo command
-    " execute command
-endfunction
+" Closer to what I want, but still not good for block comments.
+" function AutoComment(comment_char, comment_boolean)
+"     if len(a:comment_char) == 0
+"         let comment_character =  GetCommentChar()
+"     else
+"         let comment_character = a:comment_char
+"     endif
+" 
+"     " get first character in a line.
+"     let move_to_first = "normal! mq^"
+"     execute move_to_first
+"     let current_char = matchstr(getline('.'), '\%' . col('.') . 'c.')
+"     " echo current_char
+"     let change_line = "normal! "
+"     if a:comment_boolean == 'c'
+"         " echo "line needs to be commented"
+"         let change_line = change_line . "i" . comment_character . " \<esc>"
+"     " elseif a:comment_boolean == 'u' || current_char == comment_character
+"     elseif a:comment_boolean == 'u'
+"         " echo "line is already commented"
+"         if current_char == comment_character
+"             let change_line = change_line . "xx \<esc>"
+"         endif
+"     endif
+"     let change_line = change_line . "`q"
+"     " echo change_line
+"     execute change_line
+" endfunction
 
 function! GetCommentChar()
     let comments = {
