@@ -183,7 +183,7 @@ nnoremap <silent> <leader>f :ZoomToggle<CR>
 nnoremap <CR> o<Esc>k
 inoremap <C-e> <C-o>$
 inoremap <C-a> <C-o>0
-" inoremap {<CR> {<CR>}<C-o><S-o>
+inoremap {<CR> {<CR>}<C-o><S-o>
 " inoremap {<Tab> {}<Left>
 " inoremap [<Tab> []<Left>
 " inoremap (<Tab> ()<Left>
@@ -273,10 +273,17 @@ nnoremap <leader>0 :call VimSettings()<cr>
 
 "vim settings
 
+" " FILE BROWSING with netrw
+" "let g:netrw_banner=0        " disable banner
+" "let g:netrw_browse_split=4  " open in prior window
+" let g:netrw_altv=1          " open splits to the right
+" let g:netrw_liststyle=3      " tree view
+" let g:netrw_list_hide=netrw_gitignore#Hide()
+" let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
+" let g:netrw_bufsettings = 'noma nomod nu nobl nowrap ro'
 
 " " Default command to make sure vim does not behave like vi
 " set tabstop=2
-
 
 " " Search for cpp or use default
 syntax enable
@@ -377,10 +384,11 @@ set shiftwidth=4
 function! VimSettings()
     let settings = {
                 \   '0': 'do nothing',
-                \   '5': 'call Lines() " numbers!, relativenumbers!',
-                \   '6': 'call Notes() " formatoptions=ctnqro, comments+=n:*,n:#',
-                \   '7': 'set smartindent!',
-                \   '8': 'ZoomToggle " Toggle fullscreen the current view',
+                \   '1': 'call Lines() " numbers!, relativenumbers!',
+                \   '2': 'call Notes() " formatoptions=ctnqro, comments+=n:*,n:#',
+                \   '5': 'ZoomToggle " Toggle fullscreen the current view',
+                \   '6': 'let @+ = expand("%:p") " Get full filepath into yank',
+                \   '8': 'set smartindent!',
                 \   '9': 'set paste!',
                 \}
     " execute 'call Test()'
@@ -397,6 +405,16 @@ function! VimSettings()
         execute settings[action]
     endif
 endfunction
+
+" Timer to check if file has been updated by external program, and to reload.
+" if ! exists("g:CheckUpdateStarted")
+"     let g:CheckUpdateStarted=1
+"     call timer_start(1,'CheckUpdate')
+" endif
+" function! CheckUpdate(timer)
+"     silent! checktime
+"     call timer_start(1000,'CheckUpdate')
+" endfunction
 
 " If commentchar is specified, do that.
 "   If else check filetype, refer to dictionary to find char
