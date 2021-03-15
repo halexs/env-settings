@@ -1,6 +1,7 @@
 " plugins
 " TODO: separate plugins into a plugins_rc file instead of this file.
 
+" Default command to make sure vim does not behave like vi
 set nocompatible
 filetype off
 " set the runtime path to include Vundle and initialize
@@ -56,6 +57,8 @@ Plugin 'vim-python/python-syntax'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
+
+
 
 filetype plugin indent on    " required
 
@@ -282,7 +285,6 @@ nnoremap <leader>0 :call VimSettings()<cr>
 " let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
 " let g:netrw_bufsettings = 'noma nomod nu nobl nowrap ro'
 
-" " Default command to make sure vim does not behave like vi
 " set tabstop=2
 
 " " Search for cpp or use default
@@ -348,6 +350,10 @@ set incsearch
 " 
 "highlight search matches
 set hlsearch
+" set hls
+" Clear if source vimrc
+let @/ = ""
+
 
 " "Always show status line
 set laststatus=2
@@ -458,6 +464,59 @@ function! AutoComment(comment_char, comment_boolean)
     call setline('.',line)
 
 endfunction
+
+
+function Test2(comment_char, comment_boolean)
+    if len(a:comment_char) == 0
+        let comment_character =  GetCommentChar()
+    else
+        let comment_character = comment_char
+    endif
+    " comment
+    " let command = "normal! mqI" . GetCommentChar() . " \<esc>`q"
+    " uncomment
+    " let command = "normal! mq^xx \<esc>`q"
+
+    " now make it smarter depending on the GetCommentChar() character
+
+    " get first character in a line.
+    let move_to_first = "normal! mq^"
+    execute move_to_first
+    let current_char = matchstr(getline('.'), '\%' . col('.') . 'c.')
+    " echo current_char
+    if current_char == ""
+        let change_line = "normal! `q"
+    elseif a:comment_boolean == 'u' || current_char == GetCommentChar()
+        echo "line is already commented"
+        let change_line = "normal! xx \<esc>`q"
+    elseif a:comment_boolean == 'c'
+        echo "line needs to be commented"
+        let change_line = "normal! i" . GetCommentChar() . " \<esc>`q"
+    endif
+    " echo change_line
+    execute change_line
+
+    " echo command
+    " execute command
+endfunction
+
+function! GetCommentChar()
+    let comments = {
+                \   '"': ['vim'],
+                \   '#': ['py', 'sh', 'yaml'],
+                \   '//': ['js', 'ts', 'cpp', 'c', 'java'],
+                \}
+    let cur_filetype = &filetype
+    let comment_type = '#'
+
+    for [comment_char,comment_filetype] in items(comments)
+        if index(comment_filetype, cur_filetype) >= 0
+            let comment_type = comment_char
+        endif
+    endfor
+    return comment_type
+endfunction
+
 
 " These do the job, but for some reason causes vim to slow down. Currently
 " using fugitive vim instead.
