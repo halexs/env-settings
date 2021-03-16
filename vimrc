@@ -388,34 +388,63 @@ set shiftwidth=4
 
 "vim functions
 
+"     let settings = {
+"                 \   '0': 'to do nothing or just continue with <cr>',
+"                 \   '1': 'call Lines() " numbers!, relativenumbers!',
+"                 \   '2': 'call Notes() " formatoptions=ctnqro, comments+=n:*,n:#',
+"                 \   '5': 'ZoomToggle " Toggle fullscreen the current view',
+"                 \   '6': 'let @+ = expand("%:p") " Get full filepath into yank',
+"                 \   '7': 'set smartindent!',
+"                 \   '8': 'set paste!',
+"                 \   'p0': 'p is for plugins. This command does nothing.',
+"                 \   'p1': 'Files',
+"                 \   'p2': 'Commits',
+"                 \   'p3': 'BCommits',
+"                 \}
+
 function! VimSettingsMenu()
-    let settings = {
-                \   '0': 'to do nothing or just continue with <cr>',
-                \   '1': 'call Lines() " numbers!, relativenumbers!',
-                \   '2': 'call Notes() " formatoptions=ctnqro, comments+=n:*,n:#',
-                \   '5': 'ZoomToggle " Toggle fullscreen the current view',
-                \   '6': 'let @+ = expand("%:p") " Get full filepath into yank',
-                \   '7': 'set smartindent!',
-                \   '8': 'set paste!',
-                \   'p0': 'p is for plugins. This command does nothing.',
-                \   'p1': 'Files',
-                \   'p2': 'Commits',
-                \   'p3': 'BCommits',
-                \}
+    " settings format is: keypress_command, execute_command, command_comments
+    let settings = [
+                \   ['0', 'This command does nothing.', 'exit or continue with <cr> or 0'],
+                \   ['1', 'call Lines()', 'Default: on, numbers!, relativenumbers!'],
+                \   ['2', 'call Notes()', 'Default: off, formatoptions=ctnqro, comments+=n:*,n:#'],
+                \   ['5', 'ZoomToggle', 'Toggle fullscreen the current view'],
+                \   ['6', 'let @+ = expand("%:p")', 'Get full filepath into yank'],
+                \   ['7', 'set smartindent!', 'Default: on, sometimes smartindent causes problems with code'],
+                \   ['8', 'set paste!', 'Default: on, pasting code with indents sometimes causes problems'],
+                \   ['p0', 'This command does nothing.', 'p is for plugins.'],
+                \   ['p1', 'Files', 'fzf plugin to browse all the files of a repo (default is ignore .gitignore files)'],
+                \   ['p2', 'Commits', 'fzf plugin to see the past commits related to the project, requires fugitive.vim plugin'],
+                \   ['p3', 'BCommits', 'fzf plugin to see past commits related to this file, requires fugitive.vim plugin'],
+                \]
+    let settings_dict = {}
+    for setting in settings
+        let key = setting[0]
+        let command = setting[1]
+        let comments = setting[2]
+        echo key  .  " " . command  . " , \" " . comments
+        if command != "This command does nothing."
+            let settings_dict[key] = command
+        endif
+        " echo command
+        " echo comments
+    endfor
+"     echo settings_dict
     " Maybe separate plugins into a separate mapping, where 'p' brings a
     " different menu.
     " execute 'call Test()'
-    for [key,value] in items(settings)
-        echo key . ' ' . value
-    endfor
-
+"     for [key,value] in items(settings)
+"         echo key . ' ' . value
+"     endfor
+" 
     call inputsave()
 "     echo 'Enter option: '
 "     let action = getchar()
     let action = input('Enter option: ')
     call inputrestore()
-    if action != '0' && action != 'p0' && has_key(settings, action)
-        execute settings[action]
+"     echo action
+    if has_key(settings_dict, action)
+        execute settings_dict[action]
     endif
 endfunction
 
