@@ -426,23 +426,12 @@ function! VimSettingsMenu()
         if command != "This command does nothing."
             let settings_dict[key] = command
         endif
-        " echo command
-        " echo comments
     endfor
-"     echo settings_dict
     " Maybe separate plugins into a separate mapping, where 'p' brings a
     " different menu.
-    " execute 'call Test()'
-"     for [key,value] in items(settings)
-"         echo key . ' ' . value
-"     endfor
-" 
     call inputsave()
-"     echo 'Enter option: '
-"     let action = getchar()
     let action = input('Enter option: ')
     call inputrestore()
-"     echo action
     if has_key(settings_dict, action)
         execute settings_dict[action]
     endif
@@ -464,22 +453,12 @@ endfunction
 " https://github.com/KarimElghamry/vim-auto-comment
 " Autocommenting is hard and annoying. Just manually comment or uncomment
 function! AutoComment(comment_char, comment_boolean)
-    let comments = {
-                \   '"': ['vim'],
-                \   '#': ['py', 'sh'],
-                \   '//': ['js', 'ts', 'cpp', 'c', 'java'],
-                \}
     let cur_filetype = &filetype
-    let comment_type = '#'
 
-    if len(a:comment_char) == 0
-        for [comment_char,comment_filetype] in items(comments)
-            if index(comment_filetype, cur_filetype) >= 0
-                let comment_type = comment_char
-            endif
-        endfor
+    if len(a:comment_char) != 0
+        let comment_type = a:comment_char
     else
-        let comment_type = comment_char
+        let comment_type = GetCommentChar()
     endif
 
     let line=getline('.')
@@ -492,13 +471,30 @@ function! AutoComment(comment_char, comment_boolean)
         endif
     endif
 
+    " This would be for a autocomment type system.
     " if line[0] == comment_type
     "     let line = line[2:]
     " elseif line[0] != comment_type
     "     let line = comment_type . ' ' . line
     " endif
     call setline('.',line)
+endfunction
 
+function! GetCommentChar()
+    let comments = {
+                \   '"': ['vim'],
+                \   '#': ['py', 'sh', 'yaml'],
+                \   '//': ['js', 'ts', 'cpp', 'c', 'java'],
+                \}
+    let cur_filetype = &filetype
+    let comment_type = '#'
+
+    for [comment_char,comment_filetype] in items(comments)
+        if index(comment_filetype, cur_filetype) >= 0
+            let comment_type = comment_char
+        endif
+    endfor
+    return comment_type
 endfunction
 
 
@@ -530,24 +526,6 @@ endfunction
 "     " echo change_line
 "     execute change_line
 " endfunction
-
-function! GetCommentChar()
-    let comments = {
-                \   '"': ['vim'],
-                \   '#': ['py', 'sh', 'yaml'],
-                \   '//': ['js', 'ts', 'cpp', 'c', 'java'],
-                \}
-    let cur_filetype = &filetype
-    let comment_type = '#'
-
-    for [comment_char,comment_filetype] in items(comments)
-        if index(comment_filetype, cur_filetype) >= 0
-            let comment_type = comment_char
-        endif
-    endfor
-    return comment_type
-endfunction
-
 
 " These do the job, but for some reason causes vim to slow down. Currently
 " using fugitive vim instead.
