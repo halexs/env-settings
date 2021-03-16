@@ -137,7 +137,8 @@ highlight GitGutterChangeDelete ctermfg=darkgrey ctermbg=yellow
 " Maps fzf plugin to ctrl-a, searches through all NON-gitignore files.
 " nnoremap <C-;> :GFiles<CR>
 " To search through normal files, do :Files
-nnoremap <C-a> :GFiles<CR>
+nnoremap <leader>a :GFiles<CR>
+" nnoremap <C-a> :GFiles<CR>
 " map <C-a> :Files<CR>
 
 
@@ -267,7 +268,7 @@ nnoremap <silent> <leader>c :noh<return><esc>
 
 nnoremap <leader>s :call GrepSearch("")<left><left>
 
-nnoremap <leader>0 :call VimSettings()<cr>
+nnoremap <leader>0 :call VimSettingsMenu()<cr>
 " nmap <silent> <leader>ws :call MarkWindowSwap()<CR>
 " nmap <silent> <leader>wt :call DoWindowSwap()<CR><C-w>h
 " 
@@ -387,16 +388,22 @@ set shiftwidth=4
 
 "vim functions
 
-function! VimSettings()
+function! VimSettingsMenu()
     let settings = {
-                \   '0': 'do nothing',
+                \   '0': 'to do nothing or just continue with <cr>',
                 \   '1': 'call Lines() " numbers!, relativenumbers!',
                 \   '2': 'call Notes() " formatoptions=ctnqro, comments+=n:*,n:#',
                 \   '5': 'ZoomToggle " Toggle fullscreen the current view',
                 \   '6': 'let @+ = expand("%:p") " Get full filepath into yank',
-                \   '8': 'set smartindent!',
-                \   '9': 'set paste!',
+                \   '7': 'set smartindent!',
+                \   '8': 'set paste!',
+                \   'p0': 'p is for plugins. This command does nothing.',
+                \   'p1': 'Files',
+                \   'p2': 'Commits',
+                \   'p3': 'BCommits',
                 \}
+    " Maybe separate plugins into a separate mapping, where 'p' brings a
+    " different menu.
     " execute 'call Test()'
     for [key,value] in items(settings)
         echo key . ' ' . value
@@ -407,7 +414,7 @@ function! VimSettings()
 "     let action = getchar()
     let action = input('Enter option: ')
     call inputrestore()
-    if action != 0 && has_key(settings, action)
+    if action != '0' && action != 'p0' && has_key(settings, action)
         execute settings[action]
     endif
 endfunction
@@ -735,6 +742,10 @@ endfunction
 
 function! Test()
     echo "working Test"
+    " execute Files
+    " execute ZoomToggle
+    " execute "ZoomToggle"
+    " execute "Files"
 endfunction
 
 
