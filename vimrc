@@ -207,7 +207,9 @@ nnoremap Q :q<CR>
 " Navigate buffers using tab and shift-tab.
 nnoremap <Tab> :bn<CR>
 " nnoremap <S-Tab> :bp<CR>
-nnoremap <S-Tab> :call MoveBack()<CR>
+" No need for a function to run a built-in vim command.
+" nnoremap <S-Tab> :call MoveBack()<CR>
+nnoremap <S-Tab> :edit #<CR>
 
 " Turn on python plugin syntax highlighting
 let g:python_highlight_all = 1
@@ -422,7 +424,7 @@ function! VimSettingsMenu()
         let key = setting[0]
         let command = setting[1]
         let comments = setting[2]
-        echo key  .  " " . command  . " , \" " . comments
+        echo key  .  " " . command  . " | \" " . comments
         if command != "This command does nothing."
             let settings_dict[key] = command
         endif
@@ -538,10 +540,10 @@ function! StatuslineGit()
   return strlen(l:branchname) > 0?'  '.l:branchname.' ':''
 endfunction
 
-" Allows switching between 2 buffers. Called with Shift-Tab
-function! MoveBack()
-     edit #
-endfunction
+" " Allows switching between 2 buffers. Called with Shift-Tab
+" function! MoveBack()
+"      edit #
+" endfunction
     
 " rewrite to split on , to differentiate number of args
 " If second is blank, default to current filetype
@@ -563,7 +565,7 @@ function! GrepSearch(parametersplit)
     if parameters[1] != "all"
         let extension = extension . "." . parameters[1]
     endif
-    let searchcommand = "vim " . parameters[0] . " " . extension . " | copen"
+    let searchcommand = "vim \"" . parameters[0] . "\" " . extension . " | copen"
     echom searchcommand
     execute searchcommand
 endfunction

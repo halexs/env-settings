@@ -1,4 +1,4 @@
-# zsh I like: trapd00r
+# zsh I like: trapd00r, amuse, duellj, philips, xiong-chiamiov, refine
 # Start of template rc file.
 
 VIM=/usr/bin/vim
@@ -43,7 +43,8 @@ alias v-n='vim ~/notes' #  -c "call Notes()"'
 alias v-ssh='vim ~/.ssh/config'
 alias v-vrc='vim $ENVSETTINGS/vimrc ~/.vimrc'
 alias v-rc='vim $ENVSETTINGS/template_rc $SHELLRC'
-alias v-cd='vim -c "call ToggleNetrw()" .'
+# Currently using NERDtree instead of netrw
+# alias v-cd='vim -c "call ToggleNetrw()" .'
 alias v-tmux='vim $ENVSETTINGS/tmux.conf ~/.tmux.conf'
 
 # Source files to overcome terminal
