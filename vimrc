@@ -156,7 +156,7 @@ nnoremap <leader>a :GFiles<CR>
 
 " pretty print json file.
 " nnoremap \jsonpretty execute '%!python -m json.tool' | w 
-nnoremap \json-pretty :%!python -m json.tool
+" nnoremap \json-pretty :%!python -m json.tool
 
 " " nnoremap <leader>ch vat:s/^\(.*\)$/<!-- \1 -->/
 " " <html>
@@ -406,10 +406,12 @@ set shiftwidth=4
 
 function! VimSettingsMenu()
     " settings format is: keypress_command, execute_command, command_comments
+" nnoremap \json-pretty :%!python -m json.tool
     let settings = [
                 \   ['0', 'This command does nothing.', 'exit or continue with <cr> or 0'],
                 \   ['1', 'call Lines()', 'Default: on, numbers!, relativenumbers!'],
                 \   ['2', 'call Notes()', 'Default: off, formatoptions=ctnqro, comments+=n:*,n:#'],
+                \   ['4', '%!python -m json.tool', 'Prettify json files'],
                 \   ['5', 'ZoomToggle', 'Toggle fullscreen the current view'],
                 \   ['6', 'let @+ = expand("%:p")', 'Get full filepath into yank'],
                 \   ['7', 'set smartindent!', 'Default: on, sometimes smartindent causes problems with code'],
