@@ -169,6 +169,9 @@ nnoremap <leader>a :GFiles<CR>
 
 "vim general remapped keys (not related to plugins)
 
+nnoremap <leader>` :<C-u>marks<CR>:normal! `
+" nnoremap <leader>q :undolist<CR>:u<Space>
+
 " In the future, may want to remap this to be comma separated instead of being
 " two separate parameters.
 noremap <leader>/ :call AutoComment("","c")<cr>
@@ -412,7 +415,7 @@ function! VimSettingsMenu()
 
     " settings format is: keypress_command, execute_command, command_comments
     let settings = [
-                \   ['0', 'This command does nothing.', 'exit or continue with <cr> or 0'],
+                \   ['0 ', 'This command does nothing.', 'exit or continue with <cr> or 0'],
                 \   ['1', 'call Lines()', 'Default: on, numbers!, relativenumbers!'],
                 \   ['2', 'call Notes()', 'Default: off, formatoptions=ctnqro, comments+=n:*,n:#'],
                 \   ['5', 'ZoomToggle', 'Toggle fullscreen the current view'],
@@ -456,7 +459,8 @@ function! VimSettingsMenu()
                 " top.
                 let exe_command = settings_dict[action]
                 if exe_command == 'Return to default menu'
-                    echo "\n\n"
+"                     echo "\n\n"
+                    redraw
                     let settings_dict = VimSettingsExpand(settings)
                 else
                     echo " command: `" . exe_command . "`"
