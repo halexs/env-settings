@@ -399,36 +399,8 @@ set shiftwidth=4
 
 "vim functions
 
-"     let settings = {
-"                 \   '0': 'to do nothing or just continue with <cr>',
-"                 \   '1': 'call Lines() " numbers!, relativenumbers!',
-"                 \   '2': 'call Notes() " formatoptions=ctnqro, comments+=n:*,n:#',
-"                 \   '5': 'ZoomToggle " Toggle fullscreen the current view',
-"                 \   '6': 'let @+ = expand("%:p") " Get full filepath into yank',
-"                 \   '7': 'set smartindent!',
-"                 \   '8': 'set paste!',
-"                 \   'p0': 'p is for plugins. This command does nothing.',
-"                 \   'p1': 'Files',
-"                 \   'p2': 'Commits',
-"                 \   'p3': 'BCommits',
-"                 \}
 
-function! VimSettingsExpand(settings_list)
-    let settings_dict = {}
-    for setting in a:settings_list
-        let key = setting[0]
-        let command = setting[1]
-        let comments = setting[2]
-        if type(command) == v:t_list
-            echo key  .  " " . "menu"  . " | \" " . comments
-        else
-            echo key  .  " " . command  . " | \" " . comments
-        endif
-        let settings_dict[key] = command
-    endfor
-    return settings_dict
-endfunction
-
+function! VimSettingsMenu()
 " Vim function folding settings. 
 " set foldmethod=indent
 " " set foldlevel=1
@@ -436,10 +408,9 @@ endfunction
 " " set foldmethod=syntax
 " " set nofoldenable
 " set foldlevel=99
-
-function! VimSettingsMenu()
-    " settings format is: keypress_command, execute_command, command_comments
 " nnoremap \json-pretty :%!python -m json.tool
+
+    " settings format is: keypress_command, execute_command, command_comments
     let settings = [
                 \   ['0', 'This command does nothing.', 'exit or continue with <cr> or 0'],
                 \   ['1', 'call Lines()', 'Default: on, numbers!, relativenumbers!'],
@@ -500,6 +471,22 @@ function! VimSettingsMenu()
             let loop = 0
         endif
     endwhile
+endfunction
+
+function! VimSettingsExpand(settings_list)
+    let settings_dict = {}
+    for setting in a:settings_list
+        let key = setting[0]
+        let command = setting[1]
+        let comments = setting[2]
+        if type(command) == v:t_list
+            echo key  .  " " . "menu"  . " | \" " . comments
+        else
+            echo key  .  " " . command  . " | \" " . comments
+        endif
+        let settings_dict[key] = command
+    endfor
+    return settings_dict
 endfunction
 
 " Timer to check if file has been updated by external program, and to reload.
