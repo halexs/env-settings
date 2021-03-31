@@ -279,6 +279,14 @@ nnoremap <leader>0 :call VimSettingsMenu()<cr>
 
 "vim settings
 
+" Vim function folding settings. 
+set foldmethod=indent
+" set foldlevel=1
+" set foldclose=all
+" set foldmethod=syntax
+" set nofoldenable
+set foldlevel=99
+
 " " FILE BROWSING with netrw
 " "let g:netrw_banner=0        " disable banner
 " "let g:netrw_browse_split=4  " open in prior window
@@ -470,6 +478,7 @@ function! AutoComment(comment_char, comment_boolean)
     if a:comment_boolean == 'c'
         let line = comment_type . ' ' . line
     elseif a:comment_boolean == 'u'
+        " this does not work with double char comments like java/ts //
         if line[0] == comment_type
             let line = line[2:]
         endif
@@ -488,7 +497,7 @@ function! GetCommentChar()
     let comments = {
                 \   '"': ['vim'],
                 \   '#': ['py', 'sh', 'yaml'],
-                \   '//': ['js', 'ts', 'cpp', 'c', 'java'],
+                \   '//': ['js', 'ts', 'typescript', 'cpp', 'c', 'java'],
                 \}
     let cur_filetype = &filetype
     let comment_type = '#'
