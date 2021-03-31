@@ -412,6 +412,24 @@ set shiftwidth=4
 "                 \   'p3': 'BCommits',
 "                 \}
 
+function! VimSettingsExpand(settings_list)
+"     echo a:settings_list
+"     return "hello world"
+    let settings_dict = {}
+    for setting in a:settings_list
+        let key = setting[0]
+        let command = setting[1]
+        let comments = setting[2]
+        if type(command) == v:t_list
+            echo key  .  " " . "menu"  . " | \" " . comments
+        else
+            echo key  .  " " . command  . " | \" " . comments
+        endif
+        let settings_dict[key] = command
+    endfor
+    return settings_dict
+endfunction
+
 function! VimSettingsMenu()
     " settings format is: keypress_command, execute_command, command_comments
 " nnoremap \json-pretty :%!python -m json.tool
@@ -419,34 +437,98 @@ function! VimSettingsMenu()
                 \   ['0', 'This command does nothing.', 'exit or continue with <cr> or 0'],
                 \   ['1', 'call Lines()', 'Default: on, numbers!, relativenumbers!'],
                 \   ['2', 'call Notes()', 'Default: off, formatoptions=ctnqro, comments+=n:*,n:#'],
-                \   ['4', '%!python -m json.tool', 'Prettify json files'],
                 \   ['5', 'ZoomToggle', 'Toggle fullscreen the current view'],
                 \   ['6', 'let @+ = expand("%:p")', 'Get full filepath into yank'],
                 \   ['7', 'set smartindent!', 'Default: on, sometimes smartindent causes problems with code'],
                 \   ['8', 'set paste!', 'Default: on, pasting code with indents sometimes causes problems'],
-                \   ['p0', 'This command does nothing.', 'p is for plugins.'],
-                \   ['p1', 'Files', 'fzf plugin to browse all the files of a repo (default is ignore .gitignore files)'],
-                \   ['p2', 'Commits', 'fzf plugin to see the past commits related to the project, requires fugitive.vim plugin'],
-                \   ['p3', 'BCommits', 'fzf plugin to see past commits related to this file, requires fugitive.vim plugin'],
+                \   ['t', [
+                \       ['', 'Opening tool commands.', ''],
+                \       ['0', 'Return to default menu', ''],
+                \       ['1', '%!python -m json.tool', 'Prettify json files'],
+                \   ], 't is for external tools menu'],
+                \   ['p', [
+                \       ['', 'Opening plugin commands.', ''],
+                \       ['0', 'Return to default menu', 'Goes back to default menu'],
+                \       ['1', 'Files', 'fzf plugin to browse all (including .gitignore) files of a repo.'],
+                \       ['2', 'Commits', 'fzf plugin to see the past commits related to the project, requires fugitive.vim plugin'],
+                \       ['3', 'BCommits', 'fzf plugin to see past commits related to this file, requires fugitive.vim plugin'],
+                \   ], 'p is for plugins menu.'],
                 \]
-    let settings_dict = {}
-    for setting in settings
-        let key = setting[0]
-        let command = setting[1]
-        let comments = setting[2]
-        echo key  .  " " . command  . " | \" " . comments
-        if command != "This command does nothing."
-            let settings_dict[key] = command
+
+"     let settings_dict = {}
+"     for setting in settings
+"         let key = setting[0]
+"         let command = setting[1]
+"         let comments = setting[2]
+"         echo key  .  " " . command  . " | \" " . comments
+"         if command != "This command does nothing."
+"             let settings_dict[key] = command
+"         endif
+"     endfor
+    let settings_dict = VimSettingsExpand(settings)
+"     echo settings_dict
+"     call inputsave()
+"     let action = input('Enter option: ')
+"     call inputrestore()
+    " While a command is valid, if a command do it and exit, if a list, then
+    " expand out the options.
+"     let first_loop = 1
+    let loop = 1
+    while loop
+"     while type(settings_dict[action]) == v:t_list
+"         let first_loop = 0
+        call inputsave()
+        let action = input('Enter option: ')
+        call inputrestore()
+        if has_key(settings_dict, action)
+            let command = settings_dict[action]
+            if type(command) == v:t_string
+                " do the command and return
+                " Hard types: 0 always terminates, or maybe goes up?
+                " Thinking about it, 0 should bring to top, and then exits if on
+                " top.
+                let exe_command = settings_dict[action]
+                if exe_command == 'Return to default menu'
+                    echo "\n\n"
+                    let settings_dict = VimSettingsExpand(settings)
+                else
+                    echo " command: `" . exe_command . "`"
+                    let loop = 0
+                    execute exe_command
+"                 execute settings_dict[action]
+"                 echo settings_dict[action]
+"                 let loop = 0
+                endif
+            elseif type(command) == v:t_list
+                " expand out options
+                let settings_dict = VimSettingsExpand(command)
+            endif
+        else
+            let loop = 0
         endif
-    endfor
-    " Maybe separate plugins into a separate mapping, where 'p' brings a
-    " different menu.
-    call inputsave()
-    let action = input('Enter option: ')
-    call inputrestore()
-    if has_key(settings_dict, action)
-        execute settings_dict[action]
-    endif
+
+
+    endwhile
+
+
+"     let settings_dict = {}
+"     for setting in settings
+"         let key = setting[0]
+"         let command = setting[1]
+"         let comments = setting[2]
+"         echo key  .  " " . command  . " | \" " . comments
+"         if command != "This command does nothing."
+"             let settings_dict[key] = command
+"         endif
+"     endfor
+"     " Maybe separate plugins into a separate mapping, where 'p' brings a
+"     " different menu.
+"     call inputsave()
+"     let action = input('Enter option: ')
+"     call inputrestore()
+"     if has_key(settings_dict, action)
+"         execute settings_dict[action]
+"     endif
 endfunction
 
 " Timer to check if file has been updated by external program, and to reload.
