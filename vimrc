@@ -456,28 +456,10 @@ function! VimSettingsMenu()
                 \   ], 'p is for plugins menu.'],
                 \]
 
-"     let settings_dict = {}
-"     for setting in settings
-"         let key = setting[0]
-"         let command = setting[1]
-"         let comments = setting[2]
-"         echo key  .  " " . command  . " | \" " . comments
-"         if command != "This command does nothing."
-"             let settings_dict[key] = command
-"         endif
-"     endfor
     let settings_dict = VimSettingsExpand(settings)
-"     echo settings_dict
-"     call inputsave()
-"     let action = input('Enter option: ')
-"     call inputrestore()
-    " While a command is valid, if a command do it and exit, if a list, then
-    " expand out the options.
-"     let first_loop = 1
     let loop = 1
     while loop
 "     while type(settings_dict[action]) == v:t_list
-"         let first_loop = 0
         call inputsave()
         let action = input('Enter option: ')
         call inputrestore()
@@ -496,9 +478,6 @@ function! VimSettingsMenu()
                     echo " command: `" . exe_command . "`"
                     let loop = 0
                     execute exe_command
-"                 execute settings_dict[action]
-"                 echo settings_dict[action]
-"                 let loop = 0
                 endif
             elseif type(command) == v:t_list
                 " expand out options
@@ -507,29 +486,7 @@ function! VimSettingsMenu()
         else
             let loop = 0
         endif
-
-
     endwhile
-
-
-"     let settings_dict = {}
-"     for setting in settings
-"         let key = setting[0]
-"         let command = setting[1]
-"         let comments = setting[2]
-"         echo key  .  " " . command  . " | \" " . comments
-"         if command != "This command does nothing."
-"             let settings_dict[key] = command
-"         endif
-"     endfor
-"     " Maybe separate plugins into a separate mapping, where 'p' brings a
-"     " different menu.
-"     call inputsave()
-"     let action = input('Enter option: ')
-"     call inputrestore()
-"     if has_key(settings_dict, action)
-"         execute settings_dict[action]
-"     endif
 endfunction
 
 " Timer to check if file has been updated by external program, and to reload.
