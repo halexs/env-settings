@@ -252,6 +252,7 @@ nnoremap <C-q> :q<CR>
 nnoremap <leader>q :qa<CR>
 
 nnoremap <leader>r :source ~/.vimrc<CR>
+nnoremap <C-r> :e<CR>
 nnoremap <C-e> 3<C-e>
 nnoremap <C-y> 3<C-y>
 "nnoremap <leader>] 10<C-e>
