@@ -414,8 +414,6 @@ set shiftwidth=4
 "                 \}
 
 function! VimSettingsExpand(settings_list)
-"     echo a:settings_list
-"     return "hello world"
     let settings_dict = {}
     for setting in a:settings_list
         let key = setting[0]
@@ -431,6 +429,14 @@ function! VimSettingsExpand(settings_list)
     return settings_dict
 endfunction
 
+" Vim function folding settings. 
+" set foldmethod=indent
+" " set foldlevel=1
+" " set foldclose=all
+" " set foldmethod=syntax
+" " set nofoldenable
+" set foldlevel=99
+
 function! VimSettingsMenu()
     " settings format is: keypress_command, execute_command, command_comments
 " nnoremap \json-pretty :%!python -m json.tool
@@ -442,13 +448,20 @@ function! VimSettingsMenu()
                 \   ['6', 'let @+ = expand("%:p")', 'Get full filepath into yank'],
                 \   ['7', 'set smartindent!', 'Default: on, sometimes smartindent causes problems with code'],
                 \   ['8', 'set paste!', 'Default: on, pasting code with indents sometimes causes problems'],
+                \   ['f', [
+                \       [' f', '', 'Opening fold commands.'],
+                \       ['0', 'Return to default menu', ''],
+                \       ['1', 'set foldlevel=1', 'Default: 99, Sets fold level to close after the second indent'],
+                \       ['2', 'set foldmethod=syntax', 'Default: indent, Syntax make fold smarter with code and json.'],
+                \       ['9', 'THIS DOES NOTHING', 'Returns fold settings to default'],
+                \   ], 'f is for fold menu'],
                 \   ['t', [
-                \       ['', 'Opening tool commands.', ''],
+                \       [' t', '', 'Opening tool commands.'],
                 \       ['0', 'Return to default menu', ''],
                 \       ['1', '%!python -m json.tool', 'Prettify json files'],
                 \   ], 't is for external tools menu'],
                 \   ['p', [
-                \       ['', 'Opening plugin commands.', ''],
+                \       [' p', '', 'Opening plugin commands.'],
                 \       ['0', 'Return to default menu', 'Goes back to default menu'],
                 \       ['1', 'Files', 'fzf plugin to browse all (including .gitignore) files of a repo.'],
                 \       ['2', 'Commits', 'fzf plugin to see the past commits related to the project, requires fugitive.vim plugin'],
