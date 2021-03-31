@@ -479,8 +479,8 @@ function! AutoComment(comment_char, comment_boolean)
         let line = comment_type . ' ' . line
     elseif a:comment_boolean == 'u'
         " this does not work with double char comments like java/ts //
-        if line[0] == comment_type
-            let line = line[2:]
+        if line[0:strlen(comment_type)-1] == comment_type
+            let line = line[strlen(comment_type)+1:]
         endif
     endif
 
