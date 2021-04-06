@@ -7,36 +7,35 @@ EDITOR=$VIM
 SHELLRC='~/.bashrc'
 
 if [ "$SHELL" = "/bin/bash" ]; then
-  SHELLRC=~/.bashrc
-  stty -ixon
-  #vim()
-  #{
-  #    # osx users, use stty -g
-  #    local STTYOPTS="$(stty --save)"
-  #    stty stop '' -ixoff
-  #    command vim "$@"
-  #    stty "$STTYOPTS"
-  #}
+    SHELLRC=~/.bashrc
+    stty -ixon
+#vim()
+#{
+#    # osx users, use stty -g
+#    local STTYOPTS="$(stty --save)"
+#    stty stop '' -ixoff
+#    command vim "$@"
+#    stty "$STTYOPTS"
+#}
 elif [ "$SHELL" = "/bin/zsh" ]; then
-  SHELLRC=~/.zshrc
-  path+=$ENVSETTINGS/scripts
-  # Enable Ctrl-x-e to edit command line
-  autoload -U edit-command-line
-  zle -N edit-command-line
-  # bindkey '^xe' edit-command-line
-  bindkey '^x^e' edit-command-line
-  alias vim="stty stop '' -ixoff ; vim"
+    SHELLRC=~/.zshrc
+    path+=$ENVSETTINGS/scripts
+# Enable Ctrl-x-e to edit command line
+    autoload -U edit-command-line
+    zle -N edit-command-line
+# bindkey '^xe' edit-command-line
+    bindkey '^x^e' edit-command-line
+    alias vim="stty stop '' -ixoff ; vim"
+#zsh
+# `Frozing' tty, so after any command terminal settings will be restored
+    ttyctl -f
 
 # another if for bash_profile on macs
 else
-  SHELLRC=~/.bash_profile
+    SHELLRC=~/.bash_profile
 fi
 
 # Custom commands
-
-#zsh
-# `Frozing' tty, so after any command terminal settings will be restored
-ttyctl -f
 
 # alias v-notes='vim ~/notes -c "call Notes()"'
 alias v-n='vim ~/notes' #  -c "call Notes()"'
