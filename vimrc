@@ -391,7 +391,8 @@ set ts=4
 " scrolloff to keep the cursor in the center. Try it by default, or move to
 " function. Now change it to show at least 10 lines.
 " set scrolloff=999
-set scrolloff=10
+" set scrolloff=10
+set scrolloff=5
 
 "Shift Space
 "set shiftwidth=4
