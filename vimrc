@@ -447,13 +447,14 @@ function! VimSettingsMenu()
     let settings_dict = VimSettingsExpand(settings)
     let loop = 1
     while loop
-"     while type(settings_dict[action]) == v:t_list
+"     while type(settings_dict[action]) == v:t_list " only works with vim 8
         call inputsave()
         let action = input('Enter option: ')
         call inputrestore()
         if has_key(settings_dict, action)
             let command = settings_dict[action]
-            if type(command) == v:t_string
+"             if type(command) == v:t_string
+            if type(command) == type("string")
                 " do the command and return
                 " Hard types: 0 always terminates, or maybe goes up?
                 " Thinking about it, 0 should bring to top, and then exits if on
@@ -468,7 +469,8 @@ function! VimSettingsMenu()
                     let loop = 0
                     execute exe_command
                 endif
-            elseif type(command) == v:t_list
+"             elseif type(command) == v:t_list
+            elseif type(command) == type([])
                 " expand out options
                 let settings_dict = VimSettingsExpand(command)
             endif
@@ -484,7 +486,8 @@ function! VimSettingsExpand(settings_list)
         let key = setting[0]
         let command = setting[1]
         let comments = setting[2]
-        if type(command) == v:t_list
+"         if type(command) == v:t_list
+        if type(command) == type([])
             echo key  .  " " . "menu"  . " | \" " . comments
         else
             echo key  .  " " . command  . " | \" " . comments
