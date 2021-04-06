@@ -255,7 +255,7 @@ nnoremap <C-q> :q<CR>
 nnoremap <leader>q :qa<CR>
 
 nnoremap <leader>r :source ~/.vimrc<CR>
-nnoremap <C-r> :e<CR>
+" nnoremap <C-r> :e<CR> " dummy, this is the redo command.
 nnoremap <C-e> 3<C-e>
 nnoremap <C-y> 3<C-y>
 "nnoremap <leader>] 10<C-e>
@@ -483,6 +483,9 @@ endfunction
 function! VimSettingsExpand(settings_list)
     let settings_dict = {}
     for setting in a:settings_list
+        " while good programming, this apparently does not work with vim7.
+        " Will need to reduce variable use because command can be a string and
+        " a list, causing vim type mismatch errors.
         let key = setting[0]
         let command = setting[1]
         let comments = setting[2]
@@ -493,6 +496,10 @@ function! VimSettingsExpand(settings_list)
             echo key  .  " " . command  . " | \" " . comments
         endif
         let settings_dict[key] = command
+        " in order to use variables, must unset them at the end of the scope.
+        unlet key
+        unlet command
+        unlet comments
     endfor
     return settings_dict
 endfunction
