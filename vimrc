@@ -326,7 +326,7 @@ highlight ColorColumn ctermbg=white
 " to believe it's still searching through those files. 
 " replaced with fzf.vim plugin instead.
 " Still useful for quick files.
-" set path+=**
+set path+=**
 set wildmenu
 set wildignore+=**/node_modules/**
 set wildmode=longest,list,full
