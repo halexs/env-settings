@@ -25,34 +25,34 @@ call vundle#begin()
 " Put your non-Plugin stuff after this line
 
 " let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
+    Plugin 'VundleVim/Vundle.vim'
 
 " Nerdtree to replace netrw. Functionality is about the same, but a lot of
 " things are more transparent, like how to create/move/delete files. The
 " biggest change I like is shifting the 'working directory'. I was never able
 " to get that working on netrw. Bookmarks are also nice.
-Plugin 'preservim/nerdtree' | 
-			\ Plugin 'Xuyuanp/nerdtree-git-plugin'
+    Plugin 'preservim/nerdtree' | 
+                \ Plugin 'Xuyuanp/nerdtree-git-plugin'
 
 " Git integration to see if a line was added/changed/deleted.
 " Try using git fugitive to make merge conflicts easier for vim.
 " Try using both. There shouldn't be any conflicts.
-Plugin 'airblade/vim-gitgutter'
-Plugin 'tpope/vim-fugitive'
+    Plugin 'airblade/vim-gitgutter'
+    Plugin 'tpope/vim-fugitive'
 " Maps autocomplete to Tab, along with more functionality.
-Plugin 'ackyshake/VimCompletesMe'
+    Plugin 'ackyshake/VimCompletesMe'
 
 " Replaces vim's default file find throughout a project. First plugin installs
 " (and compiles I think) the fzf tool, while the second integrates the tool
 " with vim.
-Plugin 'junegunn/fzf'
-Plugin 'junegunn/fzf.vim'
+    Plugin 'junegunn/fzf'
+    Plugin 'junegunn/fzf.vim'
 
 " Colors the bottom
 " Plugin 'itchyny/lightline.vim'
 
 " Updates python syntax with features such as f-strings.
-Plugin 'vim-python/python-syntax'
+    Plugin 'vim-python/python-syntax'
 
 
 " All of your Plugins must be added before the following line
