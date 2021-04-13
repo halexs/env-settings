@@ -289,7 +289,9 @@ set foldmethod=indent
 " set foldclose=all
 " set foldmethod=syntax
 " set nofoldenable
-set foldlevel=99
+set foldlevel=2
+set nofoldenable
+" set foldlevel=99
 
 " " FILE BROWSING with netrw
 " "let g:netrw_banner=0        " disable banner
@@ -416,33 +418,42 @@ function! VimSettingsMenu()
 
     " settings format is: keypress_command, execute_command, command_comments
     let settings = [
-                \   ['0 ', 'This command does nothing.', 'exit or continue with <cr> or 0'],
-                \   ['1', 'call Lines()', 'Default: on, numbers!, relativenumbers!'],
-                \   ['2', 'call Notes()', 'Default: off, formatoptions=ctnqro, comments+=n:*,n:#'],
-                \   ['5', 'ZoomToggle', 'Toggle fullscreen the current view'],
-                \   ['6', 'let @+ = expand("%:p")', 'Get full filepath into yank'],
-                \   ['7', 'set smartindent!', 'Default: on, sometimes smartindent causes problems with code'],
-                \   ['8', 'set paste!', 'Default: on, pasting code with indents sometimes causes problems'],
-                \   ['f', [
-                \       [' f', '', 'Opening fold commands.'],
-                \       ['0', 'Return to default menu', ''],
-                \       ['1', 'set foldlevel=1', 'Default: 99, Sets fold level to close after the second indent'],
-                \       ['2', 'set foldmethod=syntax', 'Default: indent, Syntax make fold smarter with code and json.'],
-                \       ['9', 'THIS DOES NOTHING', 'Returns fold settings to default'],
-                \   ], 'f is for fold menu'],
-                \   ['t', [
-                \       [' t', '', 'Opening tool commands.'],
-                \       ['0', 'Return to default menu', ''],
-                \       ['1', '%!python -m json.tool', 'Prettify json files'],
-                \   ], 't is for external tools menu'],
-                \   ['p', [
-                \       [' p', '', 'Opening plugin commands.'],
-                \       ['0', 'Return to default menu', 'Goes back to default menu'],
-                \       ['1', 'Files', 'fzf plugin to browse all (including .gitignore) files of a repo.'],
-                \       ['2', 'Commits', 'fzf plugin to see the past commits related to the project, requires fugitive.vim plugin'],
-                \       ['3', 'BCommits', 'fzf plugin to see past commits related to this file, requires fugitive.vim plugin'],
-                \   ], 'p is for plugins menu.'],
-                \]
+        \   ['0 ', 'This command does nothing.', 'exit or continue with <cr> or 0'],
+        \   ['1', 'call Lines()', 'Default: on, numbers!, relativenumbers!'],
+        \   ['2', 'call Notes()', 'Default: off, formatoptions=ctnqro, comments+=n:*,n:#'],
+        \   ['5', 'ZoomToggle', 'Toggle fullscreen the current view'],
+        \   ['6', 'let @+ = expand("%:p")', 'Get full filepath into yank'],
+        \   ['7', 'set smartindent!', 'Default: on, sometimes smartindent causes problems with code'],
+        \   ['8', 'set paste!', 'Default: on, pasting code with indents sometimes causes problems'],
+        \   ['f', [
+        \       [' f', '', 'Opening fold commands.'],
+        \           ['d', [
+        \               [' d', '', 'Opening fold cheat cheat. These commands do nothing'],
+        \               ['za', '', 'Toggle folds'],
+        \               ['zA', '', 'Toggle folds recursively'],
+        \               ['zR', '', 'Open all folds'],
+        \               ['zM', '', 'Close all folds'],
+        \               ['zr', '', 'Fold less (next level down)'],
+        \               ['zm', '', 'Fold more (next level up)'],
+        \       ], 'Documentation on Fold'],
+        \       ['0', 'Return to default menu', ''],
+        \       ['1', 'set foldlevel=1', 'Default: 99, Sets fold level to close after the second indent'],
+        \       ['2', 'set foldmethod=syntax', 'Default: indent, Syntax make fold smarter with code and json.'],
+        \       ['9', 'THIS DOES NOTHING', 'Returns fold settings to default'],
+        \   ], 'f is for fold menu'],
+        \   ['t', [
+        \       [' t', '', 'Opening tool commands.'],
+        \       ['0', 'Return to default menu', ''],
+        \       ['1', '%!python -m json.tool', 'Prettify json files'],
+        \   ], 't is for external tools menu'],
+        \   ['p', [
+        \       [' p', '', 'Opening plugin commands.'],
+        \       ['0', 'Return to default menu', 'Goes back to default menu'],
+        \       ['1', 'Files', 'fzf plugin to browse all (including .gitignore) files of a repo.'],
+        \       ['2', 'Commits', 'fzf plugin to see the past commits related to the project, requires fugitive.vim plugin'],
+        \       ['3', 'BCommits', 'fzf plugin to see past commits related to this file, requires fugitive.vim plugin'],
+        \   ], 'p is for plugins menu.'],
+        \]
 
     let settings_dict = VimSettingsExpand(settings)
     let loop = 1
@@ -469,7 +480,7 @@ function! VimSettingsMenu()
                     let loop = 0
                     execute exe_command
                 endif
-"             elseif type(command) == v:t_list
+"             elseifztype(command) == v:t_list
             elseif type(command) == type([])
                 " expand out options
                 let settings_dict = VimSettingsExpand(command)
