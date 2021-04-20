@@ -167,7 +167,7 @@ nnoremap <leader>a :GFiles<CR>
 " "let @c = 'vat:s/^\(.*\)$/<!-- \1 -->/:noh'
 
 
-"vim general remapped keys (not related to plugins)
+" vim general remapped keys (not related to plugins)
 
 nnoremap <leader>` :<C-u>marks<CR>:normal! `
 " nnoremap <leader>q :undolist<CR>:u<Space>
@@ -427,7 +427,7 @@ function! VimSettingsMenu()
         \   ['8', 'set paste!', 'Default: on, pasting code with indents sometimes causes problems'],
         \   ['f', [
         \       [' f', '', 'Opening fold commands.'],
-        \           ['d', [
+        \       ['d', [
         \               [' d', '', 'Opening fold cheat cheat. These commands do nothing'],
         \               ['za', '', 'Toggle folds'],
         \               ['zA', '', 'Toggle folds recursively'],
@@ -435,7 +435,7 @@ function! VimSettingsMenu()
         \               ['zM', '', 'Close all folds'],
         \               ['zr', '', 'Fold less (next level down)'],
         \               ['zm', '', 'Fold more (next level up)'],
-        \       ], 'Documentation on Fold'],
+        \       ], 'Documentation on Fold, commands do nothing.'],
         \       ['0', 'Return to default menu', ''],
         \       ['1', 'set foldlevel=1', 'Default: 99, Sets fold level to close after the second indent'],
         \       ['2', 'set foldmethod=syntax', 'Default: indent, Syntax make fold smarter with code and json.'],
@@ -444,14 +444,16 @@ function! VimSettingsMenu()
         \   ['t', [
         \       [' t', '', 'Opening tool commands.'],
         \       ['0', 'Return to default menu', ''],
-        \       ['1', '%!python -m json.tool', 'Prettify json files'],
+        \       ['p', '%!python -m json.tool', 'Prettify json files'],
         \   ], 't is for external tools menu'],
         \   ['p', [
         \       [' p', '', 'Opening plugin commands.'],
         \       ['0', 'Return to default menu', 'Goes back to default menu'],
-        \       ['1', 'Files', 'fzf plugin to browse all (including .gitignore) files of a repo.'],
-        \       ['2', 'Commits', 'fzf plugin to see the past commits related to the project, requires fugitive.vim plugin'],
-        \       ['3', 'BCommits', 'fzf plugin to see past commits related to this file, requires fugitive.vim plugin'],
+        \       ['ff', 'Files', 'fzf plugin to browse all (including .gitignore) files of a repo.'],
+        \       ['fc', 'Commits', 'fzf plugin to see the past commits related to the project, requires fugitive.vim plugin'],
+        \       ['fb', 'BCommits', 'fzf plugin to see past commits related to this file, requires fugitive.vim plugin'],
+        \       ['gm', 'Git mergetool', 'Git plugin to help with merge conflicts.'],
+        \       ['gb', 'Git blame', 'Access the git history of individual lines.'],
         \   ], 'p is for plugins menu.'],
         \]
 
