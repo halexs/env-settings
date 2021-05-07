@@ -293,9 +293,9 @@ set foldmethod=indent
 " set foldclose=all
 " set foldmethod=syntax
 " set nofoldenable
-set foldlevel=2
+" set foldlevel=2
 set nofoldenable
-" set foldlevel=99
+set foldlevel=99
 
 " " FILE BROWSING with netrw
 " "let g:netrw_banner=0        " disable banner
@@ -491,6 +491,7 @@ function! VimSettingsMenu()
 "             elseifztype(command) == v:t_list
             elseif type(command) == type([])
                 " expand out options
+                redraw
                 let settings_dict = VimSettingsExpand(command)
             endif
         else
