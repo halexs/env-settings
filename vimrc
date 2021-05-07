@@ -66,7 +66,7 @@ filetype plugin indent on    " required
 map <SPACE> <leader>
 
 " Status line (bottom) configurations
- set laststatus=2
+set laststatus=2
 " set statusline+=%{StatuslineGit()}
 
 " Colors here: https://jonasjacek.github.io/colors/
@@ -534,39 +534,46 @@ endfunction
 "     call timer_start(1000,'CheckUpdate')
 " endfunction
 
-" If commentchar is specified, do that.
+" IDEA: of a better way.
+" 1. highlight text is visual mode, 
+" 2. send commands to get beginning of lines
+" 3. get number of highlighted lines
+" 4. use commands to comment out everything below
+" Problems: will this apply to every line? It should NOT
+
+" " If commentchar is specified, do that.
 "   If else check filetype, refer to dictionary to find char
 "   If not in list, default to #
 " https://github.com/KarimElghamry/vim-auto-comment
 " Autocommenting is hard and annoying. Just manually comment or uncomment
-function! AutoComment(comment_char, comment_boolean)
-    let cur_filetype = &filetype
-
-    if len(a:comment_char) != 0
-        let comment_type = a:comment_char
-    else
-        let comment_type = GetCommentChar()
-    endif
-
-    let line=getline('.')
-
-    if a:comment_boolean == 'c'
-        let line = comment_type . ' ' . line
-    elseif a:comment_boolean == 'u'
-        " this does not work with double char comments like java/ts //
-        if line[0:strlen(comment_type)-1] == comment_type
-            let line = line[strlen(comment_type)+1:]
-        endif
-    endif
-
-    " This would be for a autocomment type system.
-    " if line[0] == comment_type
-    "     let line = line[2:]
-    " elseif line[0] != comment_type
-    "     let line = comment_type . ' ' . line
+" function! AutoComment(comment_char, comment_boolean)
+"     let cur_filetype = &filetype
+" 
+    " if len(a:comment_char) != 0
+    "     let comment_type = a:comment_char
+    " else
+    "     let comment_type = GetCommentChar()
     " endif
-    call setline('.',line)
-endfunction
+" 
+"     let line=getline('.')
+" 
+"     if a:comment_boolean == 'c'
+"         let line = comment_type . ' ' . line
+"     elseif a:comment_boolean == 'u'
+"         " this does not work with double char comments like java/ts //
+" "         if line[0:strlen(comment_type)-1] == comment_type
+"             let line = line[strlen(comment_type)+1:]
+"         endif
+"     endif
+" 
+"     " This would be for a autocomment type system.
+"     " if line[0] == comment_type
+"     "     let line = line[2:]
+"     " elseif line[0] != comment_type
+"     "     let line = comment_type . ' ' . line
+"     " endif
+"     call setline('.',line)
+" endfunction
 
 function! GetCommentChar()
     let comments = {
@@ -613,6 +620,83 @@ endfunction
 "     let change_line = change_line . "`q"
 "     " echo change_line
 "     execute change_line
+" endfunction
+
+" Block comments like in sublime/visual studio
+function AutoComment(comment_char, comment_boolean) range
+    if len(a:comment_char) == 0
+        let comment_character =  GetCommentChar()
+    else
+        let comment_character = a:comment_char
+    endif
+"     echo "firstline ".a:firstline." lastline ".a:lastline
+    let vis_length = a:lastline - a:firstline
+    let vis_length = vis_length . 'j'
+    if vis_length == '0j'
+        let vis_length = ''
+    endif
+    " echo vis_length 
+
+    " get first character in a line.
+    let move_to_first = "normal! mq^"
+    execute move_to_first
+    let line = getline('.')
+    " echo line
+
+    " echo comment_character
+    " echo strlen(comment_character)
+    " let testa = col('.')
+    " echo 'a'
+    " echo testa
+    " let testb = col('.') + strlen(comment_character)
+    " echo 'b'
+    " echo testb
+    " echo 'testline1'
+    " echo line[4:5]
+    " echo 'testline2'
+    " echo line[testa-1:testb-1]
+
+
+    let first_nonspace = col('.') - 1
+    let end_char = first_nonspace + strlen(comment_character) - 1
+    let current_chars = line[first_nonspace : end_char]
+    echo current_chars
+
+    " let current_char = matchstr(getline('.'), '\%' . col('.') . 'c.')
+    " echo current_char
+    let change_line = "normal! \<C-V>" . vis_length
+    if a:comment_boolean == 'c'
+        " echo "line needs to be commented"
+        " this needs to be changed by moving down vis_length lines
+        let change_line = change_line . "I" . comment_character . " "
+        " let change_line = change_line . "i" . comment_character . " \<esc>"
+    " elseif a:comment_boolean == 'u' || current_char == comment_character
+    elseif a:comment_boolean == 'u'
+        " echo "line is already commented"
+        if current_chars == comment_character
+            let move_right = strlen(comment_character)
+            let change_line = change_line . move_right . "lx"
+            " if line[first_nonspace:strlen(comment_character)-1] == comment_type
+            "     " echo "inside u if"
+            "     " let line = line[strlen(comment_type)+1:]
+            " endif
+            " The `l` character will depend on how many comment characters
+            " there are. java/script may change with //
+            " let change_line = change_line . strlen(comment_character) . "lx \<esc>"
+            " let change_line = change_line . "xx"
+        endif
+    endif
+    let change_line = change_line . "\<esc>`q"
+    " echo change_line
+    execute change_line
+endfunction
+
+
+" function! TestRange() range
+"     let a = "hello"
+"     echo a
+" "     echo range
+"     echo "firstline ".a:firstline." lastline ".a:lastline
 " endfunction
 
 " These do the job, but for some reason causes vim to slow down. Currently
