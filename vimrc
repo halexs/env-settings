@@ -169,6 +169,10 @@ nnoremap <leader>a :GFiles<CR>
 
 " vim general remapped keys (not related to plugins)
 
+"keep visual mode after indent
+vnoremap > >gv
+vnoremap < <gv
+
 nnoremap <leader>` :<C-u>marks<CR>:normal! `
 " nnoremap <leader>q :undolist<CR>:u<Space>
 
@@ -417,6 +421,7 @@ function! VimSettingsMenu()
 " nnoremap \json-pretty :%!python -m json.tool
 
     " settings format is: keypress_command, execute_command, command_comments
+    " As a rule, Numbers and letters on outside reserved for menus.
     let settings = [
         \   ['0 ', 'This command does nothing.', 'exit or continue with <cr> or 0'],
         \   ['1', 'call Lines()', 'Default: on, numbers!, relativenumbers!'],
@@ -454,6 +459,7 @@ function! VimSettingsMenu()
         \       ['fb', 'BCommits', 'fzf plugin to see past commits related to this file, requires fugitive.vim plugin'],
         \       ['gm', 'Git mergetool', 'Git plugin to help with merge conflicts.'],
         \       ['gb', 'Git blame', 'Access the git history of individual lines.'],
+        \       ['\[,\]c', '', 'Move to previous/next Hunk'],
         \   ], 'p is for plugins menu.'],
         \]
 
