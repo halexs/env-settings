@@ -9,49 +9,49 @@ filetype off
 " To run plugins, run :source %, then refresh the file.
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
-" alternatively, pass a path where Vundle should install plugins
-"call vundle#begin('~/some/path/here')
+    " alternatively, pass a path where Vundle should install plugins
+    " all vundle#begin('~/some/path/here')
 
-" To ignore plugin indent changes, instead use:
-"filetype plugin on
-"
-" Brief help
-" :PluginList       - lists configured plugins
-" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
-" :PluginSearch foo - searches for foo; append `!` to refresh local cache
-" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
-"
-" see :h vundle for more details or wiki for FAQ
-" Put your non-Plugin stuff after this line
+    " To ignore plugin indent changes, instead use:
+    " iletype plugin on
 
-" let Vundle manage Vundle, required
+    " Brief help
+    " :PluginList       - lists configured plugins
+    " :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
+    " :PluginSearch foo - searches for foo; append `!` to refresh local cache
+    " :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+
+    " see :h vundle for more details or wiki for FAQ
+    " Put your non-Plugin stuff after this line
+
+    " let Vundle manage Vundle, required
     Plugin 'VundleVim/Vundle.vim'
 
-" Nerdtree to replace netrw. Functionality is about the same, but a lot of
-" things are more transparent, like how to create/move/delete files. The
-" biggest change I like is shifting the 'working directory'. I was never able
-" to get that working on netrw. Bookmarks are also nice.
+    " Nerdtree to replace netrw. Functionality is about the same, but a lot of
+    " things are more transparent, like how to create/move/delete files. The
+    " biggest change I like is shifting the 'working directory'. I was never able
+    " to get that working on netrw. Bookmarks are also nice.
     Plugin 'preservim/nerdtree' | 
                 \ Plugin 'Xuyuanp/nerdtree-git-plugin'
 
-" Git integration to see if a line was added/changed/deleted.
-" Try using git fugitive to make merge conflicts easier for vim.
-" Try using both. There shouldn't be any conflicts.
+    " Git integration to see if a line was added/changed/deleted.
+    " Try using git fugitive to make merge conflicts easier for vim.
+    " Try using both. There shouldn't be any conflicts.
     Plugin 'airblade/vim-gitgutter'
     Plugin 'tpope/vim-fugitive'
-" Maps autocomplete to Tab, along with more functionality.
+    " Maps autocomplete to Tab, along with more functionality.
     Plugin 'ackyshake/VimCompletesMe'
 
-" Replaces vim's default file find throughout a project. First plugin installs
-" (and compiles I think) the fzf tool, while the second integrates the tool
-" with vim.
+    " Replaces vim's default file find throughout a project. First plugin installs
+    " (and compiles I think) the fzf tool, while the second integrates the tool
+    " with vim.
     Plugin 'junegunn/fzf'
     Plugin 'junegunn/fzf.vim'
 
-" Colors the bottom
-" Plugin 'itchyny/lightline.vim'
+    " Colors the bottom
+    " Plugin 'itchyny/lightline.vim'
 
-" Updates python syntax with features such as f-strings.
+    " Updates python syntax with features such as f-strings.
     Plugin 'vim-python/python-syntax'
 
 
@@ -426,8 +426,9 @@ function! VimSettingsMenu()
         \   ['0 ', 'This command does nothing.', 'exit or continue with <cr> or 0'],
         \   ['1', 'call Lines()', 'Default: on, numbers!, relativenumbers!'],
         \   ['2', 'call Notes()', 'Default: off, formatoptions=ctnqro, comments+=n:*,n:#'],
-        \   ['5', 'ZoomToggle', 'Toggle fullscreen the current view'],
-        \   ['6', 'let @+ = expand("%:p")', 'Get full filepath into yank'],
+        \   ['4', 'ZoomToggle', 'Toggle fullscreen the current view'],
+        \   ['5', 'let @+ = expand("%")', 'Relative filepath into yank'],
+        \   ['6', 'let @+ = expand("%:p")', 'Full system filepath into yank'],
         \   ['7', 'set smartindent!', 'Default: on, sometimes smartindent causes problems with code'],
         \   ['8', 'set paste!', 'Default: on, pasting code with indents sometimes causes problems'],
         \   ['f', [
