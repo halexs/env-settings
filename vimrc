@@ -169,6 +169,11 @@ nnoremap <leader>a :GFiles<CR>
 
 " vim general remapped keys (not related to plugins)
 
+" Open tags in vertical split
+noremap <leader>] :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
+" noremap <leader>] :sp <CR>:exec("tag ".expand("<cword>"))<CR>
+
+
 "keep visual mode after indent
 vnoremap > >gv
 vnoremap < <gv
@@ -235,7 +240,7 @@ xnoremap <S-Down> :m'>+<CR>gv=gv
 " Buffers
 " nnoremap <C-i> :bn<cr>
 " nnoremap <C-o> :bp<cr>
-nnoremap <leader>d :bd<cr> 
+" nnoremap <leader>d :bd<cr> 
 nnoremap <leader>b :ls<cr>
 nnoremap <leader>o :buffers<CR>:b 
 
@@ -286,6 +291,15 @@ nnoremap <leader>0 :call VimSettingsMenu()<cr>
 
 
 "vim settings
+
+" Default splits will be on right instead of the left.
+set splitright
+set splitbelow
+
+" Playing with tags
+set tags=./tags;/
+" Without following, ctags autocomplete is slow across a big repo
+set complete-=i
 
 " Vim function folding settings. 
 set foldmethod=indent
@@ -431,6 +445,11 @@ function! VimSettingsMenu()
         \   ['6', 'let @+ = expand("%:p")', 'Full system filepath into yank'],
         \   ['7', 'set smartindent!', 'Default: on, sometimes smartindent causes problems with code'],
         \   ['8', 'set paste!', 'Default: on, pasting code with indents sometimes causes problems'],
+        \   ['d', [
+        \           [' d', '', 'Opening general help docs page. These commands do nothing'],
+        \           ['\[\]m', '', 'Cycle through function definition headers.'],
+        \           ['\<Ctrl>\<leader>\]', '', 'Open ctags in either same buffer, or vertical split buffer.'],
+        \         ], 'Documentation on general helpful commands'],
         \   ['f', [
         \       [' f', '', 'Opening fold commands.'],
         \       ['d', [
@@ -566,7 +585,7 @@ function AutoComment(comment_char, comment_boolean) range
     endif
 
     " get first character in a line.
-    let move_to_first = "normal! mq^"
+    let move_to_first = "normal! ml^"
     execute move_to_first
     let line = getline('.')
 
@@ -585,7 +604,9 @@ function AutoComment(comment_char, comment_boolean) range
             let change_line = change_line . move_right . "lx"
         endif
     endif
-    let change_line = change_line . "\<esc>`q"
+    " Can add additional line here to highlight the previous lines
+    " Can't decide a way that it'll work seamlessly, so ignore for now.
+    let change_line = change_line . "\<esc>`l"
     " echo change_line
     execute change_line
 endfunction
