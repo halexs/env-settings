@@ -169,6 +169,18 @@ nnoremap <leader>a :GFiles<CR>
 
 " vim general remapped keys (not related to plugins)
 
+" nnoremap <S-Tab> :edit #<CR>
+" inoremap <S-CR> <C-o>O
+
+" insert mode to jump around words using hjkl
+" C-l is overrided to escape
+" inoremap <C-l> <C-o>W
+" inoremap <C-h> <C-o>B
+inoremap <C-j> <C-o>b
+inoremap <C-k> <esc>ea
+" inoremap <C-e> <C-o>$
+
+
 " Open tags in vertical split
 noremap <leader>] :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
 " noremap <leader>] :sp <CR>:exec("tag ".expand("<cword>"))<CR>
@@ -248,10 +260,10 @@ nnoremap <leader>o :buffers<CR>:b
 
 
 " Use ctrl-[select] the active split!
-noremap <silent> <C-k> :wincmd k<CR>
-noremap <silent> <C-j> :wincmd j<CR>
-noremap <silent> <C-h> :wincmd h<CR>
-noremap <silent> <C-l> :wincmd l<CR>
+nnoremap <silent> <C-k> :wincmd k<CR>
+nnoremap <silent> <C-j> :wincmd j<CR>
+nnoremap <silent> <C-h> :wincmd h<CR>
+nnoremap <silent> <C-l> :wincmd l<CR>
 " inoremap <C-k> <C-o>:wincmd k<CR>
 " inoremap <C-j> <C-o>:wincmd j<CR>
 " inoremap <C-h> <C-o>:wincmd h<CR>
@@ -338,6 +350,9 @@ set expandtab
 " Highlight column 80 to unsure lines don't go too long.
 set cc=80
 highlight ColorColumn ctermbg=white
+" Any characters past the cc line is highlighted in red.
+" highlight OverLength ctermbg=red ctermfg=white guibg=#592929
+" match OverLength /\%81v.\+/
 " highlight ColorColumn guibg=lightgrey ctermbg=lightgrey
 
 " " These commands customize built-in find to make vim search through the
@@ -423,6 +438,39 @@ set shiftwidth=4
 
 "vim functions
 
+" Vim way of saving sessions.
+" fu! SaveSess()
+"     execute 'call mkdir(%:p:h/.vim)'
+"     execute 'mksession! %:p:h/.vim/session.vim'
+" endfunction
+" 
+" fu! RestoreSess()
+" execute 'so %:p:h/.vim/session.vim'
+" if bufexists(1)
+"     for l in range(1, bufnr('$'))
+"         if bufwinnr(l) == -1
+"             exec 'sbuffer ' . l
+"         endif
+"     endfor
+" endif
+" endfunction
+
+" autocmd VimLeave * call SaveSess()
+" autocmd VimEnter * call RestoreSess()
+fu! SaveSess()
+    " This function will create a directory to save the correct files.
+    " execute 'mksession! ' . '~/.vim/sessions/session.vim-' . strftime('%Y-%m-%d_%H:%M:%S')
+    " execute 'mkdir ~/.vim/sessions/' . strftime('%Y-%m-%s')
+    execute "call mkdir($HOME . '/.vim/sessions/' . strftime('%Y-%m-%d'), 'p')"
+    execute 'mksession! ' . '~/.vim/sessions/' . strftime('%Y-%m-%d') . '/vim.' . strftime('%H:%M:%S')
+    execute 'mksession! ' . '~/.vim/sessions/latest.session'
+    " execute 'mksession! ' . getcwd() . '/.session.vim-' . strftime('%Y-%m-%d_%H:%M:%S')
+    " execute 'mksession! ' . getcwd() . '/.session.vim-' . 'latest'
+endfunction
+
+
+" autocmd BufEnter,VimLeavePre * call SaveSess()
+autocmd VimLeave * call SaveSess()
 
 function! VimSettingsMenu()
 " Vim function folding settings. 
@@ -587,6 +635,7 @@ function AutoComment(comment_char, comment_boolean) range
     " get first character in a line.
     let move_to_first = "normal! ml^"
     execute move_to_first
+    " let current_char = matchstr(getline('.'), '\%' . col('.') . 'c.')
     let line = getline('.')
 
     let first_nonspace = col('.') - 1

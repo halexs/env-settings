@@ -20,6 +20,7 @@ if [ "$SHELL" = "/bin/bash" ]; then
 elif [ "$SHELL" = "/bin/zsh" ]; then
     SHELLRC=~/.zshrc
     path+=$ENVSETTINGS/scripts
+    ZSH_THEME="powerlevel10k/powerlevel10k"
 # Enable Ctrl-x-e to edit command line
     autoload -U edit-command-line
     zle -N edit-command-line
