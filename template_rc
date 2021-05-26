@@ -46,6 +46,7 @@ alias v-rc='vim $ENVSETTINGS/template_rc $SHELLRC'
 # Currently using NERDtree instead of netrw
 # alias v-cd='vim -c "call ToggleNetrw()" .'
 alias v-tmux='vim $ENVSETTINGS/tmux.conf ~/.tmux.conf'
+alias vim-latest='vim -S ~/.vim/sessions/latest.session'
 
 # Source files to overcome terminal
 alias s-rc='source $SHELLRC'

@@ -461,8 +461,11 @@ fu! SaveSess()
     " This function will create a directory to save the correct files.
     " execute 'mksession! ' . '~/.vim/sessions/session.vim-' . strftime('%Y-%m-%d_%H:%M:%S')
     " execute 'mkdir ~/.vim/sessions/' . strftime('%Y-%m-%s')
-    execute "call mkdir($HOME . '/.vim/sessions/' . strftime('%Y-%m-%d'), 'p')"
-    execute 'mksession! ' . '~/.vim/sessions/' . strftime('%Y-%m-%d') . '/vim.' . strftime('%H:%M:%S')
+    " echo substitute(getcwd(), '^.*/', '', '')
+    let save_dir = $HOME . '/.vim/sessions/' . strftime('%Y-%m-%d') . '/' . substitute(getcwd(), '^.*/', '', '')
+    execute "call mkdir(save_dir, 'p')"
+    execute 'mksession! ' . save_dir . '/vim.' . strftime('%H:%M:%S')
+    execute 'mksession! ' . save_dir . '/' . 'latest.session'
     execute 'mksession! ' . '~/.vim/sessions/latest.session'
     " execute 'mksession! ' . getcwd() . '/.session.vim-' . strftime('%Y-%m-%d_%H:%M:%S')
     " execute 'mksession! ' . getcwd() . '/.session.vim-' . 'latest'
