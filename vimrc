@@ -169,6 +169,7 @@ nnoremap <leader>a :GFiles<CR>
 
 " vim general remapped keys (not related to plugins)
 
+nnoremap <S-r> :e<CR>
 " nnoremap <S-Tab> :edit #<CR>
 " inoremap <S-CR> <C-o>O
 
@@ -195,6 +196,7 @@ nnoremap <leader>` :<C-u>marks<CR>:normal! `
 
 " In the future, may want to remap this to be comma separated instead of being
 " two separate parameters.
+" append gv
 noremap <leader>/ :call AutoComment("","c")<cr>
 noremap <leader>. :call AutoComment("","u")<cr>
 " noremap <leader>/ :call AutoComment("","c")<left><left><left><left><left><left>
@@ -500,6 +502,8 @@ function! VimSettingsMenu()
         \           [' d', '', 'Opening general help docs page. These commands do nothing'],
         \           ['\[\]m', '', 'Cycle through function definition headers.'],
         \           ['\<Ctrl>\<leader>\]', '', 'Open ctags in either same buffer, or vertical split buffer.'],
+        \           [':g/[function header][\/#]', '', 'Find all the functions in a file'],
+        \           [':echo @% or expand("%:t")', '', 'Get the name of the current file: https://vim.fandom.com/wiki/Get_the_name_of_the_current_file'],
         \         ], 'Documentation on general helpful commands'],
         \   ['f', [
         \       [' f', '', 'Opening fold commands.'],
