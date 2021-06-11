@@ -169,6 +169,10 @@ nnoremap <leader>a :GFiles<CR>
 
 " vim general remapped keys (not related to plugins)
 
+
+" Redirect vim commands to a buffer.
+command! -nargs=+ -complete=command Redir let s:reg = @@ | redir @"> | silent execute <q-args> | redir END | new | pu | 1,2d_ | let @@ = s:reg
+
 nnoremap <S-r> :e<CR>
 " nnoremap <S-Tab> :edit #<CR>
 " inoremap <S-CR> <C-o>O
@@ -298,8 +302,8 @@ nnoremap <silent> <leader>c :noh<return><esc>
 nnoremap <leader>s :call GrepSearch("")<left><left>
 
 nnoremap <leader>0 :call VimSettingsMenu()<cr>
-" nmap <silent> <leader>ws :call MarkWindowSwap()<CR>
-" nmap <silent> <leader>wt :call DoWindowSwap()<CR><C-w>h
+nmap <silent> <leader>ws :call MarkWindowSwap()<CR>
+nmap <silent> <leader>wt :call DoWindowSwap()<CR><C-w>h
 " 
 
 
@@ -439,6 +443,25 @@ set shiftwidth=4
 
 
 "vim functions
+
+function! MarkWindowSwap()
+  let g:markedWinNum = winnr()
+endfunction
+
+function! DoWindowSwap()
+    "Mark destination
+    let curNum = winnr()
+    let curBuf = bufnr( "%" )
+    exe g:markedWinNum . "wincmd w"
+    "Switch to source and shuffle dest->source
+    let markedBuf = bufnr( "%" )
+    "Hide and open so that we aren't prompted and keep history
+    exe 'hide buf' curBuf
+    "Switch to dest and shuffle source->dest
+    exe curNum . "wincmd w"
+    "Hide and open so that we aren't prompted and keep history
+    exe 'hide buf' markedBuf 
+endfunction
 
 " Vim way of saving sessions.
 " fu! SaveSess()
@@ -855,24 +878,6 @@ endfunction
 "   "autocmd VimEnter * :call ToggleNetrw()
 " augroup END
 " 
-" function! MarkWindowSwap()
-"   let g:markedWinNum = winnr()
-" endfunction
-" 
-" function! DoWindowSwap()
-"     "Mark destination
-"     let curNum = winnr()
-"     let curBuf = bufnr( "%" )
-"     exe g:markedWinNum . "wincmd w"
-"     "Switch to source and shuffle dest->source
-"     let markedBuf = bufnr( "%" )
-"     "Hide and open so that we aren't prompted and keep history
-"     exe 'hide buf' curBuf
-"     "Switch to dest and shuffle source->dest
-"     exe curNum . "wincmd w"
-"     "Hide and open so that we aren't prompted and keep history
-"     exe 'hide buf' markedBuf 
-" endfunction
 " 
 " 
 " 
