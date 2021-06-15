@@ -370,6 +370,7 @@ highlight ColorColumn ctermbg=white
 set path+=**
 set wildmenu
 set wildignore+=**/node_modules/**
+set wildignore+=**/build/**
 set wildmode=longest,list,full
 
 "Set ignore Case when Searching with / and using vimgrep (GrepSearch)
@@ -487,11 +488,15 @@ fu! SaveSess()
     " execute 'mksession! ' . '~/.vim/sessions/session.vim-' . strftime('%Y-%m-%d_%H:%M:%S')
     " execute 'mkdir ~/.vim/sessions/' . strftime('%Y-%m-%s')
     " echo substitute(getcwd(), '^.*/', '', '')
-    let save_dir = $HOME . '/.vim/sessions/' . strftime('%Y-%m-%d') . '/' . substitute(getcwd(), '^.*/', '', '')
-    execute "call mkdir(save_dir, 'p')"
-    execute 'mksession! ' . save_dir . '/vim.' . strftime('%H:%M:%S')
-    execute 'mksession! ' . save_dir . '/' . 'latest.session'
-    execute 'mksession! ' . '~/.vim/sessions/latest.session'
+
+    if len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) > 1
+        let save_dir = $HOME . '/.vim/sessions/' . strftime('%Y-%m-%d') . '/' . substitute(getcwd(), '^.*/', '', '')
+        execute "call mkdir(save_dir, 'p')"
+        execute 'mksession! ' . save_dir . '/vim.' . strftime('%H:%M:%S')
+        execute 'mksession! ' . save_dir . '/' . 'latest.session'
+        execute 'mksession! ' . '~/.vim/sessions/latest.session'
+    endif
+
     " execute 'mksession! ' . getcwd() . '/.session.vim-' . strftime('%Y-%m-%d_%H:%M:%S')
     " execute 'mksession! ' . getcwd() . '/.session.vim-' . 'latest'
 endfunction
