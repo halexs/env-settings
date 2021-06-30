@@ -40,7 +40,8 @@ call vundle#begin()
     Plugin 'airblade/vim-gitgutter'
     Plugin 'tpope/vim-fugitive'
     " Maps autocomplete to Tab, along with more functionality.
-    Plugin 'ackyshake/VimCompletesMe'
+    "   Trying to switch to built-in ctrl-p.
+    " Plugin 'ackyshake/VimCompletesMe'
 
     " Replaces vim's default file find throughout a project. First plugin installs
     " (and compiles I think) the fzf tool, while the second integrates the tool
@@ -48,12 +49,21 @@ call vundle#begin()
     Plugin 'junegunn/fzf'
     Plugin 'junegunn/fzf.vim'
 
-    " Colors the bottom
+    " Colors the bottom, doing this natively
     " Plugin 'itchyny/lightline.vim'
+
+
+    " vim jsx syntax highlighting for React, not working with jsx files
+    Plugin 'maxmellon/vim-jsx-pretty'
 
     " Updates python syntax with features such as f-strings.
     Plugin 'vim-python/python-syntax'
 
+    " VIM html tagging, cannot get this working for js files
+    " Plugin 'alvan/vim-closetag'
+
+
+    " End plugins
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -61,6 +71,11 @@ call vundle#end()            " required
 
 
 filetype plugin indent on    " required
+" set omnifunc=syntaxcomplete#Complete
+
+autocmd FileType javascript setlocal shiftwidth=2 tabstop=2
+" autocmd FileType javascript set omnifunc=htmlcomplete#CompleteTags
+" autocmd FileType html set omnifunc=htmlcomplete#CompleteTags
 
 " My leader key is space.
 map <SPACE> <leader>
@@ -107,6 +122,25 @@ set shortmess-=S
 
 
 " Generic Plugin configurations
+
+" " filetypes like xml, xhtml, ...
+" " This will make the list of non-closing tags self-closing in the specified files.
+" "
+" " let g:closetag_xhtml_filetypes = 'xhtml,javascript.jsx,jsx'
+" let g:closetag_xhtml_filetypes = 'xhtml,jsx,javascript'
+" " filenames like *.xml, *.html, *.xhtml, ...
+" " These are the file extensions where this plugin is enabled.
+" "
+" let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.js,*.jsx'
+" " Shortcut for closing tags, default is '>'
+" " autocmd BufNewFile,BufRead *.js set filetype=javascript.jsx
+" " autocmd BufNewFile,BufRead *.jsx set filetype=javascript.jsx
+" " let g:closetag_html_style=1
+" "
+" let g:closetag_shortcut = '>'
+" " Add > at current position without closing the current tag, default is ''
+" "
+" let g:closetag_close_shortcut = '<leader>>'
 
 " NERDTree plugin information
 
@@ -169,9 +203,11 @@ nnoremap <leader>a :GFiles<CR>
 
 " vim general remapped keys (not related to plugins)
 
+" remap Control Q to control p
+" inoremap <C-q> <C-p>
 
-" Redirect vim commands to a buffer.
-command! -nargs=+ -complete=command Redir let s:reg = @@ | redir @"> | silent execute <q-args> | redir END | new | pu | 1,2d_ | let @@ = s:reg
+" Redirect vim commands to a buffer. Does not work in testing
+" command! -nargs=+ -complete=command Redir let s:reg = @@ | redir @"> | silent execute <q-args> | redir END | new | pu | 1,2d_ | let @@ = s:reg
 
 nnoremap <S-r> :e<CR>
 " nnoremap <S-Tab> :edit #<CR>
@@ -278,7 +314,7 @@ nnoremap <silent> <C-l> :wincmd l<CR>
 inoremap <C-S> <ESC>:update<CR>a
 nnoremap <C-S> :update<CR>
 nnoremap <C-x> :x<CR>
-nnoremap <C-q> :q<CR>
+" nnoremap <C-q> :q<CR>
 nnoremap <leader>q :qa<CR>
 
 nnoremap <leader>r :source ~/.vimrc<CR>
@@ -443,7 +479,32 @@ set shiftwidth=4
 
 
 
+
 "vim functions
+
+"Examples:
+":call Exec('buffers')
+"This will include the output of :buffers into the current buffer.
+"
+"Also try:
+":call Exec('ls')
+":call Exec('autocmd')
+"
+funct! Exec(command)
+    redir =>output
+    silent exec a:command
+    redir END
+    let @o = output
+    execute "put o"
+    return ''
+endfunct!
+
+" funct! Exec(command)
+"     redir =>output
+"     silent exec a:command
+"     redir END
+"     return output
+" endfunct!
 
 function! MarkWindowSwap()
   let g:markedWinNum = winnr()
@@ -488,6 +549,9 @@ fu! SaveSess()
     " execute 'mksession! ' . '~/.vim/sessions/session.vim-' . strftime('%Y-%m-%d_%H:%M:%S')
     " execute 'mkdir ~/.vim/sessions/' . strftime('%Y-%m-%s')
     " echo substitute(getcwd(), '^.*/', '', '')
+
+    " This command saves the actual session, so also whatever past vimrc is
+    " there. For only saving a file, may want to use Exec function.
 
     if len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) > 1
         let save_dir = $HOME . '/.vim/sessions/' . strftime('%Y-%m-%d') . '/' . substitute(getcwd(), '^.*/', '', '')
@@ -641,7 +705,7 @@ function! GetCommentChar()
     let comments = {
                 \   '"': ['vim'],
                 \   '#': ['py', 'sh', 'yaml'],
-                \   '//': ['js', 'ts', 'typescript', 'cpp', 'c', 'java'],
+                \   '//': ['js', 'ts', 'typescript', 'cpp', 'c', 'java', 'javascript'],
                 \}
     let cur_filetype = &filetype
     let comment_type = '#'
