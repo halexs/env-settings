@@ -77,6 +77,11 @@ autocmd FileType javascript setlocal shiftwidth=2 tabstop=2
 " autocmd FileType javascript set omnifunc=htmlcomplete#CompleteTags
 " autocmd FileType html set omnifunc=htmlcomplete#CompleteTags
 
+" autocmd FileType yaml indent off
+" autocmd FileType yaml let b:did_indent = 1
+autocmd FileType yaml setlocal indentexpr= 
+" autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+
 " My leader key is space.
 map <SPACE> <leader>
 
@@ -202,7 +207,7 @@ nnoremap <leader>a :GFiles<CR>
 
 
 " vim general remapped keys (not related to plugins)
-
+vnoremap <leader>p "_dP
 " remap Control Q to control p
 " inoremap <C-q> <C-p>
 
