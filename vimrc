@@ -212,6 +212,9 @@ vnoremap <leader>p "_dP
 " inoremap <C-q> <C-p>
 
 " Redirect vim commands to a buffer. Does not work in testing
+" :redir @a
+" :set all
+" :redir END
 " command! -nargs=+ -complete=command Redir let s:reg = @@ | redir @"> | silent execute <q-args> | redir END | new | pu | 1,2d_ | let @@ = s:reg
 
 nnoremap <S-r> :e<CR>
