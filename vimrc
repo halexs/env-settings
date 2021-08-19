@@ -561,11 +561,16 @@ fu! SaveSess()
     " This command saves the actual session, so also whatever past vimrc is
     " there. For only saving a file, may want to use Exec function.
 
+    " This will get mixed up if accessing another file from current dir.
     if len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) > 1
-        let save_dir = $HOME . '/.vim/sessions/' . strftime('%Y-%m-%d') . '/' . substitute(getcwd(), '^.*/', '', '')
+        " let save_dir = $home . '/.vim/sessions/' . strftime('%y-%m-%d') . '/' . substitute(getcwd(), '^.*/', '', '')
+        let save_home_dir = $HOME . '/.vim/sessions/' . substitute(getcwd(), '^.*/', '', '')
+        let save_dir = save_home_dir . '/' . strftime('%Y-%m-%d')
+        " echo save_home_dir
+        " echo save_dir
         execute "call mkdir(save_dir, 'p')"
+        execute 'mksession! ' . save_home_dir . '/' . 'latest.session'
         execute 'mksession! ' . save_dir . '/vim.' . strftime('%H:%M:%S')
-        execute 'mksession! ' . save_dir . '/' . 'latest.session'
         execute 'mksession! ' . '~/.vim/sessions/latest.session'
     endif
 
