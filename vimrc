@@ -569,8 +569,13 @@ fu! SaveSess()
         " echo save_home_dir
         " echo save_dir
         execute "call mkdir(save_dir, 'p')"
+        # Saves a latest for the cur directory for easier access
+        #   Problems: same directory names, accessing different directories
+        #     from the current directory.
         execute 'mksession! ' . save_home_dir . '/' . 'latest.session'
+        # Saves a backup copy for record-keeping
         execute 'mksession! ' . save_dir . '/vim.' . strftime('%H:%M:%S')
+        # Saves a global latest
         execute 'mksession! ' . '~/.vim/sessions/latest.session'
     endif
 

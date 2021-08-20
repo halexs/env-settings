@@ -46,7 +46,7 @@ alias v-rc='vim $ENVSETTINGS/template_rc $SHELLRC'
 # Currently using NERDtree instead of netrw
 # alias v-cd='vim -c "call ToggleNetrw()" .'
 alias v-tmux='vim $ENVSETTINGS/tmux.conf ~/.tmux.conf'
-alias vim-latest='vim -S ~/.vim/sessions/latest.session'
+# alias vim-latest='vim -S ~/.vim/sessions/latest.session'
 
 # Source files to overcome terminal
 alias s-rc='source $SHELLRC'
@@ -76,6 +76,16 @@ alias dc-res='docker-compose down; docker-compose up -d'
 
 #export PATH=/bin:/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:$PATH
 
+# alias vim-latest='vim -S ~/.vim/sessions/latest.session'
+vimlatest () {
+    sess_path=~/.vim/sessions/${PWD##*/}/latest.session
+    if [ -f $sess_path ]
+    then
+        vim -S $sess_path
+    else
+        vim -S ~/.vim/sessions/latest.session
+    fi
+}
 
 add_dir () {
   comm=${1}
