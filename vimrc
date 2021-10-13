@@ -262,9 +262,10 @@ nnoremap <CR> o<Esc>k
 inoremap <C-e> <C-o>$
 inoremap <C-a> <C-o>0
 inoremap {<CR> {<CR>}<C-o><S-o>
+" inoremap (<CR> )<Left>
 " inoremap {<Tab> {}<Left>
 " inoremap [<Tab> []<Left>
-" inoremap (<Tab> ()<Left>
+inoremap (<Tab> ()<Left>
 " inoremap '<Tab> ''<Left>
 " inoremap \"<Tab> \""<Left>
 " inoremap :<CR> :<CR><Tab>
@@ -276,7 +277,7 @@ inoremap {<CR> {<CR>}<C-o><S-o>
 hi Visual ctermfg=darkgrey ctermbg=lightblue
 " highlight GitGutterDelete ctermfg=black ctermbg=red
 " Remap Q to quit
-nnoremap Q :q<CR>
+" nnoremap Q :q<CR>
 
 " Navigate buffers using tab and shift-tab.
 nnoremap <Tab> :bn<CR>
@@ -321,7 +322,7 @@ nnoremap <silent> <C-l> :wincmd l<CR>
 " remap file save, file save+quit, and quit-all
 inoremap <C-S> <ESC>:update<CR>a
 nnoremap <C-S> :update<CR>
-nnoremap <C-x> :x<CR>
+" nnoremap <C-x> :x<CR>
 " nnoremap <C-q> :q<CR>
 nnoremap <leader>q :qa<CR>
 
@@ -891,6 +892,7 @@ endfunction
 " " TAG JUMPING
 " " command! MakeTags !ctags -R .
 " command! MakeTags !/usr/local/bin/ctags -R .
+" ctags -R --exclude=.git --exclude=build --exclude=node_modules .
 " 
 " " FILE BROWSING
 " "let g:netrw_banner=0        " disable banner

@@ -47,7 +47,7 @@ alias v-rc='vim $ENVSETTINGS/template_rc $SHELLRC'
 # alias v-cd='vim -c "call ToggleNetrw()" .'
 alias v-tmux='vim $ENVSETTINGS/tmux.conf ~/.tmux.conf'
 # alias vim-latest='vim -S ~/.vim/sessions/latest.session'
-
+alias re-ctag='ctags -R --exclude=.git --exclude=build --exclude=node_modules .'
 # Source files to overcome terminal
 alias s-rc='source $SHELLRC'
 #alias s-py3='source ~/Work/python_env/bin/activate'
@@ -58,6 +58,8 @@ alias c-env='cd $ENVSETTINGS'
 #alias c-pl='cd /Users/ashsu/Work/playground'
 #alias c-jup='cd /Users/ashsu/Work/playground/jupyter'
 
+alias docker-ssh='cd ~/Work/docker && vagrant ssh && cd -'
+alias c-share='cd ~/Work/docker/share'
 
 # Other helpful commands
 alias dump_history='history >> ~/history.txt'
