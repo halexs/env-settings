@@ -74,6 +74,7 @@ filetype plugin indent on    " required
 " set omnifunc=syntaxcomplete#Complete
 
 autocmd FileType javascript setlocal shiftwidth=2 tabstop=2
+autocmd FileType html setlocal shiftwidth=2 tabstop=2 indentexpr=
 " autocmd FileType javascript set omnifunc=htmlcomplete#CompleteTags
 " autocmd FileType html set omnifunc=htmlcomplete#CompleteTags
 

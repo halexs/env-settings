@@ -59,6 +59,9 @@ alias c-env='cd $ENVSETTINGS'
 #alias c-jup='cd /Users/ashsu/Work/playground/jupyter'
 
 alias docker-ssh='cd ~/Work/docker && vagrant ssh && cd -'
+alias docker-up='cd ~/Work/docker && vagrant up && cd -'
+alias docker-halt='cd ~/Work/docker && vagrant halt && cd -'
+alias docker-suspend='cd ~/Work/docker && vagrant suspend && cd -'
 alias c-share='cd ~/Work/docker/share'
 
 # Other helpful commands
