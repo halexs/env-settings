@@ -1,5 +1,8 @@
 " plugins
 " TODO: separate plugins into a plugins_rc file instead of this file.
+" TODO: run specific filetype commands:
+"   https://vi.stackexchange.com/questions/10664/file-type-dependent-key-mapping
+"   also command to refresh autocommands
 
 " Default command to make sure vim does not behave like vi
 set nocompatible
@@ -283,6 +286,7 @@ hi Visual ctermfg=darkgrey ctermbg=lightblue
 " Navigate buffers using tab and shift-tab.
 nnoremap <Tab> :bn<CR>
 " nnoremap <S-Tab> :bp<CR>
+nnoremap Q :bp<CR>
 " No need for a function to run a built-in vim command.
 " nnoremap <S-Tab> :call MoveBack()<CR>
 nnoremap <S-Tab> :edit #<CR>
@@ -400,8 +404,9 @@ set relativenumber
 
 set expandtab
 " Highlight column 80 to unsure lines don't go too long.
-set cc=80
-highlight ColorColumn ctermbg=white
+" Maybe make this an underline, it's blocking too much text.
+" set cc=80
+" highlight ColorColumn ctermbg=white
 " Any characters past the cc line is highlighted in red.
 " highlight OverLength ctermbg=red ctermfg=white guibg=#592929
 " match OverLength /\%81v.\+/
