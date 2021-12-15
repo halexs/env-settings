@@ -78,6 +78,8 @@ filetype plugin indent on    " required
 
 autocmd FileType javascript setlocal shiftwidth=2 tabstop=2
 autocmd FileType html setlocal shiftwidth=2 tabstop=2 indentexpr=
+autocmd FileType css setlocal shiftwidth=2 tabstop=2 indentexpr=
+" :set ft=<your filetype>
 " autocmd FileType javascript set omnifunc=htmlcomplete#CompleteTags
 " autocmd FileType html set omnifunc=htmlcomplete#CompleteTags
 
@@ -730,7 +732,7 @@ function! GetCommentChar()
     let comments = {
                 \   '"': ['vim'],
                 \   '#': ['py', 'sh', 'yaml'],
-                \   '//': ['js', 'ts', 'typescript', 'cpp', 'c', 'java', 'javascript'],
+                \   '//': ['js', 'ts', 'typescript', 'cpp', 'c', 'java', 'javascript', 'html'],
                 \}
     let cur_filetype = &filetype
     let comment_type = '#'
