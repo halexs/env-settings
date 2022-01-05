@@ -1,5 +1,6 @@
 # zsh I like: trapd00r, amuse, duellj, philips, xiong-chiamiov, refine
 # Start of template rc file.
+# sudo date -s "$(wget -qSO- --max-redirect=0 google.com 2>&1 | grep Date: | cut -d' ' -f5-8)Z"
 
 VIM=/usr/bin/vim
 EDITOR=$VIM
@@ -39,6 +40,7 @@ fi
 # Custom commands
 
 # alias v-notes='vim ~/notes -c "call Notes()"'
+alias git='nocorrect git'
 alias v-n='vim ~/notes' #  -c "call Notes()"'
 alias v-ssh='vim ~/.ssh/config'
 alias v-vrc='vim $ENVSETTINGS/vimrc ~/.vimrc'
@@ -98,6 +100,14 @@ add_dir () {
   # For now though, just manually change it.
   echo "alias $comm='cd $PWD'" >> $SHELLRC
   source $SHELLRC
+}
+
+ssh_add_key () {
+  cat ~/.ssh/id_ed25519.pub| ssh ${1} "mkdir -p ~/.ssh/; chmod 700 ~/.ssh; cat >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys"
+  # user=${1}
+  # host=${2}
+  # # default to use id_ed25519 key, requires it to exist first
+  # cat ~/.ssh/id_ed25519.pub| ssh $user@$host "mkdir -p ~/.ssh/; chmod 700 ~/.ssh; cat >> ~/.ssh/authorized_keys; chmod 644 ~/.ssh/authorized_keys"
 }
 
 # zsh does not display git commands in cmd, but only in a file buffer.
