@@ -76,7 +76,7 @@ call vundle#end()            " required
 filetype plugin indent on    " required
 " set omnifunc=syntaxcomplete#Complete
 
-autocmd FileType javascript setlocal shiftwidth=2 tabstop=2
+autocmd FileType javascript setlocal shiftwidth=4 tabstop=4
 autocmd FileType html setlocal shiftwidth=2 tabstop=2 indentexpr=
 autocmd FileType css setlocal shiftwidth=2 tabstop=2 indentexpr=
 " :set ft=<your filetype>
@@ -622,7 +622,7 @@ function! VimSettingsMenu()
         \           ['\[\]m', '', 'Cycle through function definition headers.'],
         \           ['\<Ctrl>\<leader>\]', '', 'Open ctags in either same buffer, or vertical split buffer.'],
         \           [':g/[function header][\/#]', '', 'Find all the functions in a file'],
-        \           [':echo @% or expand("%:t")', '', 'Get the name of the current file: https://vim.fandom.com/wiki/Get_the_name_of_the_current_file'],
+        \           [':echo @% or expand("%:t") or let @" = expand("%")', '', 'Get the name of the current file: https://vim.fandom.com/wiki/Get_the_name_of_the_current_file'],
         \         ], 'Documentation on general helpful commands'],
         \   ['f', [
         \       [' f', '', 'Opening fold commands.'],
