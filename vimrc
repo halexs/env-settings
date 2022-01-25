@@ -622,7 +622,8 @@ function! VimSettingsMenu()
         \           ['\[\]m', '', 'Cycle through function definition headers.'],
         \           ['\<Ctrl>\<leader>\]', '', 'Open ctags in either same buffer, or vertical split buffer.'],
         \           [':g/[function header][\/#]', '', 'Find all the functions in a file'],
-        \           [':echo @% or expand("%:t") or let @" = expand("%")', '', 'Get the name of the current file: https://vim.fandom.com/wiki/Get_the_name_of_the_current_file'],
+        \           [':echo @% or expand("%:t") or let @" = expand("%")', 'echo @%', 'Get the name of the current file: https://vim.fandom.com/wiki/Get_the_name_of_the_current_file'],
+        \           ['exp', "put=expand('%:p')", 'Get the name of the current file: https://vim.fandom.com/wiki/Get_the_name_of_the_current_file'],
         \         ], 'Documentation on general helpful commands'],
         \   ['f', [
         \       [' f', '', 'Opening fold commands.'],
