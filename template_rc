@@ -94,6 +94,11 @@ vimlatest () {
     fi
 }
 
+aws-reauth () {
+  profile=${1}
+  python /Users/ashsu/Work/docker/share/aws/aws_mfa.py --profile $profile
+}
+
 add_dir () {
   comm=${1}
   # this has to be updated for every new shell, use $SHELL variable.
@@ -119,3 +124,9 @@ alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
 # unset DOCKER_HOST
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
+alias pycopy="~/.pyenv/versions/devops/bin/python ~/Work/docker/share/copy-paste.py"
+# alias daws-cli="docker run --rm -it --entrypoint /bin/bash -v ~/.aws:/root/.aws -v /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt -v `pwd`:/aws amazon/aws-cli"
+alias daws="docker run --rm -it -v ~/.aws:/root/.aws -v /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt -v `pwd`:/aws amazon/aws-cli"
+# alias daws-cli="docker run --rm -it --entrypoint /bin/bash -v ~/.aws:/root/.aws -v /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt -v `pwd`:/aws amazon/aws-cli"
+
+

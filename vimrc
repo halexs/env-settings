@@ -116,7 +116,7 @@ set statusline+=\ %m%r%w
 " display git branch without-plugin causing slow vim updates.
 " set statusline+=%{StatuslineGit()}\ \|
 " This requires fugitive vim plugin
-set statusline+=\ %{fugitive#head()}\ \|
+" set statusline+=\ %{fugitive#head()}\ \|
 "File+path
 set statusline+=\ %<%f\ \|
 
