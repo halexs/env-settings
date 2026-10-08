@@ -1,0 +1,149 @@
+# env-settings help registry. One row per tab-separated line:
+# layer	keys	title	action	flags	details
+# layers: topic shell tmux vim nvim claude | action: ex:<vim cmd> sh:<shell cmd> | flags: skip = not verified by make check | \n in details = newline
+topic	tabs?	How do I make tabs?			'Tab' means three things:\n\n  Another full-screen thing (shell, server, logs)  ->  tmux WINDOW\n      Alt-a c = new, Alt-1..9 = jump, Alt-n/Alt-p = next/prev, Alt-a , = rename\n  Another file in the editor                      ->  Vim BUFFER (shown as the tab bar on top)\n      Space Space = find a file, Tab / Q = next / prev, Space 1..9 = jump\n  A second whole layout in the editor (rare)      ->  Vim TAB PAGE\n      Space t n = new, Space t c = close, ]t [t = switch\n\nAvoid terminal-app tabs for projects: they die with the terminal, tmux windows do not.
+topic	shell vs tmux vs vim	What goes in the shell, tmux, or Vim?			Shell: running things. git, make, npm test, docker, ssh, cd, one-off commands.\ntmux:  keeping things alive and side by side. One session per project, a server in\n       window 2, logs in a pane, detach/reattach, ssh that survives a dropped connection.\nVim:   reading and changing code. Files, search, go-to-definition, blame, diffs, Claude.\n\nTest: text I am editing -> Vim. Keeps running while I do other things -> tmux. A command -> shell.\nThey nest: shell inside tmux, Vim inside the shell.
+topic	start a project	How do I start working on a project?	sh:t		cd into the project, then run  t\n\nIt attaches to (or creates) a tmux session named after the directory. Then start the\neditor with  vim .  and open a second window for a server or tests with  Alt-a c.
+topic	switch project	How do I switch between projects?			From inside tmux:  t other-project  (creates it if needed, switches without nesting)\nOr Alt-w to pick from a tree of every session and window. Alt-a s shows sessions only.
+topic	detach / reattach	How do I leave and come back later?			Just close the terminal, or press Alt-a d to detach. Everything keeps running.\nLater: cd into the project and run  t  (or  tmux attach).\n\nAfter a reboot sessions are gone. Before shutting down:  tmux-session save\nafterwards:  tmux-session restore  (recreates sessions and windows, not pane layouts).
+topic	find files / text	How do I find a file or search the project?			In Vim:\n  Space Space   fuzzy file finder (git aware)\n  Space f g     search text in the whole project (ripgrep)\n  Space f l     search lines in this file\n  Space s       :Grep into the quickfix list\nIn the shell:  Ctrl-t (file picker), Alt-c (jump to a directory), z name (jump to a frequent dir),\n  rg text  (search),  fd name  (find files).
+topic	who changed this line	Who changed this line and why?			The dim text at the end of the cursor line is the inline blame (author, when, commit subject).\n\n  Space g m   popup with the full commit and diff behind this line\n  Space g L   every commit that touched this line\n  Space g l   history of this file\n  Space g b   full blame window (Enter opens a commit)\n  Space g B   turn the inline text off / on
+topic	claude	How do I use Claude here?			Neovim: Space a c toggles Claude beside your code. It sees your file and selection;\n        proposed edits show as diffs: Space a a accepts, Space a d denies.\nVim:    :Claude (or Space a c) opens the CLI in a split.\ntmux:   Alt-a C opens Claude in a pane on the right.\nShell:  cc  (ccc continues the last conversation, ccr resumes one).
+topic	readme / markdown	How do I read a README rendered in the terminal?	sh:md		Shell: md  (README.md here),  md FILE,  md -f  (pick a file with live preview)\ntmux:  Alt-a m pops up the README over your work, Alt-a M lets you pick a file\nVim:   Space m p  or  :Md.  In Neovim markdown also renders in place; Space m r toggles.\nInside the pager: j/k scroll, / search, q quit.
+topic	copy / paste	How do I copy and paste?			Vim: yanks go to the system clipboard automatically, so just paste anywhere.\ntmux: drag with the mouse to select and copy, or Alt-a [ for copy mode, v to start,\n      y to copy. It lands in the system clipboard (also over ssh).\nPaste into Vim without overwriting what you yanked: select, then Space p.
+topic	scrollback	How do I scroll back in tmux?			Use the mouse wheel, or Alt-a [ to enter copy mode (move with vim keys, Ctrl-u / Ctrl-d for pages,\n/ to search). Press q to leave.
+topic	alt keys broken	Alt keys type odd characters (macOS)			Option is not acting as Alt. Fix it in your terminal:\n  Ghostty    make terminal   (sets macos-option-as-alt)\n  iTerm2     Profiles > Keys > Left Option key: Esc+\n  Terminal   Settings > Profiles > Keyboard > Use Option as Meta key
+topic	quit vim	I am stuck in Vim. How do I quit?			Esc first, then:\n  :w   save        :q   quit        :wq  save and quit\n  :q!  quit and throw changes away  :qa  quit everything   (Space q does :qa)
+topic	edit settings	How do I change these settings?			Shell:  v-rc (shell files)   v-vrc (vimrc)   v-tmux (tmux.conf), then  s-rc  to restart the shell\nVim:    edit, then  Space R  to reload\ntmux:   edit, then  Alt-r  to reload\nMachine-specific shell bits go in ~/.shellrc.local, Vim ones in ~/.vimrc.local.
+topic	update / fix install	How do I update or repair the install?	sh:make doctor		From the env-settings directory (c-env):\n  make doctor        which tools are installed\n  make update        pull and update plugins\n  make vim-plugins   (re)install Vim plugins\n  make lsp           language servers for Neovim\n  make               list everything
+shell	h	This help palette	sh:h		Fuzzy-search every key, command and how-to. Type to filter, Enter to read the full card.\nAlso: Alt-/ in the shell, Alt-a ? in tmux, Space ? in Vim.
+shell	Alt-/	Open the help palette from the prompt			Press it on any prompt. Choosing a command puts it on your command line so you can edit it before running.\nSet ES_SLASH_HELP=1 in ~/.shellrc.local to also open it when you type / on an empty line.
+shell	t [name]	Attach to / create a tmux session for this directory	sh:t		Session is named after the directory (dots become underscores). Inside tmux it switches instead of nesting.
+shell	md [file]	Render markdown in the terminal	sh:md		Uses glow (falls back to mdcat, bat, less). No argument renders README.md.
+shell	md -f / mdf	Pick a markdown file with live preview	sh:md -f		
+shell	guide	Read the long workflow guide	sh:guide		Renders docs/WORKFLOW.md. This palette is the quick version of the same material.
+shell	cc / ccc / ccr	Claude Code: new / continue / resume	sh:claude		cc = claude, ccc = claude --continue, ccr = claude --resume
+shell	z name / zi	Jump to a frequently used directory (zoxide)	sh:zi		z docs jumps to the best match for 'docs'. zi opens an interactive picker. It learns as you cd around.
+shell	Ctrl-r	Fuzzy search command history			
+shell	Ctrl-t	Fuzzy-pick a file path onto the command line			
+shell	Alt-c	Fuzzy cd into a subdirectory			
+shell	fcd [dir]	Fuzzy cd into a subdirectory (function)	sh:fcd		
+shell	fgb	Fuzzy git branch checkout	sh:fgb		Preview shows the branch history.
+shell	mkcd name	mkdir and cd in one go	sh:mkcd 		
+shell	extract file	Extract any archive	sh:extract 		tar.gz, tar.xz, zip, 7z, ...
+shell	ll / la / lt	Nicer listings (eza)	sh:ll		ll long, la with hidden files, lt tree two levels deep.
+shell	gs / gd / gds	git status -sb / diff / diff --staged	sh:gs		
+shell	gl / gla	git log graph (this branch / all branches)	sh:gl		
+shell	gacomm	git add . and commit	sh:gacomm		
+shell	Ctrl-x Ctrl-e	Edit the current command line in $EDITOR			Handy for long commands. Save and quit to run it.
+shell	Up / Down	History search by what you already typed			Type 'git ' then Up to cycle through earlier git commands.
+shell	tmux-session save|restore	Save / restore tmux sessions across reboots	sh:tmux-session save		
+shell	ssh-key-copy	Copy your ssh key to a host and add a Host entry	sh:ssh-key-copy		
+shell	vimlatest	Reopen the last Vim session for this directory	sh:vimlatest		
+shell	v-rc / v-vrc / v-tmux	Edit shell / vim / tmux config	sh:v-vrc		
+shell	s-rc	Restart the shell to pick up config changes	sh:s-rc		
+shell	c-env	cd to the env-settings repo	sh:c-env		
+shell	re-ctag	Rebuild the tags file for this project	sh:re-ctag		
+shell	dc / dc-res	docker compose / restart the stack	sh:dc 		
+tmux	Alt-a	The tmux prefix (Option-a on a Mac)			Press it, release, then the next key. Keys marked Alt-... below need no prefix.
+tmux	Alt-a ?	This help palette			
+tmux	Alt-a c	New window in the current directory			
+tmux	Alt-1..9 / Alt-0	Jump to window 1-9 / 10			
+tmux	Alt-n / Alt-p	Next / previous window			
+tmux	Alt-a ,	Rename window			
+tmux	Alt-a &	Close window			
+tmux	Alt-a %  or  |	Split side by side			
+tmux	Alt-a "  or  -	Split stacked			
+tmux	Alt-h/j/k/l	Move between panes			
+tmux	Alt-z	Zoom the pane full-screen and back			
+tmux	Alt-a H J K L	Resize the pane (repeatable)			Also Alt-a then Alt-arrow.
+tmux	Alt-a x	Close pane			
+tmux	Alt-w / Alt-s	Tree of all windows / sessions			Arrow keys or j/k to move, Enter to jump.
+tmux	Alt-a d	Detach (everything keeps running)			Reattach later with  t  or  tmux attach.
+tmux	Alt-a [	Copy mode: scroll and select with vim keys			v starts a selection, y copies to the system clipboard, q leaves, / searches.
+tmux	Alt-a m / M	Popup: README / pick a markdown file			
+tmux	Alt-a /	Popup: the workflow guide			
+tmux	Alt-a C	Claude Code in a pane on the right			
+tmux	Alt-r	Reload tmux.conf			
+tmux	Alt-a :	tmux command prompt			For example  list-keys  shows every binding.
+vim	<leader>?	This help palette  (leader = Space)	ex:Keys		
+vim	<leader>0	Same palette	ex:Keys		
+vim	<leader><Space>	Find file (git aware)	ex:call s:Files()		
+vim	<leader>ff	Find any file	ex:Files		
+vim	<leader>fg	Search text in the project (ripgrep)	ex:Rg		
+vim	<leader>fl	Search lines in this file	ex:BLines		
+vim	<leader>fh	Recently opened files	ex:History		
+vim	<leader>fc	Git commits (fzf)	ex:Commits		
+vim	<leader>fb	Git commits touching this file	ex:BCommits		
+vim	<leader>s	:Grep into the quickfix list			Then ]q / [q to walk through results, or :copen.
+vim	<Tab> / Q / <S-Tab>	Next / previous / last buffer		skip	The tab bar along the top lists open buffers.
+vim	<leader>1..9	Jump to buffer N (tab bar)		skip	
+vim	<leader>bb	Pick an open buffer	ex:Buffers		
+vim	<leader>bd	Close this buffer	ex:bdelete		
+vim	<leader>tn	New Vim tab page	ex:tabnew		
+vim	<leader>tc	Close tab page	ex:tabclose		
+vim	]t / [t	Next / previous tab page		skip	
+vim	<C-t>	File tree	ex:NERDTreeToggle		In the tree: o open, t new tab, m menu (add/move/delete), ? help.
+vim	<leader>n	Reveal this file in the tree	ex:NERDTreeFind		
+vim	<C-h/j/k/l>	Move between splits		skip	:vsplit and :split create them.
+vim	<leader>z	Zoom this split / restore	ex:ZoomToggle		
+vim	<leader>ws	Swap windows: mark this one, then go to the other and press <leader>wt			
+vim	<leader>gm	Git: popup with the commit behind this line	ex:GitMessenger		
+vim	<leader>gL	Git: history of this line	ex:call s:LineHistory()		
+vim	<leader>gl	Git: history of this file	ex:Git log --oneline --follow -- %		
+vim	<leader>gb	Git: blame window	ex:Git blame		
+vim	<leader>gB	Git: toggle inline blame text	ex:BlamerToggle		
+vim	<leader>gs	Git: status (- stage, cc commit)	ex:Git		
+vim	<leader>gd	Git: diff this file	ex:Gdiffsplit		
+vim	[c / ]c	Previous / next changed hunk		skip	<leader>hp previews the hunk, <leader>hs stages it, <leader>hu undoes it.
+vim	gd / gr / K	Definition / references / hover docs		skip	Needs a language server (make lsp in Neovim, ALE in Vim).
+vim	[e / ]e	Previous / next problem		skip	
+vim	<leader>rn	Rename symbol		skip	
+vim	<leader>x	Fix / format buffer		skip	
+vim	<C-Space>	Trigger completion (insert mode)		skip	
+vim	<leader>/	Toggle comment on line or selection			Also gc{motion}, e.g. gcap for a paragraph.
+vim	ys{motion}" / cs"' / ds"	Surround: add / change / delete quotes and brackets		skip	vim-surround. Example: ysiw" wraps the word in quotes.
+vim	<S-Up> / <S-Down>	Move the line or selection up / down		skip	
+vim	<leader>p	Paste over a selection without losing the yank (visual)		skip	
+vim	<C-s>	Save		skip	
+vim	<leader>q	Quit everything	ex:qa		
+vim	<leader>]	Open tag under cursor in a vertical split			Make tags with  re-ctag  in the shell.
+vim	<leader>u	Undo tree	ex:UndotreeToggle		
+vim	<Esc><Esc>	Clear search highlight	ex:nohlsearch	skip	
+vim	<leader>R	Reload the vimrc	ex:ReloadVimrc		
+vim	<leader>mp	Render markdown in the terminal	ex:Md		
+vim	:Claude [args]	Claude Code in a terminal split (plain Vim)	ex:Claude		
+vim	:Cheatsheet	Every key, one page	ex:Cheatsheet		
+vim	:Guide	Open the long workflow guide	ex:Guide		
+vim	:Redir cmd	Show a command's output in a scratch buffer			Example: :Redir ls
+vim	:Template name	Insert a file from templates/			Tab completes the names.
+vim	:TrimWhitespace	Remove trailing whitespace	ex:TrimWhitespace		
+vim	:Notes	Notes mode: continue bullets and # comments	ex:Notes		
+vim	toggle line numbers	Absolute + relative numbers on/off	ex:call s:ToggleLines()		
+vim	toggle spell check	Spell check on/off	ex:set spell!		
+vim	toggle wrap	Line wrapping on/off	ex:set wrap!		
+vim	toggle invisibles	Show tabs / trailing spaces on/off	ex:set list!		
+vim	toggle paste	Paste mode (stops auto-indent mangling pasted code)	ex:set paste!		
+vim	fold on (indent)	Enable folding by indent, level 1	ex:setlocal foldenable foldmethod=indent foldlevel=1		za toggles a fold, zR opens all, zM closes all.
+vim	fold on (syntax)	Enable folding by syntax	ex:setlocal foldenable foldmethod=syntax		
+vim	fold off	Reset folding (everything open)	ex:setlocal nofoldenable foldmethod=indent foldlevel=99		
+vim	copy path	Copy this file's relative path	ex:let @+ = expand('%')		
+vim	copy full path	Copy this file's absolute path	ex:let @+ = expand('%:p')		
+vim	prettify json	Format this buffer as JSON	ex:call s:PrettyJson()		Uses jq if installed, else python3.
+vim	plugins: update	Update Vim plugins	ex:PlugUpdate		
+vim	plugins: clean	Remove plugins no longer listed	ex:PlugClean		
+nvim	<leader>mr	Toggle inline markdown rendering	ex:RenderMarkdown toggle		
+nvim	<leader>ca	Code action		skip	Needs a language server.
+nvim	<leader>dd	Show diagnostics for this line		skip	
+nvim	<Space> (wait)	Pause after <Space> to see every key group (which-key)		skip	
+claude	<leader>ac	Toggle the Claude panel (Neovim)	ex:ClaudeCode		In Vim the same key runs :Claude in a terminal split.
+claude	<leader>af	Focus the Claude panel	ex:ClaudeCodeFocus		
+claude	<leader>ar	Resume a conversation	ex:ClaudeCode --resume		
+claude	<leader>aC	Continue the last conversation	ex:ClaudeCode --continue		
+claude	<leader>ab	Add the current file to Claude's context	ex:ClaudeCodeAdd %		
+claude	<leader>as	Send the selection to Claude (visual mode)		skip	
+claude	<leader>aa	Accept the diff Claude proposes	ex:ClaudeCodeDiffAccept		
+claude	<leader>ad	Deny the diff	ex:ClaudeCodeDiffDeny		
+claude	<leader>am	Pick the Claude model	ex:ClaudeCodeSelectModel		
+claude	Alt-a C	Claude in a tmux pane			
+claude	cc	Claude in the shell	sh:claude		

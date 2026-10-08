@@ -85,3 +85,34 @@ _es_load_syntax_highlighting() {
 # --- fallback prompt (replaced by starship when installed) -------------------
 setopt prompt_subst
 PROMPT='%F{blue}%~%f %(?.%F{green}.%F{red})❯%f '
+
+# --- help palette: Alt-/ anywhere on the prompt ------------------------------
+# Opens the same fuzzy help as `h`. Picking a command puts it on the command
+# line (not run) so you can edit it; other entries print their details.
+# ES_SLASH_HELP=1 (set in ~/.shellrc.local) also opens it when you type / on an
+# empty line; cancelling leaves the / so paths still work.
+_es_help_widget() {
+  local pick action
+  zle -I
+  _es_help_chosen=
+  pick=$(h --pick </dev/tty) || { zle reset-prompt; return 0 }
+  if [[ -n $pick ]]; then
+    _es_help_chosen=1
+    action=${pick%%$'\t'*}
+    [[ $action == sh:* ]] && { BUFFER=${action#sh:}; CURSOR=${#BUFFER} }
+  fi
+  zle reset-prompt
+}
+zle -N _es_help_widget
+bindkey '^[/' _es_help_widget
+
+_es_slash_widget() {
+  if [[ -n ${ES_SLASH_HELP:-} && -z $BUFFER ]]; then
+    _es_help_widget
+    [[ -z $_es_help_chosen ]] && { BUFFER=/; CURSOR=1 }
+  else
+    zle self-insert
+  fi
+}
+zle -N _es_slash_widget
+bindkey '/' _es_slash_widget
