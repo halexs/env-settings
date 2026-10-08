@@ -1,1003 +1,697 @@
-" plugins
-" TODO: separate plugins into a plugins_rc file instead of this file.
-" TODO: run specific filetype commands:
-"   https://vi.stackexchange.com/questions/10664/file-type-dependent-key-mapping
-"   also command to refresh autocommands
-
-" Default command to make sure vim does not behave like vi
-set nocompatible
-filetype off
-" set the runtime path to include Vundle and initialize
+" ============================================================================
+" env-settings vimrc  (Vim 8.1+ and Neovim)
 "
-" To run plugins, run :source %, then refresh the file.
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-    " alternatively, pass a path where Vundle should install plugins
-    " all vundle#begin('~/some/path/here')
+" Sourced from ~/.vimrc by `make vim`. Machine-specific tweaks go in
+" ~/.vimrc.local, which is loaded last. Run `make vim-plugins` once to install
+" vim-plug and the plugins; until then everything below still works, minus the
+" plugin features.
+"
+" Leader is <Space>. Press <Space>0 for a searchable menu of handy commands,
+" or run :Cheatsheet.
+" ============================================================================
+" encoding must be set before scriptencoding, or the Unicode glyphs below are
+" mangled under a non-UTF-8 locale.
+if &encoding !=? 'utf-8' | set encoding=utf-8 | endif
+scriptencoding utf-8
 
-    " To ignore plugin indent changes, instead use:
-    " iletype plugin on
+if &compatible | set nocompatible | endif
 
-    " Brief help
-    " :PluginList       - lists configured plugins
-    " :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
-    " :PluginSearch foo - searches for foo; append `!` to refresh local cache
-    " :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+if exists('g:env_settings_loaded') || v:version < 801
+  finish
+endif
+let g:env_settings_loaded = 1
 
-    " see :h vundle for more details or wiki for FAQ
-    " Put your non-Plugin stuff after this line
+" Leader first: plugin and Lua mappings below capture it when they are defined.
+let g:mapleader = "\<Space>"
+let g:maplocalleader = ','
 
-    " let Vundle manage Vundle, required
-    Plugin 'VundleVim/Vundle.vim'
+" Repo root, used to find templates/.
+let s:root = fnamemodify(resolve(expand('<sfile>:p')), ':h')
 
-    " Nerdtree to replace netrw. Functionality is about the same, but a lot of
-    " things are more transparent, like how to create/move/delete files. The
-    " biggest change I like is shifting the 'working directory'. I was never able
-    " to get that working on netrw. Bookmarks are also nice.
-    Plugin 'preservim/nerdtree' | 
-                \ Plugin 'Xuyuanp/nerdtree-git-plugin'
+" Per-editor state directory (undo, swap, sessions). Neovim and Vim keep
+" separate ones because their undo file formats are not compatible.
+let s:datadir = has('nvim') ? stdpath('data') : expand('~/.vim')
+for s:d in ['undo', 'swap', 'backup', 'sessions']
+  if !isdirectory(s:datadir . '/' . s:d)
+    silent! call mkdir(s:datadir . '/' . s:d, 'p', 0700)
+  endif
+endfor
+unlet s:d
 
-    " Git integration to see if a line was added/changed/deleted.
-    " Try using git fugitive to make merge conflicts easier for vim.
-    " Try using both. There shouldn't be any conflicts.
-    Plugin 'airblade/vim-gitgutter'
-    Plugin 'tpope/vim-fugitive'
-    " Maps autocomplete to Tab, along with more functionality.
-    "   Trying to switch to built-in ctrl-p.
-    " Plugin 'ackyshake/VimCompletesMe'
+" ----------------------------------------------------------------------------
+" Plugins (vim-plug)
+" ----------------------------------------------------------------------------
+let s:plug_file = has('nvim') ? stdpath('data') . '/site/autoload/plug.vim'
+      \                       : expand('~/.vim/autoload/plug.vim')
+let s:use_plug = filereadable(s:plug_file)
 
-    " Replaces vim's default file find throughout a project. First plugin installs
-    " (and compiles I think) the fzf tool, while the second integrates the tool
-    " with vim.
-    Plugin 'junegunn/fzf'
-    Plugin 'junegunn/fzf.vim'
+" ALE settings that must be set before it loads.
+" Neovim 0.11+ uses its built-in LSP client instead (see nvim/ide.lua).
+let s:nvim_ide = has('nvim-0.11')
+let g:ale_completion_enabled = s:nvim_ide ? 0 : 1
+let g:ale_disable_lsp = s:nvim_ide ? 1 : 'auto'
 
-    " Colors the bottom, doing this natively
-    " Plugin 'itchyny/lightline.vim'
+if s:use_plug
+  call plug#begin(s:datadir . '/plugged')
 
+  " Look and feel
+  Plug 'catppuccin/vim', { 'as': 'catppuccin' }
+  Plug 'itchyny/lightline.vim'
 
-    " vim jsx syntax highlighting for React, not working with jsx files
-    Plugin 'maxmellon/vim-jsx-pretty'
+  " Navigation and search
+  Plug 'preservim/nerdtree' | Plug 'Xuyuanp/nerdtree-git-plugin'
+  Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+  Plug 'junegunn/fzf.vim'
 
-    " Updates python syntax with features such as f-strings.
-    Plugin 'vim-python/python-syntax'
+  " Git
+  Plug 'airblade/vim-gitgutter'
+  Plug 'tpope/vim-fugitive'
 
-    " VIM html tagging, cannot get this working for js files
-    " Plugin 'alvan/vim-closetag'
+  " Editing
+  Plug 'tpope/vim-commentary'
+  Plug 'tpope/vim-surround'
+  Plug 'tpope/vim-repeat'
+  Plug 'machakann/vim-highlightedyank'
+  Plug 'mbbill/undotree', { 'on': 'UndotreeToggle' }
 
+  " Languages: syntax/indent for ~600 filetypes (replaces jsx-pretty, python-syntax)
+  Plug 'sheerun/vim-polyglot'
+  " Linting, fixing and LSP completion
+  Plug 'dense-analysis/ale'
 
-    " End plugins
+  " Neovim only: IDE features (LSP, installer) and Claude Code integration.
+  if s:nvim_ide
+    Plug 'neovim/nvim-lspconfig'
+    Plug 'mason-org/mason.nvim'
+    Plug 'folke/which-key.nvim'
+    Plug 'folke/snacks.nvim'
+    Plug 'coder/claudecode.nvim'
+  endif
 
-" All of your Plugins must be added before the following line
-call vundle#end()            " required
+  call plug#end()
 
+  if s:nvim_ide
+    execute 'luafile' fnameescape(s:root . '/nvim/ide.lua')
+  endif
+endif
 
+" True when a plug-in was installed AND is registered, e.g. s:has('ale').
+function! s:has(name) abort
+  return s:use_plug && has_key(get(g:, 'plugs', {}), a:name) && isdirectory(g:plugs[a:name].dir)
+endfunction
 
-filetype plugin indent on    " required
-" set omnifunc=syntaxcomplete#Complete
+" ----------------------------------------------------------------------------
+" Core options
+" ----------------------------------------------------------------------------
+set nobomb
+set backspace=indent,eol,start
+set nrformats-=octal
+set hidden                          " switch buffers without saving
+set autoread
+set belloff=all
+set history=1000
+set ttimeout ttimeoutlen=10
+set timeoutlen=500
+set updatetime=250                  " gitgutter / CursorHold latency
+set display=lastline
+set formatoptions+=j                " drop comment leader when joining lines
+set nojoinspaces
+set viminfo='200,<500,s50,h
 
-autocmd FileType javascript setlocal shiftwidth=4 tabstop=4
-autocmd FileType html setlocal shiftwidth=2 tabstop=2 indentexpr=
-autocmd FileType css setlocal shiftwidth=2 tabstop=2 indentexpr=
-" :set ft=<your filetype>
-" autocmd FileType javascript set omnifunc=htmlcomplete#CompleteTags
-" autocmd FileType html set omnifunc=htmlcomplete#CompleteTags
+" Files: keep swap/backup/undo out of project directories.
+let &directory = s:datadir . '/swap//'
+let &backupdir = s:datadir . '/backup//'
+set backup writebackup
+set undofile
+let &undodir = s:datadir . '/undo'
+set undolevels=1000 undoreload=10000
 
-" autocmd FileType yaml indent off
-" autocmd FileType yaml let b:did_indent = 1
-autocmd FileType yaml setlocal indentexpr= 
-" autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+" Mouse and clipboard
+set mouse=a
+if !has('nvim') && exists('&ttymouse')
+  silent! set ttymouse=sgr
+endif
+if has('clipboard')
+  set clipboard=unnamed
+  if !has('mac') && !has('macunix')
+    set clipboard=unnamedplus
+  endif
+endif
 
-" My leader key is space.
-map <SPACE> <leader>
-
-" Status line (bottom) configurations
+" Display
+set number relativenumber
+set cursorline
+set signcolumn=yes
+set scrolloff=5 sidescrolloff=8
+set showcmd
+set ruler
+set wrap linebreak
+if exists('&breakindent') | set breakindent | endif
+set list listchars=tab:▸\ ,trail:·,nbsp:␣,extends:›,precedes:‹
+set fillchars=vert:│,fold:─
+set showmatch matchtime=2
+set shortmess-=S shortmess+=c       " show search count, quiet completion
 set laststatus=2
-" set statusline+=%{StatuslineGit()}
+set splitright splitbelow
 
-" Colors here: https://jonasjacek.github.io/colors/
-" More useful statusline: 
-" https://stackoverflow.com/questions/5375240/a-more-useful-statusline-in-vim
-hi NormalColor ctermbg=155 ctermfg=27 
-hi InsertColor ctermbg=189 ctermfg=27 
-hi ReplaceColor ctermbg=165 ctermfg=0 
-hi VisualColor ctermbg=darkgrey ctermfg=lightgrey
+" Search
+set ignorecase smartcase
+set incsearch hlsearch
 
-set statusline=
-" Change color based on mode.
-set statusline+=%#NormalColor#%{(mode()=='n')?'\ \ NORMAL\ ':''}
-set statusline+=%#InsertColor#%{(mode()=='i')?'\ \ INSERT\ ':''}
-set statusline+=%#ReplaceColor#%{(mode()=='R')?'\ \ REPLACE\ ':''}
-set statusline+=%#VisualColor#%{(mode()=='v')?'\ \ VISUAL\ ':''}
-" "buffernr
-" " set statusline+=\[%n]
-" "Modified? Readonly? Top/bot.
-set statusline+=\ %m%r%w
-" display git branch without-plugin causing slow vim updates.
-" set statusline+=%{StatuslineGit()}\ \|
-" This requires fugitive vim plugin
-" set statusline+=\ %{fugitive#head()}\ \|
-"File+path
-set statusline+=\ %<%f\ \|
+" Indentation (filetype specific overrides live in the autocmds below)
+set expandtab
+set tabstop=4 shiftwidth=4 softtabstop=4
+set autoindent smartindent
 
-" Dividing line, above is left, below is right.
-set statusline+=\ %=
+" Folding: off by default, indent based when toggled on (zi).
+set foldmethod=indent nofoldenable foldlevel=99
 
-"FileType
-set statusline+=\ %y\ \|
-"Rownumber/total (%)
-set statusline+=\ row:%l/%L\ (%03p%%)\ \|
-"Colnr
-set statusline+=\ col:%03c
-set shortmess-=S
+" Command-line completion
+set wildmenu
+set wildmode=longest:full,full
+if has('patch-8.2.4325') || has('nvim')
+  set wildoptions=pum
+endif
+set wildignore+=**/node_modules/**,**/build/**,**/dist/**,**/.git/**,**/__pycache__/**,*.pyc
+set path+=**
 
+" Completion popup
+set completeopt=menuone,noselect
+if has('patch-8.1.1880')
+  set completeopt+=popup
+endif
+set complete-=i                     " scanning includes is slow in big repos
 
-" Generic Plugin configurations
+" Tags: look upward from the current file for a tags file (see `make ctags`).
+set tags=./tags;/
 
-" " filetypes like xml, xhtml, ...
-" " This will make the list of non-closing tags self-closing in the specified files.
-" "
-" " let g:closetag_xhtml_filetypes = 'xhtml,javascript.jsx,jsx'
-" let g:closetag_xhtml_filetypes = 'xhtml,jsx,javascript'
-" " filenames like *.xml, *.html, *.xhtml, ...
-" " These are the file extensions where this plugin is enabled.
-" "
-" let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.js,*.jsx'
-" " Shortcut for closing tags, default is '>'
-" " autocmd BufNewFile,BufRead *.js set filetype=javascript.jsx
-" " autocmd BufNewFile,BufRead *.jsx set filetype=javascript.jsx
-" " let g:closetag_html_style=1
-" "
-" let g:closetag_shortcut = '>'
-" " Add > at current position without closing the current tag, default is ''
-" "
-" let g:closetag_close_shortcut = '<leader>>'
+" Searching: ripgrep when available (also feeds :Grep).
+if executable('rg')
+  set grepprg=rg\ --vimgrep\ --smart-case\ --hidden\ --glob\ '!.git'
+  set grepformat=%f:%l:%c:%m
+else
+  set grepprg=grep\ -rnH\ --exclude-dir=.git\ --exclude-dir=node_modules
+endif
 
-" NERDTree plugin information
+" ----------------------------------------------------------------------------
+" Appearance
+" ----------------------------------------------------------------------------
+syntax enable
+set background=dark
 
-" nnoremap <leader>n :NERDTreeFocus<CR>
-" nnoremap <C-n> :NERDTree<CR>
-nnoremap <C-t> :NERDTreeToggle<CR>
-nnoremap <leader>n :NERDTreeFind<CR>
-let NERDTreeShowHidden=1
-" Allows nerdtree to create/add/remove files.
-set modifiable
+" True colour when the terminal supports it (tmux.conf enables RGB too).
+if has('termguicolors') && (has('nvim') || $COLORTERM =~# 'truecolor\|24bit')
+  if !has('nvim') && &term =~# '^\(screen\|tmux\)'
+    let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+    let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+  endif
+  set termguicolors
+endif
 
-" Start NERDTree and leave the cursor in it.
-" autocmd VimEnter * NERDTree
-" Start NERDTree and put the cursor back in the other window.
-" autocmd VimEnter * NERDTree | wincmd p
-" Exit Vim if NERDTree is the only window left.
-" autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+" Cursor shape follows the mode: bar in insert, underline in replace.
+if !has('nvim') && !has('gui_running') && &term !~# 'linux'
+  let &t_SI = "\<Esc>[6 q"
+  let &t_SR = "\<Esc>[4 q"
+  let &t_EI = "\<Esc>[2 q"
+endif
 
-" Vim git gutter information, using both fugitive and git gutter
-" vim gitgutter plugin update time
-set updatetime=100
-highlight clear SignColumn
-highlight GitGutterAdd ctermfg=darkgrey ctermbg=green 
-highlight GitGutterChange ctermfg=darkgrey ctermbg=yellow
-highlight GitGutterDelete ctermfg=darkgrey ctermbg=red
-highlight GitGutterChangeDelete ctermfg=darkgrey ctermbg=yellow
+augroup EnvColors
+  autocmd!
+  autocmd ColorScheme * highlight clear SignColumn
+augroup END
 
-" Maps fzf plugin to ctrl-a, searches through all NON-gitignore files.
-" nnoremap <C-;> :GFiles<CR>
-" To search through normal files, do :Files
-nnoremap <leader>a :GFiles<CR>
-" nnoremap <C-a> :GFiles<CR>
-" map <C-a> :Files<CR>
+if s:has('catppuccin') && &t_Co >= 256 && (&termguicolors || has('gui_running'))
+  silent! colorscheme catppuccin_mocha
+elseif has('patch-9.0.0')
+  silent! colorscheme habamax         " ships with Vim 9, fine in 256 colours
+endif
 
+" Status line: lightline when installed, a plain one otherwise.
+let g:lightline = {
+      \ 'colorscheme': 'wombat',
+      \ 'active': {
+      \   'left':  [['mode', 'paste'], ['branch', 'readonly', 'filename', 'modified']],
+      \   'right': [['lineinfo'], ['percent'], ['filetype', 'fileencoding']],
+      \ },
+      \ 'component_function': { 'branch': 'EnvBranch' },
+      \ 'separator': { 'left': '', 'right': '' },
+      \ 'subseparator': { 'left': '│', 'right': '│' },
+      \ }
+if s:has('catppuccin')
+  let g:lightline.colorscheme = 'catppuccin_mocha'
+endif
 
-" vim code help
+function! EnvBranch() abort
+  if !exists('*FugitiveHead') | return '' | endif
+  let l:b = FugitiveHead()
+  return empty(l:b) ? '' : '⎇ ' . l:b
+endfunction
 
-" " SNIPPETS
-" " Read in and create a python main function
-" nnoremap \python-main :read $ENVSETTINGS/templates/python-main.template<CR>o<Tab>
-" nnoremap \html-main :read $ENVSETTINGS/templates/html-main.template<CR>
-" " For local replace
-" nnoremap gr gd[{V%::s/<C-R>///gc<left><left><left>
-" 
-" " For global replace
-" " nnoremap gR gD:%s/<C-R>///gc<left><left><left>
+if s:has('lightline.vim')
+  set noshowmode
+else
+  set statusline=\ %f\ %m%r%w%=%y\ \ %l:%c\ \ %p%%\
+endif
 
-" pretty print json file.
-" nnoremap \jsonpretty execute '%!python -m json.tool' | w 
-" nnoremap \json-pretty :%!python -m json.tool
+" ----------------------------------------------------------------------------
+" Plugin settings
+" ----------------------------------------------------------------------------
+" NERDTree
+let g:NERDTreeShowHidden = 1
+let g:NERDTreeMinimalUI = 1
+let g:NERDTreeWinSize = 32
+let g:NERDTreeIgnore = ['^\.git$', '^node_modules$', '__pycache__', '\.pyc$', '\.swp$']
 
-" " nnoremap <leader>ch vat:s/^\(.*\)$/<!-- \1 -->/
-" " <html>
-" "  help world
-" " </html>
-" 
-" " macros
-" "let @c = 'vat:s/^\(.*\)$/<!-- \1 -->/:noh'
+" gitgutter
+let g:gitgutter_sign_added = '▎'
+let g:gitgutter_sign_modified = '▎'
+let g:gitgutter_sign_removed = '▁'
+let g:gitgutter_sign_removed_first_line = '▔'
+let g:gitgutter_sign_modified_removed = '▎'
 
+" fzf
+let g:fzf_preview_window = ['right,50%', 'ctrl-/']
+if has('popupwin') || has('nvim')
+  let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.8, 'border': 'rounded' } }
+endif
 
-" vim general remapped keys (not related to plugins)
-vnoremap <leader>p "_dP
-" remap Control Q to control p
-" inoremap <C-q> <C-p>
+" ALE: lint on save and when text stops changing; fix with :ALEFix.
+let g:ale_sign_error = '✘'
+let g:ale_sign_warning = '▲'
+let g:ale_virtualtext_cursor = 'current'
+let g:ale_lint_on_text_changed = 'normal'
+let g:ale_lint_delay = 300
+let g:ale_fix_on_save = 0
+let g:ale_fixers = {
+      \ '*': ['remove_trailing_lines', 'trim_whitespace'],
+      \ 'python': ['ruff_format', 'ruff'],
+      \ 'javascript': ['prettier'],
+      \ 'typescript': ['prettier'],
+      \ 'css': ['prettier'],
+      \ 'html': ['prettier'],
+      \ 'json': ['prettier'],
+      \ 'sh': ['shfmt'],
+      \ }
 
-" Redirect vim commands to a buffer. Does not work in testing
-" :redir @a
-" :set all
-" :redir END
-" command! -nargs=+ -complete=command Redir let s:reg = @@ | redir @"> | silent execute <q-args> | redir END | new | pu | 1,2d_ | let @@ = s:reg
-
-nnoremap <S-r> :e<CR>
-" nnoremap <S-Tab> :edit #<CR>
-" inoremap <S-CR> <C-o>O
-
-" insert mode to jump around words using hjkl
-" C-l is overrided to escape
-" inoremap <C-l> <C-o>W
-" inoremap <C-h> <C-o>B
-inoremap <C-j> <C-o>b
-inoremap <C-k> <esc>ea
-" inoremap <C-e> <C-o>$
-
-
-" Open tags in vertical split
-noremap <leader>] :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
-" noremap <leader>] :sp <CR>:exec("tag ".expand("<cword>"))<CR>
-
-
-"keep visual mode after indent
-vnoremap > >gv
-vnoremap < <gv
-
-nnoremap <leader>` :<C-u>marks<CR>:normal! `
-" nnoremap <leader>q :undolist<CR>:u<Space>
-
-" In the future, may want to remap this to be comma separated instead of being
-" two separate parameters.
-" append gv
-noremap <leader>/ :call AutoComment("","c")<cr>
-noremap <leader>. :call AutoComment("","u")<cr>
-" noremap <leader>/ :call AutoComment("","c")<left><left><left><left><left><left>
-" noremap <leader>. :call AutoComment("","u")<left><left><left><left><left><left>
-" noremap <c-/> :call AutoComment("","c")<cr>
-" noremap <c-.> :call AutoComment("","u")<cr>
-" vnoremap <leader>/ :call AutoComment("","c")<left><left><left><left><left><left>
-" vnoremap <leader>. :call AutoComment("","u")<left><left><left><left><left><left>
-
-
-" If splits exists, this will have the split take up the whole page.
-nnoremap <silent> <leader>f :ZoomToggle<CR>
-
-nnoremap <CR> o<Esc>k
-inoremap <C-e> <C-o>$
-inoremap <C-a> <C-o>0
-inoremap {<CR> {<CR>}<C-o><S-o>
-" inoremap (<CR> )<Left>
-" inoremap {<Tab> {}<Left>
-" inoremap [<Tab> []<Left>
-inoremap (<Tab> ()<Left>
-" inoremap '<Tab> ''<Left>
-" inoremap \"<Tab> \""<Left>
-" inoremap :<CR> :<CR><Tab>
-"nnoremap <SPACE> <Nop>
-
-
-" Visual line color. In black background and grey text, cannot see.
-" hi Visual  guifg=blue guibg=blue gui=none
-hi Visual ctermfg=darkgrey ctermbg=lightblue
-" highlight GitGutterDelete ctermfg=black ctermbg=red
-" Remap Q to quit
-" nnoremap Q :q<CR>
-
-" Navigate buffers using tab and shift-tab.
-nnoremap <Tab> :bn<CR>
-" nnoremap <S-Tab> :bp<CR>
-nnoremap Q :bp<CR>
-" No need for a function to run a built-in vim command.
-" nnoremap <S-Tab> :call MoveBack()<CR>
-nnoremap <S-Tab> :edit #<CR>
-
-" Turn on python plugin syntax highlighting
+" Python syntax (from polyglot's python-syntax)
 let g:python_highlight_all = 1
 
-" Move lines up and down with shift arrowkey
-nnoremap <S-Up> :m-2<CR>
-nnoremap <S-Down> :m+<CR>
-inoremap <S-Up> <Esc>:m-2<CR>
-inoremap <S-Down> <Esc>:m+<CR>
+" ----------------------------------------------------------------------------
+" Mappings
+" ----------------------------------------------------------------------------
+nnoremap <Space> <Nop>
+xnoremap <Space> <Nop>
 
-" move selected lines up one line
-xnoremap <S-Up>  :m-2<CR>gv=gv
+" --- files, buffers, search ---
+nnoremap <silent> <C-t> :NERDTreeToggle<CR>
+nnoremap <silent> <leader>n :NERDTreeFind<CR>
+nnoremap <silent> <leader>a :call <SID>Files()<CR>
+nnoremap <silent> <leader>ff :Files<CR>
+nnoremap <silent> <leader>fg :Rg<CR>
+nnoremap <silent> <leader>fl :BLines<CR>
+nnoremap <silent> <leader>fh :History<CR>
+nnoremap <silent> <leader>fc :Commits<CR>
+nnoremap <silent> <leader>fb :BCommits<CR>
+nnoremap <silent> <leader>b :call <SID>Buffers()<CR>
+nnoremap <silent> <leader>o :call <SID>Buffers()<CR>
+nnoremap <leader>s :Grep<Space>
+nnoremap <silent> <leader>c :nohlsearch<CR>
+nnoremap <silent> <leader>e :edit<CR>
 
-" move selected lines down one line
-xnoremap <S-Down> :m'>+<CR>gv=gv
-" Buffers
-" nnoremap <C-i> :bn<cr>
-" nnoremap <C-o> :bp<cr>
-" nnoremap <leader>d :bd<cr> 
-nnoremap <leader>b :ls<cr>
-nnoremap <leader>o :buffers<CR>:b 
+" Buffers: Tab / Shift-Tab / Q, plus unimpaired-style [b ]b.
+nnoremap <silent> <Tab> :bnext<CR>
+nnoremap <silent> Q :bprevious<CR>
+nnoremap <silent> <S-Tab> :edit #<CR>
+nnoremap <silent> ]b :bnext<CR>
+nnoremap <silent> [b :bprevious<CR>
+nnoremap <silent> <leader>d :bdelete<CR>
 
-" nnoremap <leader>l :ls<cr>
-
-
-" Use ctrl-[select] the active split!
-nnoremap <silent> <C-k> :wincmd k<CR>
-nnoremap <silent> <C-j> :wincmd j<CR>
+" Windows
 nnoremap <silent> <C-h> :wincmd h<CR>
+nnoremap <silent> <C-j> :wincmd j<CR>
+nnoremap <silent> <C-k> :wincmd k<CR>
 nnoremap <silent> <C-l> :wincmd l<CR>
-" inoremap <C-k> <C-o>:wincmd k<CR>
-" inoremap <C-j> <C-o>:wincmd j<CR>
-" inoremap <C-h> <C-o>:wincmd h<CR>
-" inoremap <C-l> <C-o>:wincmd l<CR>
-" remap file save, file save+quit, and quit-all
-inoremap <C-S> <ESC>:update<CR>a
-nnoremap <C-S> :update<CR>
-" nnoremap <C-x> :x<CR>
-" nnoremap <C-q> :q<CR>
-nnoremap <leader>q :qa<CR>
+nnoremap <silent> <leader>f :ZoomToggle<CR>
+nnoremap <silent> <leader>ws :call <SID>MarkWindowSwap()<CR>
+nnoremap <silent> <leader>wt :call <SID>DoWindowSwap()<CR><C-w>h
 
-nnoremap <leader>r :source ~/.vimrc<CR>
-" nnoremap <C-r> :e<CR> " dummy, this is the redo command.
+" Save and quit. (<C-S> needs `stty -ixon`, which shell/rc.sh sets.)
+nnoremap <silent> <C-s> :update<CR>
+inoremap <silent> <C-s> <Esc>:update<CR>a
+nnoremap <silent> <leader>q :qa<CR>
+nnoremap <silent> <leader>r :ReloadVimrc<CR>
+
+" Scrolling: 3 lines with <C-e>/<C-y>, 10 with <C-n>/<C-p>.
 nnoremap <C-e> 3<C-e>
 nnoremap <C-y> 3<C-y>
-"nnoremap <leader>] 10<C-e>
-"nnoremap <leader>[ 10<C-y>
-" nnoremap <C-j> 10<C-e>
-" nnoremap <C-k> 10<C-y>
 nnoremap <C-n> 10<C-e>
-nnoremap <C-m> 10<C-y>
+nnoremap <C-p> 10<C-y>
 
-inoremap <C-l> <ESC>
-" This will clear the hlsearch
-" nnoremap <silent> <C-c> :noh<return><esc>
-nnoremap <silent> <leader>c :noh<return><esc>
+" Move lines with Shift-Up / Shift-Down.
+nnoremap <silent> <S-Up>   :move -2<CR>
+nnoremap <silent> <S-Down> :move +1<CR>
+inoremap <silent> <S-Up>   <Esc>:move -2<CR>a
+inoremap <silent> <S-Down> <Esc>:move +1<CR>a
+xnoremap <silent> <S-Up>   :<C-u>'<,'>move '<-2<CR>gv=gv
+xnoremap <silent> <S-Down> :<C-u>'<,'>move '>+1<CR>gv=gv
 
-" command! -nargs=* Xyz :call GrepSearch(<q-args>)
+" Keep the selection after indenting.
+xnoremap > >gv
+xnoremap < <gv
 
-nnoremap <leader>s :call GrepSearch("")<left><left>
+" Paste over a selection without clobbering the unnamed register.
+xnoremap <leader>p "_dP
 
-nnoremap <leader>0 :call VimSettingsMenu()<cr>
-nmap <silent> <leader>ws :call MarkWindowSwap()<CR>
-nmap <silent> <leader>wt :call DoWindowSwap()<CR><C-w>h
-" 
+" Insert-mode shortcuts
+inoremap <C-l> <Esc>
+inoremap <C-a> <C-o>0
+inoremap <C-e> <C-o>$
+inoremap <C-j> <C-o>b
+inoremap <C-k> <Esc>ea
+inoremap {<CR> {<CR>}<C-o>O
+inoremap (<Tab> ()<Left>
 
+" Enter in normal mode adds a blank line below (not in quickfix / cmdline window).
+nnoremap <CR> o<Esc>k
 
+" Marks and tags
+nnoremap <leader>` :<C-u>marks<CR>:normal! `
+nnoremap <silent> <leader>] :call <SID>TagInSplit()<CR>
 
-"vim settings
+" Comments (vim-commentary): <Space>/ toggles on a line or a selection.
+nmap <leader>/ gcc
+xmap <leader>/ gc
+nmap <leader>. gcc
+xmap <leader>. gc
 
-" Default splits will be on right instead of the left.
-set splitright
-set splitbelow
+" Git (fugitive)
+nnoremap <silent> <leader>gs :Git<CR>
+nnoremap <silent> <leader>gb :Git blame<CR>
+nnoremap <silent> <leader>gd :Gdiffsplit<CR>
 
-" Playing with tags
-set tags=./tags;/
-" Without following, ctags autocomplete is slow across a big repo
-set complete-=i
+" Misc
+nnoremap <silent> <leader>u :UndotreeToggle<CR>
+nnoremap <silent> <leader>0 :Menu<CR>
 
-" Vim function folding settings. 
-set foldmethod=indent
-" set foldlevel=1
-" set foldclose=all
-" set foldmethod=syntax
-" set nofoldenable
-" set foldlevel=2
-set nofoldenable
-set foldlevel=99
+" ALE (only when installed)
+if s:has('ale') && !s:nvim_ide
+  nmap <silent> [e <Plug>(ale_previous_wrap)
+  nmap <silent> ]e <Plug>(ale_next_wrap)
+  nnoremap <silent> gd :ALEGoToDefinition<CR>
+  nnoremap <silent> gr :ALEFindReferences<CR>
+  nnoremap <silent> K  :ALEHover<CR>
+  nnoremap <silent> <leader>rn :ALERename<CR>
+  nnoremap <silent> <leader>x  :ALEFix<CR>
+  " Tab completes in the popup menu.
+  inoremap <expr> <C-Space> pumvisible() ? "\<C-n>" : "\<C-x>\<C-o>"
+endif
 
-" " FILE BROWSING with netrw
-" "let g:netrw_banner=0        " disable banner
-" "let g:netrw_browse_split=4  " open in prior window
-" let g:netrw_altv=1          " open splits to the right
-" let g:netrw_liststyle=3      " tree view
-" let g:netrw_list_hide=netrw_gitignore#Hide()
-" let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
-" let g:netrw_bufsettings = 'noma nomod nu nobl nowrap ro'
+" ----------------------------------------------------------------------------
+" Autocommands
+" ----------------------------------------------------------------------------
+augroup EnvSettings
+  autocmd!
+  " Per-filetype indentation.
+  autocmd FileType javascript setlocal shiftwidth=4 tabstop=4
+  autocmd FileType html,css   setlocal shiftwidth=2 tabstop=2 indentexpr=
+  autocmd FileType yaml       setlocal shiftwidth=2 tabstop=2 indentexpr=
+  autocmd FileType json       setlocal shiftwidth=2 tabstop=2
+  autocmd FileType make,go    setlocal noexpandtab
+  autocmd FileType gitcommit  setlocal spell textwidth=72
+  autocmd FileType markdown   setlocal spell
 
-" set tabstop=2
+  " <CR> must keep working where it means something.
+  autocmd FileType qf nnoremap <buffer> <CR> <CR>
+  autocmd CmdwinEnter * nnoremap <buffer> <CR> <CR>
 
-" " Search for cpp or use default
-syntax enable
-" 
-set mouse=a
+  " Reopen files where you left off.
+  autocmd BufReadPost *
+        \ if &filetype !~# 'gitcommit\|gitrebase' && line("'\"") > 1 && line("'\"") <= line('$')
+        \ | execute 'normal! g`"' | endif
 
-" Allows mac to copy and paste through vim and clipboard
-set clipboard=unnamed
+  " Pick up changes made by other programs.
+  autocmd FocusGained,BufEnter,CursorHold * if mode() !=# 'c' | silent! checktime | endif
 
-" "Line Numbers
-set number
-set relativenumber
+  " Rebalance splits when the terminal is resized.
+  autocmd VimResized * wincmd =
 
-set expandtab
-" Highlight column 80 to unsure lines don't go too long.
-" Maybe make this an underline, it's blocking too much text.
-" set cc=80
-" highlight ColorColumn ctermbg=white
-" Any characters past the cc line is highlighted in red.
-" highlight OverLength ctermbg=red ctermfg=white guibg=#592929
-" match OverLength /\%81v.\+/
-" highlight ColorColumn guibg=lightgrey ctermbg=lightgrey
+  " Create missing parent directories when saving.
+  autocmd BufWritePre * call s:MkdirP(expand('<afile>:p:h'), v:cmdbang)
 
-" " These commands customize built-in find to make vim search through the
-" whole project structure. Unfortunately even if files matched 'ignores'
-" node_modules, the searching takes a long time to complete still, leading me
-" to believe it's still searching through those files. 
-" replaced with fzf.vim plugin instead.
-" Still useful for quick files.
-set path+=**
-set wildmenu
-set wildignore+=**/node_modules/**
-set wildignore+=**/build/**
-set wildmode=longest,list,full
+  " Open the quickfix window after :grep / :make when there are results.
+  autocmd QuickFixCmdPost [^l]* cwindow
+  autocmd QuickFixCmdPost l*    lwindow
 
-"Set ignore Case when Searching with / and using vimgrep (GrepSearch)
-set ignorecase
+  " Close Vim if NERDTree is the last window.
+  autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
 
-" Smart Casing when searching. This will ignore ignorecase if capital letters
-" are specified
-" Does not affect vimgrep. Need to turn off ignorecase (set noic)
-set smartcase
+  " Save a session when leaving Vim (restore with `vimlatest` in the shell).
+  autocmd VimLeave * call s:SaveSession()
+augroup END
 
-" "Wrapping
-set wrap
-" 
-"Auto Indent. The following 2 go together.
-set ai
-set smartindent
-" 
-" Always Show cmd
-set showcmd
-" 
-" "Underline Current Cursor Line
-set cursorline
-" "set ruler
-" 
-" 
-" "Matching Brackets
-set showmatch
-" 
-"Tenth of a second to blink when matching brackets
-set mat=2
-" 
-"Search as characters are entered
-set incsearch
-" 
-"highlight search matches
-set hlsearch
-" set hls
-" Clear if source vimrc
-let @/ = ""
-
-
-" "Always show status line
-set laststatus=2
-" 
-" "set background=dark
-" 
-" Allows to switch buffers even if not written too (which is vim default)
-set hidden
-
-" keep undo history
-set undofile                " Save undos after file closes
-set undodir=$HOME/.vim/undo " where to save undo histories
-set undolevels=1000         " How many undos
-set undoreload=10000        " number of lines to save for undo
-
-"Tab Space
-set ts=4
-" set ts=2
-
-" scrolloff to keep the cursor in the center. Try it by default, or move to
-" function. Now change it to show at least 10 lines.
-" set scrolloff=999
-" set scrolloff=10
-set scrolloff=5
-
-"Shift Space
-"set shiftwidth=4
-set shiftwidth=4
-
-
-
-
-
-"vim functions
-
-"Examples:
-":call Exec('buffers')
-"This will include the output of :buffers into the current buffer.
-"
-"Also try:
-":call Exec('ls')
-":call Exec('autocmd')
-"
-funct! Exec(command)
-    redir =>output
-    silent exec a:command
-    redir END
-    let @o = output
-    execute "put o"
-    return ''
-endfunct!
-
-" funct! Exec(command)
-"     redir =>output
-"     silent exec a:command
-"     redir END
-"     return output
-" endfunct!
-
-function! MarkWindowSwap()
-  let g:markedWinNum = winnr()
+" ----------------------------------------------------------------------------
+" Functions and commands
+" ----------------------------------------------------------------------------
+function! s:MkdirP(dir, force) abort
+  if a:dir !~# '^\w\+://' && !isdirectory(a:dir) && (a:force || confirm('Create directory ' . a:dir . '?', "&Yes\n&No", 2) == 1)
+    call mkdir(a:dir, 'p')
+  endif
 endfunction
 
-function! DoWindowSwap()
-    "Mark destination
-    let curNum = winnr()
-    let curBuf = bufnr( "%" )
-    exe g:markedWinNum . "wincmd w"
-    "Switch to source and shuffle dest->source
-    let markedBuf = bufnr( "%" )
-    "Hide and open so that we aren't prompted and keep history
-    exe 'hide buf' curBuf
-    "Switch to dest and shuffle source->dest
-    exe curNum . "wincmd w"
-    "Hide and open so that we aren't prompted and keep history
-    exe 'hide buf' markedBuf 
+" fzf file finder: git files in a repo, everything otherwise.
+function! s:Files() abort
+  if !exists(':Files')
+    echohl WarningMsg | echo 'fzf.vim is not installed (run: make vim-plugins)' | echohl None
+    return
+  endif
+  call system('git rev-parse --is-inside-work-tree')
+  if v:shell_error | Files | else | GFiles | endif
 endfunction
 
-" Vim way of saving sessions.
-" fu! SaveSess()
-"     execute 'call mkdir(%:p:h/.vim)'
-"     execute 'mksession! %:p:h/.vim/session.vim'
-" endfunction
-" 
-" fu! RestoreSess()
-" execute 'so %:p:h/.vim/session.vim'
-" if bufexists(1)
-"     for l in range(1, bufnr('$'))
-"         if bufwinnr(l) == -1
-"             exec 'sbuffer ' . l
-"         endif
-"     endfor
-" endif
-" endfunction
-
-" autocmd VimLeave * call SaveSess()
-" autocmd VimEnter * call RestoreSess()
-fu! SaveSess()
-    " This function will create a directory to save the correct files.
-    " execute 'mksession! ' . '~/.vim/sessions/session.vim-' . strftime('%Y-%m-%d_%H:%M:%S')
-    " execute 'mkdir ~/.vim/sessions/' . strftime('%Y-%m-%s')
-    " echo substitute(getcwd(), '^.*/', '', '')
-
-    " This command saves the actual session, so also whatever past vimrc is
-    " there. For only saving a file, may want to use Exec function.
-
-    " This will get mixed up if accessing another file from current dir.
-    if len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) > 1
-        " let save_dir = $home . '/.vim/sessions/' . strftime('%y-%m-%d') . '/' . substitute(getcwd(), '^.*/', '', '')
-        let save_home_dir = $HOME . '/.vim/sessions/' . substitute(getcwd(), '^.*/', '', '')
-        let save_dir = save_home_dir . '/' . strftime('%Y-%m-%d')
-        " echo save_home_dir
-        " echo save_dir
-        execute "call mkdir(save_dir, 'p')"
-        " Saves a latest for the cur directory for easier access
-        "   Problems: same directory names, accessing different directories
-        "     from the current directory.
-        execute 'mksession! ' . save_home_dir . '/' . 'latest.session'
-        " Saves a backup copy for record-keeping
-        execute 'mksession! ' . save_dir . '/vim.' . strftime('%H:%M:%S')
-        " Saves a global latest
-        execute 'mksession! ' . '~/.vim/sessions/latest.session'
-    endif
-
-    " execute 'mksession! ' . getcwd() . '/.session.vim-' . strftime('%Y-%m-%d_%H:%M:%S')
-    " execute 'mksession! ' . getcwd() . '/.session.vim-' . 'latest'
+function! s:Buffers() abort
+  if exists(':Buffers') | Buffers | else | ls | call feedkeys(':buffer ') | endif
 endfunction
 
-
-" autocmd BufEnter,VimLeavePre * call SaveSess()
-autocmd VimLeave * call SaveSess()
-
-function! VimSettingsMenu()
-" Vim function folding settings. 
-" set foldmethod=indent
-" " set foldlevel=1
-" " set foldclose=all
-" " set foldmethod=syntax
-" " set nofoldenable
-" set foldlevel=99
-" nnoremap \json-pretty :%!python -m json.tool
-
-    " settings format is: keypress_command, execute_command, command_comments
-    " As a rule, Numbers and letters on outside reserved for menus.
-    let settings = [
-        \   ['0 ', 'This command does nothing.', 'exit or continue with <cr> or 0'],
-        \   ['1', 'call Lines()', 'Default: on, numbers!, relativenumbers!'],
-        \   ['2', 'call Notes()', 'Default: off, formatoptions=ctnqro, comments+=n:*,n:#'],
-        \   ['4', 'ZoomToggle', 'Toggle fullscreen the current view'],
-        \   ['5', 'let @+ = expand("%")', 'Relative filepath into yank'],
-        \   ['6', 'let @+ = expand("%:p")', 'Full system filepath into yank'],
-        \   ['7', 'set smartindent!', 'Default: on, sometimes smartindent causes problems with code'],
-        \   ['8', 'set paste!', 'Default: on, pasting code with indents sometimes causes problems'],
-        \   ['d', [
-        \           [' d', '', 'Opening general help docs page. These commands do nothing'],
-        \           ['\[\]m', '', 'Cycle through function definition headers.'],
-        \           ['\<Ctrl>\<leader>\]', '', 'Open ctags in either same buffer, or vertical split buffer.'],
-        \           [':g/[function header][\/#]', '', 'Find all the functions in a file'],
-        \           [':echo @% or expand("%:t") or let @" = expand("%")', 'echo @%', 'Get the name of the current file: https://vim.fandom.com/wiki/Get_the_name_of_the_current_file'],
-        \           ['exp', "put=expand('%:p')", 'Get the name of the current file: https://vim.fandom.com/wiki/Get_the_name_of_the_current_file'],
-        \         ], 'Documentation on general helpful commands'],
-        \   ['f', [
-        \       [' f', '', 'Opening fold commands.'],
-        \       ['d', [
-        \               [' d', '', 'Opening fold cheat cheat. These commands do nothing'],
-        \               ['za', '', 'Toggle folds'],
-        \               ['zA', '', 'Toggle folds recursively'],
-        \               ['zR', '', 'Open all folds'],
-        \               ['zM', '', 'Close all folds'],
-        \               ['zr', '', 'Fold less (next level down)'],
-        \               ['zm', '', 'Fold more (next level up)'],
-        \       ], 'Documentation on Fold, commands do nothing.'],
-        \       ['0', 'Return to default menu', ''],
-        \       ['1', 'set foldlevel=1', 'Default: 99, Sets fold level to close after the second indent'],
-        \       ['2', 'set foldmethod=syntax', 'Default: indent, Syntax make fold smarter with code and json.'],
-        \       ['9', 'THIS DOES NOTHING', 'Returns fold settings to default'],
-        \   ], 'f is for fold menu'],
-        \   ['t', [
-        \       [' t', '', 'Opening tool commands.'],
-        \       ['0', 'Return to default menu', ''],
-        \       ['p', '%!python -m json.tool', 'Prettify json files'],
-        \   ], 't is for external tools menu'],
-        \   ['p', [
-        \       [' p', '', 'Opening plugin commands.'],
-        \       ['0', 'Return to default menu', 'Goes back to default menu'],
-        \       ['ff', 'Files', 'fzf plugin to browse all (including .gitignore) files of a repo.'],
-        \       ['fc', 'Commits', 'fzf plugin to see the past commits related to the project, requires fugitive.vim plugin'],
-        \       ['fb', 'BCommits', 'fzf plugin to see past commits related to this file, requires fugitive.vim plugin'],
-        \       ['gm', 'Git mergetool', 'Git plugin to help with merge conflicts.'],
-        \       ['gb', 'Git blame', 'Access the git history of individual lines.'],
-        \       ['\[,\]c', '', 'Move to previous/next Hunk'],
-        \   ], 'p is for plugins menu.'],
-        \]
-
-    let settings_dict = VimSettingsExpand(settings)
-    let loop = 1
-    while loop
-"     while type(settings_dict[action]) == v:t_list " only works with vim 8
-        call inputsave()
-        let action = input('Enter option: ')
-        call inputrestore()
-        if has_key(settings_dict, action)
-            let command = settings_dict[action]
-"             if type(command) == v:t_string
-            if type(command) == type("string")
-                " do the command and return
-                " Hard types: 0 always terminates, or maybe goes up?
-                " Thinking about it, 0 should bring to top, and then exits if on
-                " top.
-                let exe_command = settings_dict[action]
-                if exe_command == 'Return to default menu'
-"                     echo "\n\n"
-                    redraw
-                    let settings_dict = VimSettingsExpand(settings)
-                else
-                    echo " command: `" . exe_command . "`"
-                    let loop = 0
-                    execute exe_command
-                endif
-"             elseifztype(command) == v:t_list
-            elseif type(command) == type([])
-                " expand out options
-                redraw
-                let settings_dict = VimSettingsExpand(command)
-            endif
-        else
-            let loop = 0
-        endif
-    endwhile
+" Open the tag under the cursor in a vertical split; undo the split on failure.
+function! s:TagInSplit() abort
+  let l:word = expand('<cword>')
+  vsplit
+  try
+    execute 'tag' l:word
+  catch
+    close
+    echohl ErrorMsg | echo matchstr(v:exception, 'E\d\+:.*') | echohl None
+  endtry
 endfunction
 
-function! VimSettingsExpand(settings_list)
-    let settings_dict = {}
-    for setting in a:settings_list
-        " while good programming, this apparently does not work with vim7.
-        " Will need to reduce variable use because command can be a string and
-        " a list, causing vim type mismatch errors.
-        let key = setting[0]
-        let command = setting[1]
-        let comments = setting[2]
-"         if type(command) == v:t_list
-        if type(command) == type([])
-            echo key  .  " " . "menu"  . " | \" " . comments
-        else
-            echo key  .  " " . command  . " | \" " . comments
-        endif
-        let settings_dict[key] = command
-        " in order to use variables, must unset them at the end of the scope.
-        unlet key
-        unlet command
-        unlet comments
-    endfor
-    return settings_dict
+" :Grep PATTERN [args]  -> quickfix list via 'grepprg' (ripgrep when available)
+command! -nargs=+ -complete=file_in_path Grep execute 'silent grep!' <q-args> | redraw!
+
+" :Redir {command}  -> output of any command in a scratch buffer
+command! -nargs=+ -complete=command Redir call s:Redir(<q-args>)
+function! s:Redir(cmd) abort
+  let l:out = execute(a:cmd)
+  new
+  setlocal buftype=nofile bufhidden=wipe noswapfile
+  call setline(1, split(l:out, "\n"))
 endfunction
 
-" Timer to check if file has been updated by external program, and to reload.
-" if ! exists("g:CheckUpdateStarted")
-"     let g:CheckUpdateStarted=1
-"     call timer_start(1,'CheckUpdate')
-" endif
-" function! CheckUpdate(timer)
-"     silent! checktime
-"     call timer_start(1000,'CheckUpdate')
-" endfunction
-
-function! GetCommentChar()
-    let comments = {
-                \   '"': ['vim'],
-                \   '#': ['py', 'sh', 'yaml'],
-                \   '//': ['js', 'ts', 'typescript', 'cpp', 'c', 'java', 'javascript', 'html'],
-                \}
-    let cur_filetype = &filetype
-    let comment_type = '#'
-
-    for [comment_char,comment_filetype] in items(comments)
-        if index(comment_filetype, cur_filetype) >= 0
-            let comment_type = comment_char
-        endif
-    endfor
-    return comment_type
+" :Template NAME -> insert a file from templates/ at the cursor
+command! -nargs=1 -complete=customlist,s:TemplateComplete Template call s:Template(<q-args>)
+function! s:TemplateComplete(arglead, cmdline, cursorpos) abort
+  let l:files = map(glob(s:root . '/templates/*.template', 0, 1), "fnamemodify(v:val, ':t:r')")
+  return filter(l:files, 'v:val =~# "^" . a:arglead')
+endfunction
+function! s:Template(name) abort
+  let l:file = s:root . '/templates/' . a:name . '.template'
+  if !filereadable(l:file)
+    echohl ErrorMsg | echo 'No such template: ' . a:name | echohl None
+    return
+  endif
+  execute 'read' fnameescape(l:file)
 endfunction
 
-" Block comments like in sublime/visual studio
-function AutoComment(comment_char, comment_boolean) range
-    if len(a:comment_char) == 0
-        let comment_character =  GetCommentChar()
-    else
-        let comment_character = a:comment_char
-    endif
-    let vis_length = a:lastline - a:firstline
-    let vis_length = vis_length . 'j'
-    if vis_length == '0j'
-        let vis_length = ''
-    endif
+command! TrimWhitespace let s:v = winsaveview() | keeppatterns %s/\s\+$//e | call winrestview(s:v)
 
-    " get first character in a line.
-    let move_to_first = "normal! ml^"
-    execute move_to_first
-    " let current_char = matchstr(getline('.'), '\%' . col('.') . 'c.')
-    let line = getline('.')
-
-    let first_nonspace = col('.') - 1
-    let end_char = first_nonspace + strlen(comment_character) - 1
-    let current_chars = line[first_nonspace : end_char]
-
-    " let current_char = matchstr(getline('.'), '\%' . col('.') . 'c.')
-    " echo current_char
-    let change_line = "normal! \<C-V>" . vis_length
-    if a:comment_boolean == 'c'
-        let change_line = change_line . "I" . comment_character . " "
-    elseif a:comment_boolean == 'u'
-        if current_chars == comment_character
-            let move_right = strlen(comment_character)
-            let change_line = change_line . move_right . "lx"
-        endif
-    endif
-    " Can add additional line here to highlight the previous lines
-    " Can't decide a way that it'll work seamlessly, so ignore for now.
-    let change_line = change_line . "\<esc>`l"
-    " echo change_line
-    execute change_line
-endfunction
-
-" These do the job, but for some reason causes vim to slow down. Currently
-" using fugitive vim instead.
-function! GitBranch()
-  return system("git rev-parse --abbrev-ref HEAD 2>/dev/null | tr -d '\n'")
-endfunction
-
-function! StatuslineGit()
-  let l:branchname = GitBranch()
-  return strlen(l:branchname) > 0?'  '.l:branchname.' ':''
-endfunction
-
-" " Allows switching between 2 buffers. Called with Shift-Tab
-" function! MoveBack()
-"      edit #
-" endfunction
-    
-" rewrite to split on , to differentiate number of args
-" If second is blank, default to current filetype
-"   If default filetype is blank, default to all
-" If second is all, default to call
-" If second is another specified filetype, then search using that.
-function! GrepSearch(parametersplit)
-    let parameters = split(a:parametersplit, ",")
-    if len(parameters) == 1
-        let found_extension = expand('%:e')
-        " echo found_extension
-        if len(found_extension) != 0
-            call add(parameters, found_extension)
-        else
-            call add(parameters, 'all')
-        endif
-    endif
-    let extension = "**/*"
-    if parameters[1] != "all"
-        let extension = extension . "." . parameters[1]
-    endif
-    let searchcommand = "vim \"" . parameters[0] . "\" " . extension . " | copen"
-    echom searchcommand
-    execute searchcommand
-endfunction
-
-" Zoom / Restore window.
+" Zoom the current split to fill the tab, and back.
 function! s:ZoomToggle() abort
-    if exists('t:zoomed') && t:zoomed
-        execute t:zoom_winrestcmd
-        let t:zoomed = 0
-    else
-        let t:zoom_winrestcmd = winrestcmd()
-        resize
-        vertical resize
-        let t:zoomed = 1
-    endif
+  if get(t:, 'zoomed', 0)
+    execute t:zoom_winrestcmd
+    let t:zoomed = 0
+  else
+    let t:zoom_winrestcmd = winrestcmd()
+    resize
+    vertical resize
+    let t:zoomed = 1
+  endif
 endfunction
 command! ZoomToggle call s:ZoomToggle()
 
+" Swap two windows: mark one, move to the other, swap.
+function! s:MarkWindowSwap() abort
+  let g:marked_win = winnr()
+endfunction
+function! s:DoWindowSwap() abort
+  if !exists('g:marked_win') | return | endif
+  let l:cur_win = winnr()
+  let l:cur_buf = bufnr('%')
+  execute g:marked_win . 'wincmd w'
+  let l:marked_buf = bufnr('%')
+  execute 'hide buf' l:cur_buf
+  execute l:cur_win . 'wincmd w'
+  execute 'hide buf' l:marked_buf
+endfunction
 
+" Sessions: ~/.vim/sessions/<dir>/latest.session plus a dated history.
+function! s:SaveSession() abort
+  if len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) < 2
+    return
+  endif
+  let l:root = s:datadir . '/sessions'
+  let l:proj = l:root . '/' . fnamemodify(getcwd(), ':t')
+  let l:day = l:proj . '/' . strftime('%Y-%m-%d')
+  silent! call mkdir(l:day, 'p')
+  execute 'mksession!' fnameescape(l:proj . '/latest.session')
+  execute 'mksession!' fnameescape(l:day . '/vim.' . strftime('%H-%M-%S'))
+  execute 'mksession!' fnameescape(l:root . '/latest.session')
+endfunction
 
-function! Lines()
+command! ReloadVimrc unlet! g:env_settings_loaded | source $MYVIMRC | echo 'vimrc reloaded'
+
+function! s:ToggleLines() abort
   set number!
   set relativenumber!
 endfunction
 
-function! Notes()
+" Notes mode: continue bullet lists and numbered comments.
+function! s:Notes() abort
   setlocal formatoptions=ctnqro
   setlocal comments+=n:*,n:#
 endfunction
+command! Notes call s:Notes()
 
-
-
-
-" inoremap <tab> <c-r>=Smart_TabComplete()<CR>
-" function! Smart_TabComplete()
-"   let line = getline('.')                         " current line
-" 
-"   let substr = strpart(line, -1, col('.')+1)      " from the start of the current
-"                                                   " line to one character right
-"                                                   " of the cursor
-"   let substr = matchstr(substr, "[^ \t]*$")       " word till cursor
-"   if (strlen(substr)==0)                          " nothing to match on empty string
-"     return "\<tab>"
-"   endif
-"   let has_period = match(substr, '\.') != -1      " position of period, if any
-"   let has_slash = match(substr, '\/') != -1       " position of slash, if any
-"   if (!has_period && !has_slash)
-"     return "\<C-X>\<C-P>"                         " existing text matching
-"   elseif ( has_slash )
-"     return "\<C-X>\<C-F>"                         " file matching
-"   else
-"     return "\<C-X>\<C-O>"                         " plugin matching
-"   endif
-" endfunction
-
-
-" 
-" " mf files, ma, then `argdo open` to open in buffers. How to automate?
-" 
-" noremap <leader>e :call ToggleNetrw()<CR>
-" 
-" 
-" function! NetrwMapping()
-"   noremap <buffer> <C-v> :call OpenToRight()<CR>
-"   noremap <buffer> <C-h> :call OpenBelow()<CR>
-" endfunction
-" 
-" 
-" "noremap xq <ESC>
-" "nnoremap tq :rightbelow 20vs<CR>:e .<CR><C-w>r<CR>
-" 
-" " Toggles netrw on the left side. Opens by default, toggle with
-" " ctrl-e
-" 
-" " TAG JUMPING
-" " command! MakeTags !ctags -R .
-" command! MakeTags !/usr/local/bin/ctags -R .
-" ctags -R --exclude=.git --exclude=build --exclude=node_modules .
-" 
-" " FILE BROWSING
-" "let g:netrw_banner=0        " disable banner
-" "let g:netrw_browse_split=4  " open in prior window
-" let g:netrw_altv=1          " open splits to the right
-" let g:netrw_liststyle=3      " tree view
-" let g:netrw_list_hide=netrw_gitignore#Hide()
-" let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
-" let g:netrw_bufsettings = 'noma nomod nu nobl nowrap ro'
-" 
-" " THIS ALLOWS:
-" " - :edit a folder to open file browser
-" "   <CR>/v/t to open in an h-split/v-split/tab
-" "   check |netrw-browse-maps| for more mappings
-" 
-" 
-" " functions
-" 
-" function! OpenToRight()
-"   :normal v
-"   let g:path=expand('%:p')
-"   :q!
-"   execute 'belowright vnew' g:path
-"   :normal <C-l>
-" endfunction
-" 
-" function! OpenBelow()
-"   :normal v
-"   let g:path=expand('%:p')
-"   :q!
-"   execute 'belowright new' g:path
-"   :normal <C-l>
-" endfunction
-" 
-" let g:NetrwIsOpen=0
-" 
-" function! ToggleNetrw()
-"   silent Lexplore
-"   vertical resize 30
-"   "if g:NetrwIsOpen
-"   "  let i = bufnr("$")
-"   "  while (i >= 1)
-"   "    if (getbufvar(i, "&filetype") == "netrw")
-"   "      silent exe "bwipeout " . i
-"   "    endif
-"   "    let i-=1
-"   "  endwhile
-"   "  let g:NetrwIsOpen=0
-"   "else
-"   "  let g:NetrwIsOpen=1
-"   "  silent Lexplore
-"   "  vertical resize 30
-"   "endif
-" endfunction
-" 
-" "fun! ProjectDrawer()
-" "  if &ft ==# "netrw"
-" "    call ToggleNetrw()
-" "  endif
-" "endfun
-" 
-" "augroup ProjectDrawer
-" "  autocmd!
-" "  autocmd VimEnter * :call ToggleNetrw()
-" "augroup END
-" 
-" augroup netrw_mapping
-"   autocmd!
-"   autocmd filetype netrw call NetrwMapping()
-"   "autocmd filetype netrw call ToggleNetrw()
-"   "autocmd VimEnter * :call ProjectDrawer()
-"   "autocmd VimEnter * :call ToggleNetrw()
-" augroup END
-" 
-" 
-" 
-" 
-
-" Helpful guides and how-tos for testing/quick reference purposes
-
-" function! Demo()
-"   let curline = getline('.')
-"   call inputsave()
-"   let name = input('Enter name: ')
-"   call inputrestore()
-"   call setline('.', curline . ' ' . name)
-" endfunction
-
-function! Test()
-    echo "working Test"
-    " execute Files
-    " execute ZoomToggle
-    " execute "ZoomToggle"
-    " execute "Files"
+function! s:PrettyJson() abort
+  if executable('jq')
+    %!jq .
+  else
+    %!python3 -m json.tool
+  endif
 endfunction
 
+" Claude Code in a terminal split. Neovim with claudecode.nvim gets the full
+" IDE integration (:ClaudeCode, see nvim/ide.lua); this is the plain Vim fallback.
+function! s:Claude(args) abort
+  if !executable('claude')
+    echohl ErrorMsg | echo 'claude CLI not found (run: make claude)' | echohl None
+    return
+  endif
+  let l:cmd = 'claude' . (empty(a:args) ? '' : ' ' . a:args)
+  if has('nvim')
+    execute 'vertical botright new | terminal' l:cmd
+    startinsert
+  else
+    execute 'vertical botright terminal ++close' l:cmd
+  endif
+endfunction
+command! -nargs=* Claude call s:Claude(<q-args>)
+if !s:nvim_ide
+  nnoremap <silent> <leader>ac :Claude<CR>
+  nnoremap <silent> <leader>ar :Claude --resume<CR>
+  nnoremap <silent> <leader>aC :Claude --continue<CR>
+endif
 
+" ----------------------------------------------------------------------------
+" Menu  (<Space>0 or :Menu): fuzzy-searchable list of handy actions
+" ----------------------------------------------------------------------------
+let s:menu = [
+      \ ['Toggle line numbers',                    'call s:ToggleLines()'],
+      \ ['Notes mode (bullets, numbered comments)', 'Notes'],
+      \ ['Toggle zoom of current split',           'ZoomToggle'],
+      \ ['Copy relative file path',                'let @+ = expand("%")'],
+      \ ['Copy absolute file path',                'let @+ = expand("%:p")'],
+      \ ['Toggle paste mode',                      'set paste!'],
+      \ ['Toggle smartindent',                     'set smartindent!'],
+      \ ['Toggle spell check',                     'set spell!'],
+      \ ['Toggle line wrap',                       'set wrap!'],
+      \ ['Toggle invisible characters',            'set list!'],
+      \ ['Fold: enable, indent based, level 1',    'setlocal foldenable foldmethod=indent foldlevel=1'],
+      \ ['Fold: syntax based',                     'setlocal foldenable foldmethod=syntax'],
+      \ ['Fold: reset (all open)',                 'setlocal nofoldenable foldmethod=indent foldlevel=99'],
+      \ ['Prettify JSON in this buffer',           'call s:PrettyJson()'],
+      \ ['Trim trailing whitespace',               'TrimWhitespace'],
+      \ ['ALE: fix this buffer',                   'ALEFix'],
+      \ ['Git: commits (fzf)',                     'Commits'],
+      \ ['Git: commits touching this file (fzf)',  'BCommits'],
+      \ ['Git: blame',                             'Git blame'],
+      \ ['Git: merge tool',                        'Git mergetool'],
+      \ ['Claude Code',                           s:nvim_ide ? 'ClaudeCode' : 'Claude'],
+      \ ['Undo tree',                              'UndotreeToggle'],
+      \ ['Show cheat sheet',                       'Cheatsheet'],
+      \ ['Reload vimrc',                           'ReloadVimrc'],
+      \ ['Plugins: update',                        'PlugUpdate'],
+      \ ['Plugins: clean unused',                  'PlugClean'],
+      \ ]
 
+function! s:MenuRun(line) abort
+  let l:idx = str2nr(matchstr(a:line, '^\s*\zs\d\+')) - 1
+  if l:idx < 0 || l:idx >= len(s:menu) | return | endif
+  try
+    execute s:menu[l:idx][1]
+  catch
+    echohl ErrorMsg | echo matchstr(v:exception, 'E\d\+:.*') | echohl None
+  endtry
+endfunction
 
+function! s:Menu() abort
+  let l:labels = map(copy(s:menu), {i, e -> printf('%2d  %s', i + 1, e[0])})
+  if exists('*fzf#run')
+    call fzf#run(fzf#wrap({
+          \ 'source': l:labels,
+          \ 'sink': function('s:MenuRun'),
+          \ 'options': ['--prompt', 'Menu> ', '--no-multi'],
+          \ }))
+  else
+    let l:choice = inputlist(['Select an action:'] + l:labels)
+    if l:choice > 0 && l:choice <= len(l:labels)
+      call s:MenuRun(l:labels[l:choice - 1])
+    endif
+  endif
+endfunction
+command! Menu call s:Menu()
+
+command! Cheatsheet call s:Cheatsheet()
+function! s:Cheatsheet() abort
+  new
+  setlocal buftype=nofile bufhidden=wipe noswapfile filetype=help nonumber norelativenumber nolist
+  call setline(1, [
+        \ 'env-settings cheat sheet                                  (q to close)',
+        \ '',
+        \ 'Leader = <Space>',
+        \ '',
+        \ 'Find       <leader>a files (git aware)   <leader>ff all files    <leader>fg ripgrep',
+        \ '           <leader>fl lines in buffer    <leader>fh history      <leader>s  :Grep (quickfix)',
+        \ 'Buffers    <Tab> next   Q previous   <S-Tab> last   <leader>b list   <leader>d delete',
+        \ 'Windows    <C-h/j/k/l> move   <leader>f zoom   <leader>ws then <leader>wt swap',
+        \ 'Tree       <C-t> toggle   <leader>n reveal current file',
+        \ 'Git        <leader>gs status   gb blame   gd diff   [c ]c hunks   <leader>hp preview hunk',
+        \ 'Code       gd definition   gr references   K hover   [e ]e next/prev problem',
+        \ '           <leader>x fix   <leader>rn rename   <C-Space> complete',
+        \ 'Edit       <leader>/ toggle comment   gc{motion}   cs"'' change surround   ys{motion}" add',
+        \ '           <S-Up/Down> move line   <leader>p paste without yanking   >/< keep selection',
+        \ 'Tags       <leader>] open tag in vertical split   <C-]> jump   <C-t> is NERDTree here',
+        \ 'Claude     <leader>ac toggle   af focus   ar resume   aC continue   ab add file',
+        \ '           (visual) <leader>as send selection   <leader>aa / ad accept / deny diff',
+        \ 'Other      <leader>u undo tree   <leader>0 menu   <leader>r reload vimrc   <leader>c clear search',
+        \ '',
+        \ 'Commands   :Grep  :Redir {cmd}  :Template {name}  :TrimWhitespace  :Notes  :Menu',
+        \ ])
+  setlocal nomodifiable
+  nnoremap <buffer> q :close<CR>
+endfunction
+
+" ----------------------------------------------------------------------------
+" Local overrides
+" ----------------------------------------------------------------------------
+if filereadable(expand('~/.vimrc.local'))
+  source ~/.vimrc.local
+endif

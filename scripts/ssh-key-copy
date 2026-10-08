@@ -1,62 +1,60 @@
-#!/bin/sh
+#!/usr/bin/env bash
+# Copy an SSH public key to a host and add a Host entry to ~/.ssh/config.
+#
+#   ssh-key-copy -i ~/.ssh/id_ed25519 -u user -h host [-n nickname] [-X]
+#
+# Missing values are prompted for. -X turns on X11 forwarding for that host.
+set -euo pipefail
 
-# only private key for now
-fail=0
+key="" user="" host="" nick="" x11=no
 
-check_input() {
-  var=$1
-  data=$2
-  if [ -z "$data" ]
-    then
-      echo "Need to specify $var"
-      read -p "$var: " data
-      if [ -z "$data" ]
-        then
-          fail=1
-      fi
-  fi
-  eval "$var=$data"
-}
+usage() { sed -n '2,7p' "$0" | sed 's/^# \{0,1\}//'; exit "${1:-1}"; }
 
-while getopts "i:u:h:" opt; do
+while getopts "i:u:h:n:Xx" opt; do
   case $opt in
-    i) key=$OPTARG;;
-    u) user=$OPTARG;;
-    h) host=$OPTARG;;
+    i) key=$OPTARG ;;
+    u) user=$OPTARG ;;
+    h) host=$OPTARG ;;
+    n) nick=$OPTARG ;;
+    X) x11=yes ;;
+    x) usage 0 ;;
+    *) usage 1 ;;
   esac
 done
 
+ask() { # ask VAR "prompt" [default]
+  local var=$1 prompt=$2 default=${3:-} reply
+  [ -n "${!var}" ] && return 0
+  read -r -p "$prompt${default:+ [$default]}: " reply
+  printf -v "$var" '%s' "${reply:-$default}"
+  [ -n "${!var}" ] || { echo "$var is required" >&2; exit 1; }
+}
 
-check_input "key" $key
-check_input "user" $user
-check_input "host" $host
+ask key  "Private key path" "$HOME/.ssh/id_ed25519"
+ask user "Remote user"
+ask host "Remote host"
+ask nick "Host nickname" "$host"
 
-echo "Specify host nick-name, use host if not supplied"
-read -p '(optional) sshname: ' sshname
-if [ -z "$sshname" ]
-then
-  sshname=$host
+key=${key/#\~/$HOME}
+[ -r "$key.pub" ] || { echo "Missing public key: $key.pub (create one with ssh-keygen -t ed25519)" >&2; exit 1; }
+
+if command -v ssh-copy-id >/dev/null 2>&1; then
+  ssh-copy-id -i "$key.pub" "$user@$host"
+else
+  ssh "$user@$host" 'mkdir -p ~/.ssh && chmod 700 ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys' < "$key.pub"
 fi
 
-if [ "$fail" == 1 ] ; then
-  echo "exiting script"
-  exit 1
+mkdir -p ~/.ssh && chmod 700 ~/.ssh
+if grep -qE "^Host[[:space:]]+$nick\$" ~/.ssh/config 2>/dev/null; then
+  echo "$HOME/.ssh/config already has a Host entry named '$nick'; leaving it alone."
+else
+  {
+    printf '\nHost %s\n' "$nick"
+    printf '    HostName %s\n' "$host"
+    printf '    User %s\n' "$user"
+    printf '    IdentityFile %s\n' "$key"
+    printf '    ForwardX11 %s\n' "$x11"
+  } >> ~/.ssh/config
+  chmod 600 ~/.ssh/config
+  echo "Added '$nick' to ~/.ssh/config. Connect with: ssh $nick"
 fi
-
-
-#check if key has .pub at the end. For now, make that in assumption.
-
-comm="cat ${key}.pub | ssh ${user}@${host} \"mkdir -p ~/.ssh/ && chmod 700 ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys\""
-echo $comm
-eval $comm
-
-# Add to ~/.ssh/config file
-config_string="\nhost $sshname\n
-\t\thostname $host\n
-\t\tIdentityFile $key\n
-\t\tuser $user\n
-\t\tforwardx11 yes
-"
-#echo $config_string
-echo $config_string >> ~/.ssh/config
-
