@@ -23,6 +23,10 @@ exec $SHELL -l
 On a Mac install [Homebrew](https://brew.sh) first. Optionally run `make fonts terminal`
 for the Ghostty terminal and a Nerd Font.
 
+**New to tmux/Vim, or wondering where tabs fit?** Read [docs/WORKFLOW.md](docs/WORKFLOW.md):
+what belongs in the shell vs tmux vs Vim, how to make tabs, and a typical day. Once installed,
+`guide` shows it rendered in the terminal.
+
 `make` alone lists every target. The useful ones:
 
 | Target | Does |
@@ -53,6 +57,9 @@ Neovim 0.11+ (installed by `make deps` on macOS) gets an IDE layer from `nvim/id
   code actions (`<Space>ca`), format (`<Space>x`), diagnostics (`[e` `]e`); completion
   popup as you type. Servers are installed by `make lsp`.
 - **Search / files**: fzf (`<Space>a`, `<Space>fg`), NERDTree (`<C-t>`), Git via fugitive and gitgutter.
+- **Git, GitLens style**: the current line shows its blame inline (`Alice, 3 days ago • fix login redirect`).
+  `<Space>gm` pops up the full commit, `gL` the history of just that line, `gb` a blame window, `gB` toggles the inline text.
+- **Editor tabs**: open buffers show as a tab bar along the top; `<Space>1`..`9` jump to one. Start screen with recent files.
 - **Discoverability**: press `<Space>` and wait for which-key. `<Space>0` opens a fuzzy menu, `:Cheatsheet` lists keys.
 - **Claude Code** ([claudecode.nvim](https://github.com/coder/claudecode.nvim)) uses the same protocol as the VS Code extension:
   Claude sees your open file and selection and proposes edits as diffs inside Neovim.
@@ -72,6 +79,12 @@ Plain Vim has no editor integration protocol, so it gets `:Claude` (and the same
 which runs the CLI in a terminal split, with ALE for linting and completion. Outside any
 editor, `cc` runs `claude`, and `prefix C` in tmux opens Claude in a split.
 
+## Reading markdown in the terminal
+
+`md` renders `README.md` (or any file) with [glow](https://github.com/charmbracelet/glow); `md -f` picks a file with
+fzf and a live preview. In tmux, `Alt-a m` pops the README over your work. In Vim, `<Space>mp` or `:Md`; in Neovim
+markdown buffers also render in place (`<Space>mr` toggles). Falls back to bat/less when glow is not installed.
+
 ## Keys worth knowing
 
 - Leader is `<Space>`. Vim: `<Tab>`/`Q` next/previous buffer, `<Space>/` toggle comment, `<S-Up/Down>` move line.
@@ -90,7 +103,8 @@ vimrc               Vim + Neovim config (vim-plug)
 nvim/ide.lua        Neovim-only: LSP, Claude Code, which-key
 tmux.conf           tmux config
 ctags               universal-ctags options
-scripts/            ssh-key-copy, tmux-session (on PATH)
+docs/WORKFLOW.md    how to use all of this
+scripts/            on PATH: t (project tmux session), md (render markdown), ssh-key-copy, tmux-session
 templates/          snippets for :Template
 terminal/           Ghostty config
 ```

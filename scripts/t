@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Attach to (or create) a tmux session named after the current directory.
+#
+#   t              session for this directory, e.g. ~/code/api -> "api"
+#   t NAME         session called NAME, started in this directory
+#
+# Works from inside tmux too (switches client instead of nesting).
+set -euo pipefail
+
+name=${1:-$(basename "$PWD")}
+name=${name//[.:]/_}          # tmux forbids . and : in session names
+
+if [ -n "${TMUX:-}" ]; then
+  tmux has-session -t "=$name" 2>/dev/null || tmux new-session -d -s "$name" -c "$PWD"
+  exec tmux switch-client -t "=$name"
+fi
+exec tmux new-session -A -s "$name" -c "$PWD"

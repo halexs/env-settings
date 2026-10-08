@@ -31,12 +31,12 @@ fi
 if have brew; then
   say "Using Homebrew"
   install_each "brew install" git vim neovim tmux zsh fzf ripgrep fd bat eza zoxide starship \
-    universal-ctags shellcheck shfmt jq git-delta gh node
+    universal-ctags shellcheck shfmt jq git-delta gh node glow
 elif have apt-get; then
   say "Using apt"
   $SUDO apt-get update
   install_each "$SUDO apt-get install -y" git curl vim tmux zsh fzf ripgrep fd-find bat \
-    eza zoxide universal-ctags shellcheck jq
+    eza zoxide universal-ctags shellcheck jq glow
   # Debian/Ubuntu ship these under different names; expose the usual ones.
   have fdfind && ! have fd  && ln -sf "$(command -v fdfind)" "$HOME/.local/bin/fd"
   have batcat && ! have bat && ln -sf "$(command -v batcat)" "$HOME/.local/bin/bat"
@@ -60,6 +60,16 @@ if ! have starship; then
       || warn "starship install failed"
   else
     warn "curl missing; skipping starship"
+  fi
+fi
+
+# glow renders markdown in the terminal (`md`, :Md). Not packaged everywhere.
+if ! have glow; then
+  if have go; then
+    say "Installing glow with go"
+    GOBIN="$HOME/.local/bin" go install github.com/charmbracelet/glow@latest || warn "glow install failed"
+  else
+    warn "glow not available from your package manager. Get it from https://github.com/charmbracelet/glow/releases (md falls back to bat/less meanwhile)"
   fi
 fi
 
