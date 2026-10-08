@@ -23,9 +23,14 @@ exec $SHELL -l
 On a Mac install [Homebrew](https://brew.sh) first. Optionally run `make fonts terminal`
 for the Ghostty terminal and a Nerd Font.
 
+**Built-in help.** Stuck or forgot a key? Press `Alt-/` at the shell prompt (or run `h`), `Alt-a ?` in tmux,
+or `Space ?` in Vim. It is a fuzzy-searchable palette of every key, command and how-to
+("How do I make tabs?", "Who changed this line?"), with the explanation beside it, like the `/` menu in Claude Code.
+Choosing a command puts it on your command line. All three menus read one file, `help/help.tsv`, which
+`make check` verifies against the real config, so it cannot silently go stale.
+
 **New to tmux/Vim, or wondering where tabs fit?** Read [docs/WORKFLOW.md](docs/WORKFLOW.md):
-what belongs in the shell vs tmux vs Vim, how to make tabs, and a typical day. Once installed,
-`guide` shows it rendered in the terminal.
+what belongs in the shell vs tmux vs Vim and a typical day. `guide` shows it rendered in the terminal.
 
 `make` alone lists every target. The useful ones:
 
@@ -60,7 +65,7 @@ Neovim 0.11+ (installed by `make deps` on macOS) gets an IDE layer from `nvim/id
 - **Git, GitLens style**: the current line shows its blame inline (`Alice, 3 days ago • fix login redirect`).
   `<Space>gm` pops up the full commit, `gL` the history of just that line, `gb` a blame window, `gB` toggles the inline text.
 - **Editor tabs**: open buffers show as a tab bar along the top; `<Space>1`..`9` jump to one. Start screen with recent files.
-- **Discoverability**: press `<Space>` and wait for which-key. `<Space>0` opens a fuzzy menu, `:Cheatsheet` lists keys.
+- **Discoverability**: `<Space>?` searches every key and command; `:Cheatsheet` lists them on one page; press `<Space>` and wait for which-key.
 - **Claude Code** ([claudecode.nvim](https://github.com/coder/claudecode.nvim)) uses the same protocol as the VS Code extension:
   Claude sees your open file and selection and proposes edits as diffs inside Neovim.
 
@@ -103,8 +108,9 @@ vimrc               Vim + Neovim config (vim-plug)
 nvim/ide.lua        Neovim-only: LSP, Claude Code, which-key
 tmux.conf           tmux config
 ctags               universal-ctags options
+help/help.tsv       the help registry behind h, Alt-a ? and <Space>? (edit this to add help)
 docs/WORKFLOW.md    how to use all of this
-scripts/            on PATH: t (project tmux session), md (render markdown), ssh-key-copy, tmux-session
+scripts/            on PATH: h (help palette), t (project tmux session), md (render markdown), ssh-key-copy, tmux-session
 templates/          snippets for :Template
 terminal/           Ghostty config
 ```

@@ -47,3 +47,20 @@ fi
 
 # --- fallback prompt (replaced by starship when installed) -------------------
 PS1='\[\e[34m\]\w\[\e[0m\] \[\e[32m\]❯\[\e[0m\] '
+
+# --- help palette: Alt-/ anywhere on the prompt ------------------------------
+# Same fuzzy help as `h`. Choosing a command puts it on the command line (bash 4+).
+if [[ $- == *i* ]]; then
+  if [ "${BASH_VERSINFO[0]}" -ge 4 ]; then
+    _es_help_widget() {
+      local pick
+      pick=$(h --pick </dev/tty) || return 0
+      case ${pick%%$'\t'*} in
+        sh:*) READLINE_LINE=${pick%%$'\t'*}; READLINE_LINE=${READLINE_LINE#sh:}; READLINE_POINT=${#READLINE_LINE} ;;
+      esac
+    }
+    bind -x '"\e/": _es_help_widget'
+  else
+    bind -x '"\e/": h'
+  fi
+fi

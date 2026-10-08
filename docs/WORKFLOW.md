@@ -1,7 +1,18 @@
 # How to use this setup
 
-Read it any time with `guide` in the shell, `Alt-a` then `/` in tmux, or
-`Space ?` in Vim. `q` quits.
+**You should rarely need this file.** Help is built in and searchable, like the `/` menu in Claude Code.
+Type a few words ("tabs", "blame", "split", "copy") and press Enter for the full explanation:
+
+| Where you are | Press |
+|---------------|-------|
+| Shell prompt | `Alt-/` or run `h`. Picking a command puts it on your command line, ready to edit |
+| tmux | `Alt-a` then `?` |
+| Vim / Neovim | `Space ?` (or `:Keys`) |
+
+Questions like "How do I make tabs?" and "Who changed this line?" are in there too. Everything
+comes from one file, `help/help.tsv`, so the three menus always agree.
+This longer guide is for reading once: `guide` in the shell, `Alt-a /` in tmux, `:Guide` in Vim.
+`q` quits.
 
 ## The big picture
 
@@ -117,8 +128,9 @@ The sign column on the left shows added, changed and removed lines.
 | Vim | `Space m p` renders the current file or README. In **Neovim** markdown buffers also render in place (headings, tables, code); `Space m r` toggles that |
 
 ### Help inside Vim
-`Space 0` opens a searchable menu of actions. `:Cheatsheet` lists keys. `Space` and pause
-(Neovim) shows what each key group does.
+`Space ?` opens the searchable palette: every key, command and how-to. Enter runs the entry when it
+is a Vim command (for example "toggle spell check") and otherwise explains it. `:Cheatsheet` lists all
+Vim keys on one page. In Neovim, `Space` and a pause shows what each key group does.
 
 ## tmux keys
 
@@ -136,6 +148,7 @@ Prefix is `Alt-a` (Option on a Mac). Press it, release, then the key.
 | prefix `H J K L` | resize panes (repeatable) |
 | prefix `d` | detach |
 | prefix `[` | copy mode: move with vim keys, `v` select, `y` copy. Also copies to the system clipboard |
+| prefix `?` | searchable help for everything |
 | prefix `m` / `M` / `/` | README popup / pick markdown / this guide |
 | prefix `C` | Claude in a right-hand pane |
 

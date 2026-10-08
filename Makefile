@@ -147,6 +147,14 @@ check: lint ## Syntax-check every config (shell, vim, tmux)
 	  tmux -L es-check kill-server 2>/dev/null; \
 	  if [ $$rc -eq 0 ]; then echo "  tmux.conf ok"; else echo "  tmux.conf has errors"; exit 1; fi
 
+	@echo "help:"; $(ROOT)/scripts/h --validate
+	@if [ -e $(HOME)/.vim/autoload/plug.vim ]; then \
+	  vim -es -N -u $(ROOT)/vimrc -i NONE -S $(ROOT)/install/check-help.vim </dev/null || exit 1; \
+	else echo "  (skipped Vim/key verification: run make vim-plugins first)"; fi
+	@if command -v nvim >/dev/null 2>&1 && [ -e "$${XDG_DATA_HOME:-$(HOME)/.local/share}/nvim/site/autoload/plug.vim" ]; then \
+	  out=$$(nvim --headless -u $(ROOT)/vimrc -S $(ROOT)/install/check-help.vim </dev/null 2>&1) \
+	    || { echo "$$out"; exit 1; }; echo "  Neovim help entries verified"; fi
+
 lint: ## Lint shell scripts (bash -n, zsh -n, shellcheck)
 	@for f in $(SH_FILES); do bash -n $$f || exit 1; done; echo "bash -n ok"
 	@if command -v zsh >/dev/null 2>&1; then zsh -n shell/zsh.zsh && echo "zsh -n ok"; else echo "zsh not installed, skipped"; fi

@@ -6,8 +6,8 @@
 " vim-plug and the plugins; until then everything below still works, minus the
 " plugin features.
 "
-" Leader is <Space>. Press <Space>0 for a searchable menu of handy commands,
-" or run :Cheatsheet.
+" Leader is <Space>. Press <Space>? for a searchable list of every key and
+" command (:Keys), or run :Cheatsheet.
 " ============================================================================
 " encoding must be set before scriptencoding, or the Unicode glyphs below are
 " mangled under a non-UTF-8 locale.
@@ -315,7 +315,7 @@ let g:startify_change_to_vcs_root = 1
 let g:startify_files_number = 8
 let g:startify_custom_header = [
       \ '   env-settings',
-      \ '   <Space><Space> files   <Space>0 menu   :Cheatsheet   :Guide (workflow docs)',
+      \ '   <Space>? search every key and command   <Space><Space> files   :Guide long docs',
       \ '',
       \ ]
 let g:startify_lists = [
@@ -326,7 +326,7 @@ let g:startify_lists = [
 let g:startify_commands = [
       \ { 'f': ['Find file (fzf)', 'Files'] },
       \ { 'g': ['Search text (ripgrep)', 'Rg'] },
-      \ { 'm': ['Menu', 'Menu'] },
+      \ { 'h': ['Help: search all keys', 'Keys'] },
       \ ]
 
 " ALE: lint on save and when text stops changing; fix with :ALEFix.
@@ -467,8 +467,8 @@ nnoremap <silent> <leader>gL :call <SID>LineHistory()<CR>
 
 " Misc
 nnoremap <silent> <leader>u :UndotreeToggle<CR>
-nnoremap <silent> <leader>0 :Menu<CR>
-nnoremap <silent> <leader>? :Guide<CR>
+nnoremap <silent> <leader>0 :Keys<CR>
+nnoremap <silent> <leader>? :Keys<CR>
 nnoremap <silent> <leader>mp :Md<CR>
 
 " ALE (only when installed)
@@ -711,108 +711,110 @@ function! s:Claude(args) abort
 endfunction
 command! -nargs=* Claude call s:Claude(<q-args>)
 if !s:nvim_ide
+  command! -nargs=* ClaudeCode Claude <args>
   nnoremap <silent> <leader>ac :Claude<CR>
   nnoremap <silent> <leader>ar :Claude --resume<CR>
   nnoremap <silent> <leader>aC :Claude --continue<CR>
 endif
 
 " ----------------------------------------------------------------------------
-" Menu  (<Space>0 or :Menu): fuzzy-searchable list of handy actions
+" Help palette  (<Space>? or :Keys): every key, command and how-to, fuzzy searchable
+"
+" Reads help/help.tsv, the same file behind `h` in the shell and Alt-a ? in tmux,
+" so there is one place to keep help up to date. Enter runs the entry when it
+" is a Vim command, otherwise shows its details.
 " ----------------------------------------------------------------------------
-let s:menu = [
-      \ ['Toggle line numbers',                    'call s:ToggleLines()'],
-      \ ['Notes mode (bullets, numbered comments)', 'Notes'],
-      \ ['Toggle zoom of current split',           'ZoomToggle'],
-      \ ['Copy relative file path',                'let @+ = expand("%")'],
-      \ ['Copy absolute file path',                'let @+ = expand("%:p")'],
-      \ ['Toggle paste mode',                      'set paste!'],
-      \ ['Toggle smartindent',                     'set smartindent!'],
-      \ ['Toggle spell check',                     'set spell!'],
-      \ ['Toggle line wrap',                       'set wrap!'],
-      \ ['Toggle invisible characters',            'set list!'],
-      \ ['Fold: enable, indent based, level 1',    'setlocal foldenable foldmethod=indent foldlevel=1'],
-      \ ['Fold: syntax based',                     'setlocal foldenable foldmethod=syntax'],
-      \ ['Fold: reset (all open)',                 'setlocal nofoldenable foldmethod=indent foldlevel=99'],
-      \ ['Prettify JSON in this buffer',           'call s:PrettyJson()'],
-      \ ['Trim trailing whitespace',               'TrimWhitespace'],
-      \ ['ALE: fix this buffer',                   'ALEFix'],
-      \ ['Git: commits (fzf)',                     'Commits'],
-      \ ['Git: commits touching this file (fzf)',  'BCommits'],
-      \ ['Git: blame',                             'Git blame'],
-      \ ['Git: merge tool',                        'Git mergetool'],
-      \ ['Claude Code',                           s:nvim_ide ? 'ClaudeCode' : 'Claude'],
-      \ ['Git: toggle inline blame',               'BlamerToggle'],
-      \ ['Git: commit behind this line (popup)',   'GitMessenger'],
-      \ ['Git: history of this line',              'call s:LineHistory()'],
-      \ ['Git: history of this file',              'Git log --oneline --follow -- %'],
-      \ ['Markdown: render in terminal (glow)',    'Md'],
-      \ ['Open the workflow guide',                'Guide'],
-      \ ['Undo tree',                              'UndotreeToggle'],
-      \ ['Show cheat sheet',                       'Cheatsheet'],
-      \ ['Reload vimrc',                           'ReloadVimrc'],
-      \ ['Plugins: update',                        'PlugUpdate'],
-      \ ['Plugins: clean unused',                  'PlugClean'],
-      \ ]
+let s:help_file = s:root . '/help/help.tsv'
 
-function! s:MenuRun(line) abort
-  let l:idx = str2nr(matchstr(a:line, '^\s*\zs\d\+')) - 1
-  if l:idx < 0 || l:idx >= len(s:menu) | return | endif
-  try
-    execute s:menu[l:idx][1]
-  catch
-    echohl ErrorMsg | echo matchstr(v:exception, 'E\d\+:.*') | echohl None
-  endtry
+function! s:HelpRows(layers) abort
+  let l:rows = []
+  if !filereadable(s:help_file) | return l:rows | endif
+  for l:line in readfile(s:help_file)
+    if empty(l:line) || l:line[0] ==# '#' | continue | endif
+    let l:f = split(l:line, "\t", 1)
+    if len(l:f) < 6 | continue | endif
+    if !empty(a:layers) && index(a:layers, l:f[0]) < 0 | continue | endif
+    call add(l:rows, { 'layer': l:f[0], 'keys': l:f[1], 'title': l:f[2], 'action': l:f[3],
+          \ 'details': substitute(join(l:f[5:], ' '), '\\n', "\n", 'g') })
+  endfor
+  return l:rows
 endfunction
 
-function! s:Menu() abort
-  let l:labels = map(copy(s:menu), {i, e -> printf('%2d  %s', i + 1, e[0])})
-  if exists('*fzf#run')
-    call fzf#run(fzf#wrap({
-          \ 'source': l:labels,
-          \ 'sink': function('s:MenuRun'),
-          \ 'options': ['--prompt', 'Menu> ', '--no-multi'],
-          \ }))
+function! s:Keys(query) abort
+  let s:help_rows = s:HelpRows([])
+  if empty(s:help_rows)
+    echohl ErrorMsg | echo 'help/help.tsv not found' | echohl None
+    return
+  endif
+  if !exists('*fzf#run')
+    call s:Cheatsheet()
+    return
+  endif
+  let l:lines = map(copy(s:help_rows), {i, r -> printf("%d\t%-6s %-24s %s", i + 1, r.layer, r.keys, r.title)})
+  call fzf#run(fzf#wrap({
+        \ 'source': l:lines,
+        \ 'sink': function('s:KeysRun'),
+        \ 'options': ['--delimiter', "\t", '--with-nth', '2..', '--prompt', 'help> ', '--no-multi',
+        \   '--query', a:query, '--preview-window', 'right,55%,wrap',
+        \   '--preview', shellescape(s:root . '/scripts/h') . ' --card {1}'],
+        \ }))
+endfunction
+
+function! s:KeysRun(line) abort
+  let l:idx = str2nr(matchstr(a:line, '^\d\+')) - 1
+  if l:idx < 0 || l:idx >= len(s:help_rows) | return | endif
+  let l:row = s:help_rows[l:idx]
+  if l:row.action =~# '^ex:'
+    try
+      execute l:row.action[3:]
+    catch
+      echohl ErrorMsg | echo matchstr(v:exception, 'E\d\+:.*') | echohl None
+    endtry
   else
-    let l:choice = inputlist(['Select an action:'] + l:labels)
-    if l:choice > 0 && l:choice <= len(l:labels)
-      call s:MenuRun(l:labels[l:choice - 1])
+    if l:row.action =~# '^sh:'
+      let @" = l:row.action[3:]
     endif
+    call s:ShowCard(l:row)
   endif
 endfunction
-command! Menu call s:Menu()
 
-command! Cheatsheet call s:Cheatsheet()
-function! s:Cheatsheet() abort
-  new
-  setlocal buftype=nofile bufhidden=wipe noswapfile filetype=help nonumber norelativenumber nolist
-  call setline(1, [
-        \ 'env-settings cheat sheet                                  (q to close)',
-        \ '',
-        \ 'Leader = <Space>',
-        \ '',
-        \ 'Find       <leader><Space> files (git aware)   <leader>ff all files   <leader>fg ripgrep',
-        \ '           <leader>fl lines in buffer    <leader>fh history      <leader>s  :Grep (quickfix)',
-        \ 'Buffers    (the tab bar on top) <Tab> next   Q previous   <S-Tab> last   <leader>1..9 jump',
-        \ '           <leader>bb list   <leader>bd close   Vim tab pages: <leader>tn new  tc close  ]t [t',
-        \ 'Windows    <C-h/j/k/l> move   <leader>z zoom   <leader>ws then <leader>wt swap',
-        \ 'Tree       <C-t> toggle   <leader>n reveal current file',
-        \ 'Git        <leader>gs status  gb blame window  gd diff  gB toggle inline blame  gm commit popup',
-        \ '           <leader>gl file history  gL line history  [c ]c hunks  <leader>hp preview hunk',
-        \ 'Code       gd definition   gr references   K hover   [e ]e next/prev problem',
-        \ '           <leader>x fix   <leader>rn rename   <C-Space> complete',
-        \ 'Edit       <leader>/ toggle comment   gc{motion}   cs"'' change surround   ys{motion}" add',
-        \ '           <S-Up/Down> move line   <leader>p paste without yanking   >/< keep selection',
-        \ 'Tags       <leader>] open tag in vertical split   <C-]> jump   <C-t> is NERDTree here',
-        \ 'Claude     <leader>ac toggle   af focus   ar resume   aC continue   ab add file',
-        \ '           (visual) <leader>as send selection   <leader>aa / ad accept / deny diff',
-        \ 'Docs       <leader>? workflow guide   <leader>mp render markdown   <leader>mr inline render (nvim)',
-        \ 'Other      <leader>u undo tree   <leader>0 menu   <leader>R reload vimrc   <Esc><Esc> clear search',
-        \ '',
-        \ 'Commands   :Grep  :Redir {cmd}  :Template {name}  :TrimWhitespace  :Notes  :Menu  :Md  :Guide',
-        \ ])
+" Details of one entry in a small split. q closes it.
+function! s:ShowCard(row) abort
+  let l:lines = [a:row.title . '   [' . a:row.layer . ']', a:row.keys, '']
+        \ + split(a:row.details, "\n", 1)
+  if a:row.action =~# '^sh:'
+    call extend(l:lines, ['', 'Run in the shell:  ' . a:row.action[3:] . '   (copied to the unnamed register)'])
+  endif
+  botright new
+  setlocal buftype=nofile bufhidden=wipe noswapfile nonumber norelativenumber nolist nowrap
+  call setline(1, l:lines)
+  execute 'resize' min([len(l:lines) + 1, 16])
   setlocal nomodifiable
-  nnoremap <buffer> q :close<CR>
+  nnoremap <buffer> <silent> q :close<CR>
 endfunction
+
+" One-page list of every Vim/Claude key, generated from the same file.
+function! s:Cheatsheet() abort
+  let l:lines = ['env-settings key reference   (leader = Space, q closes)', '']
+  for l:layer in ['vim', 'nvim', 'claude']
+    let l:rows = s:HelpRows([l:layer])
+    if empty(l:rows) | continue | endif
+    call add(l:lines, toupper(l:layer) . (l:layer ==# 'nvim' ? '  (Neovim only)' : ''))
+    for l:r in l:rows
+      call add(l:lines, printf('  %-28s %s', l:r.keys, l:r.title))
+    endfor
+    call add(l:lines, '')
+  endfor
+  new
+  setlocal buftype=nofile bufhidden=wipe noswapfile nonumber norelativenumber nolist nowrap
+  call setline(1, l:lines)
+  setlocal nomodifiable
+  nnoremap <buffer> <silent> q :close<CR>
+endfunction
+
+command! -nargs=? Keys call s:Keys(<q-args>)
+command! -nargs=? Menu call s:Keys(<q-args>)
+command! Cheatsheet call s:Cheatsheet()
 
 " ----------------------------------------------------------------------------
 " Local overrides

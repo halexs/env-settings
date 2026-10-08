@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+# h: searchable help for this whole setup (shell, tmux, Vim, Claude).
+#
+#   h [QUERY...]          fuzzy palette; type to filter, Enter shows the full card
+#   h --layer NAME [Q]    only one layer: topic shell tmux vim nvim claude
+#   h --list [LAYER]      plain table (no fzf needed)
+#   h --pick [Q]          choose a row, print "ACTION<TAB>KEYS<TAB>TITLE" (used by the Alt-/ widget)
+#   h --card N            print card for row N (used for the preview)
+#   h --tsv [LAYER]       raw rows, for editors
+#   h --validate          check the registry for mistakes
+#
+# The data lives in help/help.tsv, the single source for every help menu.
+set -euo pipefail
+
+SELF=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")
+DATA=${ES_HELP_FILE:-$(cd "$(dirname "$SELF")/.." && pwd)/help/help.tsv}
+[ -r "$DATA" ] || { echo "h: cannot read $DATA" >&2; exit 1; }
+
+LAYERS="topic shell tmux vim nvim claude"
+layer_filter=""
+
+# Data rows only (no comments or blanks), optionally one layer.
+rows() { awk -F'\t' -v layer="${1:-}" '!/^#/ && NF >= 6 && (layer == "" || $1 == layer)' "$DATA"; }
+
+color() { # color LAYER
+  case $1 in
+    topic) printf '\033[1;35m' ;; shell) printf '\033[1;32m' ;; tmux) printf '\033[1;33m' ;;
+    vim) printf '\033[1;34m' ;; nvim) printf '\033[1;36m' ;; claude) printf '\033[1;31m' ;; *) printf '\033[1m' ;;
+  esac
+}
+
+card() { # card N   (numbering follows the current layer filter)
+  local line layer keys title action details
+  line=$(rows "$layer_filter" | sed -n "${1}p")
+  [ -n "$line" ] || { echo "no such entry" >&2; return 1; }
+  # cut, not read: IFS=tab would collapse empty columns.
+  layer=$(cut -f1 <<<"$line"); keys=$(cut -f2 <<<"$line"); title=$(cut -f3 <<<"$line")
+  action=$(cut -f4 <<<"$line"); details=$(cut -f6- <<<"$line")
+  printf '%b%s\033[0m  \033[2m[%s]\033[0m\n' "$(color "$layer")" "$title" "$layer"
+  printf '\033[1m%s\033[0m\n\n' "$keys"
+  if [ -n "$details" ]; then printf '%s\n\n' "$details" | sed 's/\\n/\
+/g'; fi
+  case $action in
+    sh:*)  printf 'Run in the shell:  \033[1m%s\033[0m\n' "${action#sh:}" ;;
+    ex:*)  printf 'In Vim:  \033[1m:%s\033[0m\n' "${action#ex:}" ;;
+  esac
+}
+
+# "N<TAB>display" lines for fzf.
+menu() {
+  rows "${1:-}" | awk -F'\t' '
+    function col(l) { return l=="topic"?"1;35":l=="shell"?"1;32":l=="tmux"?"1;33":l=="vim"?"1;34":l=="nvim"?"1;36":l=="claude"?"1;31":"1" }
+    { printf "%d\t\033[%sm%-6s\033[0m  \033[1m%-24s\033[0m  %s\n", NR, col($1), $1, $2, $3 }'
+}
+
+# NB: numbering is per layer filter, so previews must see the same filter.
+
+pick() { # pick QUERY...  -> prints the chosen row number
+  local query=$*
+  menu "$layer_filter" | fzf --ansi --delimiter '\t' --with-nth 2 --nth 1.. \
+    --height "${ES_HELP_HEIGHT:-100%}" --layout=reverse --border=rounded \
+    --prompt 'help> ' --query "$query" \
+    --preview "ES_HELP_LAYER='$layer_filter' '$SELF' --card {1}" \
+    --preview-window 'right,55%,wrap' \
+    --header 'Enter: details   Esc: close   type to filter (keys, commands, questions)' |
+    cut -f1 | head -n1
+}
+
+validate() {
+  local bad=0 n=0 line layer action
+  while IFS= read -r line; do
+    case $line in '#'*|'') continue ;; esac
+    n=$((n + 1))
+    if [ "$(awk -F'\t' '{print NF}' <<<"$line")" -ne 6 ]; then
+      echo "row $n: expected 6 tab-separated columns: ${line:0:60}" >&2; bad=1; continue
+    fi
+    layer=$(cut -f1 <<<"$line"); action=$(cut -f4 <<<"$line")
+    case " $LAYERS " in *" $layer "*) ;; *) echo "row $n: unknown layer '$layer'" >&2; bad=1 ;; esac
+    case $action in ''|sh:*|ex:*) ;; *) echo "row $n: bad action '$action'" >&2; bad=1 ;; esac
+    if [ -z "$(cut -f2 <<<"$line")" ] || [ -z "$(cut -f3 <<<"$line")" ]; then
+      echo "row $n: empty keys/title" >&2; bad=1
+    fi
+  done < "$DATA"
+  [ "$bad" -eq 0 ] && echo "help.tsv ok ($n entries)"
+  return "$bad"
+}
+
+mode=palette
+while [ $# -gt 0 ]; do
+  case $1 in
+    --layer) layer_filter=$2; shift 2 ;;
+    --list|--tsv|--pick|--card|--validate) mode=${1#--}; shift; [ "$mode" = card ] && { n=$1; shift; } ;;
+    -h|--help) sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) break ;;
+  esac
+done
+# --list / --tsv take an optional layer as their argument.
+if { [ "$mode" = list ] || [ "$mode" = tsv ]; } && [ $# -gt 0 ]; then layer_filter=$1; shift; fi
+[ -n "${ES_HELP_LAYER:-}" ] && layer_filter=$ES_HELP_LAYER
+
+case $mode in
+  validate) validate ;;
+  tsv)      rows "$layer_filter" ;;
+  card)     card "$n" ;;
+  list)     rows "$layer_filter" | awk -F'\t' '{ printf "%-6s  %-26s  %s\n", $1, $2, $3 }' ;;
+  pick)     command -v fzf >/dev/null 2>&1 || exit 1
+            n=$(pick "$*") || exit 0
+            [ -n "$n" ] || exit 0
+            card "$n" >&2
+            line=$(rows "$layer_filter" | sed -n "${n}p")
+            printf '%s\t%s\t%s\n' "$(cut -f4 <<<"$line")" "$(cut -f2 <<<"$line")" "$(cut -f3 <<<"$line")" ;;
+  palette)
+    if ! command -v fzf >/dev/null 2>&1; then
+      echo "(install fzf for the interactive palette: make deps)" >&2
+      if [ -t 1 ]; then "$SELF" --list "$layer_filter" | ${PAGER:-less -R}; else "$SELF" --list "$layer_filter"; fi
+      exit 0
+    fi
+    n=$(pick "$*") || exit 0
+    [ -n "$n" ] || exit 0
+    ES_HELP_LAYER=$layer_filter "$SELF" --card "$n" |
+      if [ -n "${ES_HELP_PAGER:-}" ]; then less -R; else cat; fi ;;
+esac
