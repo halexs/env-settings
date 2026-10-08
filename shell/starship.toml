@@ -1,0 +1,78 @@
+# Starship prompt. Uses only plain Unicode, so no Nerd Font is required.
+# Docs: https://starship.rs/config/
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = true
+command_timeout = 800
+
+format = """
+$username$hostname$directory$git_branch$git_status$python$nodejs$rust$golang$docker_context$cmd_duration
+$character"""
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+vimcmd_symbol = "[❮](bold blue)"
+
+[directory]
+style = "bold blue"
+truncation_length = 4
+truncate_to_repo = true
+read_only = " ro"
+
+[username]
+format = "[$user]($style)@"
+style_user = "dimmed white"
+style_root = "bold red"
+
+[hostname]
+ssh_only = true
+format = "[$hostname]($style) "
+style = "dimmed white"
+
+[git_branch]
+symbol = "⎇ "
+format = "[$symbol$branch]($style) "
+style = "bold purple"
+
+[git_status]
+format = '([$all_status$ahead_behind]($style) )'
+style = "bold yellow"
+conflicted = "="
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+untracked = "?"
+stashed = "$"
+modified = "!"
+staged = "+"
+renamed = "»"
+deleted = "✘"
+
+[cmd_duration]
+min_time = 2000
+format = "[took $duration]($style) "
+style = "yellow"
+
+[python]
+symbol = "py "
+format = '[${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
+style = "yellow"
+
+[nodejs]
+symbol = "node "
+format = "[$symbol($version )]($style)"
+style = "green"
+
+[rust]
+symbol = "rs "
+format = "[$symbol($version )]($style)"
+
+[golang]
+symbol = "go "
+format = "[$symbol($version )]($style)"
+
+[docker_context]
+symbol = "docker "
+format = "[$symbol$context]($style) "
+only_with_files = true

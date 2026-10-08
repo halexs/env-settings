@@ -1,2 +1,5 @@
 *.swp
+*.env-settings.bak
+.DS_Store
 DS_*
+tags
