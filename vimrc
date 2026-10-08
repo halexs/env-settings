@@ -63,9 +63,15 @@ if s:use_plug
   Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
   Plug 'junegunn/fzf.vim'
 
-  " Git
+  " Git: change signs, fugitive, GitLens-style inline blame, commit popup per line
   Plug 'airblade/vim-gitgutter'
   Plug 'tpope/vim-fugitive'
+  Plug 'APZelos/blamer.nvim'
+  Plug 'rhysd/git-messenger.vim'
+
+  " VS Code-like chrome: buffer tab bar on top, start screen
+  Plug 'mengelbrecht/lightline-bufferline'
+  Plug 'mhinz/vim-startify'
 
   " Editing
   Plug 'tpope/vim-commentary'
@@ -86,6 +92,8 @@ if s:use_plug
     Plug 'folke/which-key.nvim'
     Plug 'folke/snacks.nvim'
     Plug 'coder/claudecode.nvim'
+    Plug 'MeanderingProgrammer/render-markdown.nvim'
+    Plug 'lukas-reineke/indent-blankline.nvim'
   endif
 
   call plug#end()
@@ -218,6 +226,7 @@ endif
 augroup EnvColors
   autocmd!
   autocmd ColorScheme * highlight clear SignColumn
+  autocmd ColorScheme * highlight! link Blamer Comment
 augroup END
 
 if s:has('catppuccin') && &t_Co >= 256 && (&termguicolors || has('gui_running'))
@@ -234,6 +243,9 @@ let g:lightline = {
       \   'right': [['lineinfo'], ['percent'], ['filetype', 'fileencoding']],
       \ },
       \ 'component_function': { 'branch': 'EnvBranch' },
+      \ 'tabline': { 'left': [['buffers']], 'right': [['close']] },
+      \ 'component_expand': { 'buffers': 'lightline#bufferline#buffers' },
+      \ 'component_type': { 'buffers': 'tabsel' },
       \ 'separator': { 'left': '', 'right': '' },
       \ 'subseparator': { 'left': '│', 'right': '│' },
       \ }
@@ -247,8 +259,16 @@ function! EnvBranch() abort
   return empty(l:b) ? '' : '⎇ ' . l:b
 endfunction
 
+" Buffer "tabs" along the top (<Space>1..9 jumps to one), like VS Code editor tabs.
+let g:lightline#bufferline#show_number = 2
+let g:lightline#bufferline#number_separator = ' '
+let g:lightline#bufferline#modified = ' ●'
+let g:lightline#bufferline#unnamed = '[No Name]'
+let g:lightline#bufferline#shorten_path = 1
+
 if s:has('lightline.vim')
   set noshowmode
+  if s:has('lightline-bufferline') | set showtabline=2 | endif
 else
   set statusline=\ %f\ %m%r%w%=%y\ \ %l:%c\ \ %p%%\
 endif
@@ -274,6 +294,40 @@ let g:fzf_preview_window = ['right,50%', 'ctrl-/']
 if has('popupwin') || has('nvim')
   let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.8, 'border': 'rounded' } }
 endif
+
+" Inline git blame at the end of the cursor line (like GitLens / VS Code):
+"   Alice, 3 days ago • fix login redirect      (<Space>gB toggles it)
+let g:blamer_enabled = 1
+let g:blamer_delay = 300
+let g:blamer_prefix = '   '
+let g:blamer_relative_time = 1
+let g:blamer_template = '<author>, <author-time> • <summary>'
+let g:blamer_show_in_insert_modes = 0
+let g:blamer_show_in_visual_modes = 0
+
+" git-messenger: <Space>gm pops up the full commit behind the current line.
+let g:git_messenger_no_default_mappings = 1
+let g:git_messenger_include_diff = 'current'
+let g:git_messenger_always_into_popup = 1
+
+" Start screen: recent files in this directory, then everywhere.
+let g:startify_change_to_vcs_root = 1
+let g:startify_files_number = 8
+let g:startify_custom_header = [
+      \ '   env-settings',
+      \ '   <Space><Space> files   <Space>0 menu   :Cheatsheet   :Guide (workflow docs)',
+      \ '',
+      \ ]
+let g:startify_lists = [
+      \ { 'type': 'dir',       'header': ['   Recent in ' . getcwd()] },
+      \ { 'type': 'files',     'header': ['   Recent'] },
+      \ { 'type': 'commands',  'header': ['   Commands'] },
+      \ ]
+let g:startify_commands = [
+      \ { 'f': ['Find file (fzf)', 'Files'] },
+      \ { 'g': ['Search text (ripgrep)', 'Rg'] },
+      \ { 'm': ['Menu', 'Menu'] },
+      \ ]
 
 " ALE: lint on save and when text stops changing; fix with :ALEFix.
 let g:ale_sign_error = '✘'
@@ -305,17 +359,19 @@ xnoremap <Space> <Nop>
 " --- files, buffers, search ---
 nnoremap <silent> <C-t> :NERDTreeToggle<CR>
 nnoremap <silent> <leader>n :NERDTreeFind<CR>
-nnoremap <silent> <leader>a :call <SID>Files()<CR>
+" A mapping that is a prefix of another one makes Vim wait 'timeoutlen' before
+" firing it, so solo mappings avoid prefixes used elsewhere (a*, f*, d*, c*, r*, b*).
+nnoremap <silent> <leader><Space> :call <SID>Files()<CR>
 nnoremap <silent> <leader>ff :Files<CR>
 nnoremap <silent> <leader>fg :Rg<CR>
 nnoremap <silent> <leader>fl :BLines<CR>
 nnoremap <silent> <leader>fh :History<CR>
 nnoremap <silent> <leader>fc :Commits<CR>
 nnoremap <silent> <leader>fb :BCommits<CR>
-nnoremap <silent> <leader>b :call <SID>Buffers()<CR>
+nnoremap <silent> <leader>bb :call <SID>Buffers()<CR>
 nnoremap <silent> <leader>o :call <SID>Buffers()<CR>
 nnoremap <leader>s :Grep<Space>
-nnoremap <silent> <leader>c :nohlsearch<CR>
+nnoremap <silent> <Esc><Esc> :nohlsearch<CR>
 nnoremap <silent> <leader>e :edit<CR>
 
 " Buffers: Tab / Shift-Tab / Q, plus unimpaired-style [b ]b.
@@ -324,14 +380,30 @@ nnoremap <silent> Q :bprevious<CR>
 nnoremap <silent> <S-Tab> :edit #<CR>
 nnoremap <silent> ]b :bnext<CR>
 nnoremap <silent> [b :bprevious<CR>
-nnoremap <silent> <leader>d :bdelete<CR>
+nnoremap <silent> <leader>bd :bdelete<CR>
+
+" Buffer tabs along the top: <Space>1..9 jump to the Nth one (lightline-bufferline).
+if s:has('lightline-bufferline')
+  for s:i in range(1, 9)
+    execute 'nmap <silent> <leader>' . s:i . ' <Plug>lightline#bufferline#go(' . s:i . ')'
+  endfor
+  unlet s:i
+endif
+
+" Vim tab pages are whole window layouts, not files; use them for a second
+" workspace. For "one tab per file" use buffers (above).
+nnoremap <silent> <leader>tn :tabnew<CR>
+nnoremap <silent> <leader>tc :tabclose<CR>
+nnoremap <silent> <leader>to :tabonly<CR>
+nnoremap <silent> ]t :tabnext<CR>
+nnoremap <silent> [t :tabprevious<CR>
 
 " Windows
 nnoremap <silent> <C-h> :wincmd h<CR>
 nnoremap <silent> <C-j> :wincmd j<CR>
 nnoremap <silent> <C-k> :wincmd k<CR>
 nnoremap <silent> <C-l> :wincmd l<CR>
-nnoremap <silent> <leader>f :ZoomToggle<CR>
+nnoremap <silent> <leader>z :ZoomToggle<CR>
 nnoremap <silent> <leader>ws :call <SID>MarkWindowSwap()<CR>
 nnoremap <silent> <leader>wt :call <SID>DoWindowSwap()<CR><C-w>h
 
@@ -339,7 +411,7 @@ nnoremap <silent> <leader>wt :call <SID>DoWindowSwap()<CR><C-w>h
 nnoremap <silent> <C-s> :update<CR>
 inoremap <silent> <C-s> <Esc>:update<CR>a
 nnoremap <silent> <leader>q :qa<CR>
-nnoremap <silent> <leader>r :ReloadVimrc<CR>
+nnoremap <silent> <leader>R :ReloadVimrc<CR>
 
 " Scrolling: 3 lines with <C-e>/<C-y>, 10 with <C-n>/<C-p>.
 nnoremap <C-e> 3<C-e>
@@ -388,10 +460,16 @@ xmap <leader>. gc
 nnoremap <silent> <leader>gs :Git<CR>
 nnoremap <silent> <leader>gb :Git blame<CR>
 nnoremap <silent> <leader>gd :Gdiffsplit<CR>
+nnoremap <silent> <leader>gB :BlamerToggle<CR>
+nmap <silent> <leader>gm <Plug>(git-messenger)
+nnoremap <silent> <leader>gl :Git log --oneline --follow -- %<CR>
+nnoremap <silent> <leader>gL :call <SID>LineHistory()<CR>
 
 " Misc
 nnoremap <silent> <leader>u :UndotreeToggle<CR>
 nnoremap <silent> <leader>0 :Menu<CR>
+nnoremap <silent> <leader>? :Guide<CR>
+nnoremap <silent> <leader>mp :Md<CR>
 
 " ALE (only when installed)
 if s:has('ale') && !s:nvim_ide
@@ -578,6 +656,44 @@ function! s:PrettyJson() abort
   endif
 endfunction
 
+" History of just the current line (git log -L), shown by fugitive.
+function! s:LineHistory() abort
+  if empty(expand('%'))
+    return
+  endif
+  execute 'Git log -L' . line('.') . ',' . line('.') . ':' . fnameescape(expand('%'))
+endfunction
+
+" :Md [file] -> render markdown in the terminal with glow (scripts/md falls back
+" to bat/less when glow is missing). Defaults to the current markdown buffer,
+" else README.md. q closes it. Neovim also renders inline: <Space>mr toggles.
+function! s:Md(file) abort
+  let l:file = a:file
+  if empty(l:file)
+    let l:file = &filetype ==# 'markdown' ? expand('%:p') : (filereadable('README.md') ? 'README.md' : '')
+  endif
+  if empty(l:file)
+    echohl ErrorMsg | echo 'Md: no file given and no README.md here' | echohl None
+    return
+  endif
+  let l:cmd = [s:root . '/scripts/md', l:file]
+  if has('nvim')
+    tabnew
+    let l:buf = bufnr('%')
+    let l:opts = { 'on_exit': {-> execute('silent! bdelete! ' . l:buf)} }
+    if has('nvim-0.11')
+      call jobstart(l:cmd, extend(l:opts, { 'term': v:true }))
+    else
+      call termopen(l:cmd, l:opts)
+    endif
+    startinsert
+  else
+    execute 'tab terminal ++close' join(map(copy(l:cmd), 'shellescape(v:val)'), ' ')
+  endif
+endfunction
+command! -nargs=? -complete=file Md call s:Md(<q-args>)
+command! Guide call s:Md(s:root . '/docs/WORKFLOW.md')
+
 " Claude Code in a terminal split. Neovim with claudecode.nvim gets the full
 " IDE integration (:ClaudeCode, see nvim/ide.lua); this is the plain Vim fallback.
 function! s:Claude(args) abort
@@ -625,6 +741,12 @@ let s:menu = [
       \ ['Git: blame',                             'Git blame'],
       \ ['Git: merge tool',                        'Git mergetool'],
       \ ['Claude Code',                           s:nvim_ide ? 'ClaudeCode' : 'Claude'],
+      \ ['Git: toggle inline blame',               'BlamerToggle'],
+      \ ['Git: commit behind this line (popup)',   'GitMessenger'],
+      \ ['Git: history of this line',              'call s:LineHistory()'],
+      \ ['Git: history of this file',              'Git log --oneline --follow -- %'],
+      \ ['Markdown: render in terminal (glow)',    'Md'],
+      \ ['Open the workflow guide',                'Guide'],
       \ ['Undo tree',                              'UndotreeToggle'],
       \ ['Show cheat sheet',                       'Cheatsheet'],
       \ ['Reload vimrc',                           'ReloadVimrc'],
@@ -668,12 +790,14 @@ function! s:Cheatsheet() abort
         \ '',
         \ 'Leader = <Space>',
         \ '',
-        \ 'Find       <leader>a files (git aware)   <leader>ff all files    <leader>fg ripgrep',
+        \ 'Find       <leader><Space> files (git aware)   <leader>ff all files   <leader>fg ripgrep',
         \ '           <leader>fl lines in buffer    <leader>fh history      <leader>s  :Grep (quickfix)',
-        \ 'Buffers    <Tab> next   Q previous   <S-Tab> last   <leader>b list   <leader>d delete',
-        \ 'Windows    <C-h/j/k/l> move   <leader>f zoom   <leader>ws then <leader>wt swap',
+        \ 'Buffers    (the tab bar on top) <Tab> next   Q previous   <S-Tab> last   <leader>1..9 jump',
+        \ '           <leader>bb list   <leader>bd close   Vim tab pages: <leader>tn new  tc close  ]t [t',
+        \ 'Windows    <C-h/j/k/l> move   <leader>z zoom   <leader>ws then <leader>wt swap',
         \ 'Tree       <C-t> toggle   <leader>n reveal current file',
-        \ 'Git        <leader>gs status   gb blame   gd diff   [c ]c hunks   <leader>hp preview hunk',
+        \ 'Git        <leader>gs status  gb blame window  gd diff  gB toggle inline blame  gm commit popup',
+        \ '           <leader>gl file history  gL line history  [c ]c hunks  <leader>hp preview hunk',
         \ 'Code       gd definition   gr references   K hover   [e ]e next/prev problem',
         \ '           <leader>x fix   <leader>rn rename   <C-Space> complete',
         \ 'Edit       <leader>/ toggle comment   gc{motion}   cs"'' change surround   ys{motion}" add',
@@ -681,9 +805,10 @@ function! s:Cheatsheet() abort
         \ 'Tags       <leader>] open tag in vertical split   <C-]> jump   <C-t> is NERDTree here',
         \ 'Claude     <leader>ac toggle   af focus   ar resume   aC continue   ab add file',
         \ '           (visual) <leader>as send selection   <leader>aa / ad accept / deny diff',
-        \ 'Other      <leader>u undo tree   <leader>0 menu   <leader>r reload vimrc   <leader>c clear search',
+        \ 'Docs       <leader>? workflow guide   <leader>mp render markdown   <leader>mr inline render (nvim)',
+        \ 'Other      <leader>u undo tree   <leader>0 menu   <leader>R reload vimrc   <Esc><Esc> clear search',
         \ '',
-        \ 'Commands   :Grep  :Redir {cmd}  :Template {name}  :TrimWhitespace  :Notes  :Menu',
+        \ 'Commands   :Grep  :Redir {cmd}  :Template {name}  :TrimWhitespace  :Notes  :Menu  :Md  :Guide',
         \ ])
   setlocal nomodifiable
   nnoremap <buffer> q :close<CR>

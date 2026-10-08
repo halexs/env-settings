@@ -54,3 +54,8 @@ alias re-ctag='ctags -R --exclude=.git --exclude=build --exclude=node_modules .'
 alias cc='claude'
 alias ccc='claude --continue'
 alias ccr='claude --resume'
+
+# --- docs -------------------------------------------------------------------
+alias mdf='md -f'                                         # pick a markdown file with fzf
+alias guide='md "$ENVSETTINGS/docs/WORKFLOW.md"'          # how to use this setup
+alias tl='tmux list-sessions'

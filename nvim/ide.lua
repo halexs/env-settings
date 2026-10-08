@@ -107,6 +107,14 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 -- ---------------------------------------------------------------------------
+-- Markdown rendered in the buffer (headings, tables, code blocks, checkboxes),
+-- and faint indent guides. <Space>mr toggles the rendering.
+-- ---------------------------------------------------------------------------
+setup("render-markdown", { code = { sign = false }, heading = { sign = false } })
+setup("ibl", { indent = { char = "│" }, scope = { enabled = false } })
+map("n", "<leader>mr", "<cmd>RenderMarkdown toggle<cr>", "Markdown: toggle inline rendering")
+
+-- ---------------------------------------------------------------------------
 -- Discoverability: press <Space> and wait to see what is available.
 -- ---------------------------------------------------------------------------
 if setup("which-key", { delay = 400 }) then
@@ -114,6 +122,9 @@ if setup("which-key", { delay = 400 }) then
   if ok then
     wk.add({
       { "<leader>a", group = "Claude / AI" },
+      { "<leader>b", group = "buffers" },
+      { "<leader>m", group = "markdown" },
+      { "<leader>t", group = "tabs" },
       { "<leader>f", group = "find" },
       { "<leader>g", group = "git" },
       { "<leader>w", group = "windows" },

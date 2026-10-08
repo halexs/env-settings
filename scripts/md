@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Read markdown in the terminal, rendered (headings, tables, code, links).
+#
+#   md                 render README.md in the current directory
+#   md FILE...         render the given file(s)
+#   md -f              pick a markdown file under here with fzf (live preview)
+#
+# Uses glow if installed, then mdcat, then bat, then less. Inside the pager:
+# j/k scroll, / search, q quit.
+set -euo pipefail
+
+have() { command -v "$1" >/dev/null 2>&1; }
+
+render() { # render FILE [pager]
+  local file=$1 pager=${2:-yes}
+  if have glow; then
+    if [ "$pager" = yes ]; then glow -p -w 100 "$file"; else glow -w 80 "$file"; fi
+  elif have mdcat; then
+    if [ "$pager" = yes ]; then mdcat --paginate "$file"; else mdcat "$file"; fi
+  elif have bat; then
+    bat --language=markdown --style=plain,numbers --paging=always "$file"
+  else
+    "${PAGER:-less}" "$file"
+  fi
+}
+
+if [ "${1:-}" = "-f" ] || [ "${1:-}" = "--pick" ]; then
+  have fzf || { echo "md -f needs fzf" >&2; exit 1; }
+  if have fd; then list=(fd --type f --extension md --exclude node_modules); else list=(find . -name '*.md' -not -path '*/node_modules/*' -not -path '*/.git/*'); fi
+  preview="$0 --preview {}"
+  file=$("${list[@]}" | fzf --height 80% --reverse --preview "$preview" --preview-window right:60%) || exit 0
+  render "$file"
+  exit 0
+fi
+
+if [ "${1:-}" = "--preview" ]; then
+  render "$2" no 2>/dev/null || cat "$2"
+  exit 0
+fi
+
+if [ "$#" -eq 0 ]; then
+  if [ -f README.md ]; then set -- README.md
+  else echo "usage: md [-f] [FILE...]   (no README.md in $PWD)" >&2; exit 1; fi
+fi
+
+for f in "$@"; do render "$f"; done
